@@ -19,7 +19,8 @@ import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mai
 import { toast } from 'react-hot-toast';
 
 interface Contact {
-  id: string; // Changed to string to match backend API
+  id: string; // connection id from backend API
+  userId?: string; // actual user id of the other party (for messaging)
   name: string;
   title: string;
   company: string;
@@ -77,6 +78,18 @@ export default function DashboardContactPage() {
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [approveModal, setApproveModal] = useState<{isOpen: boolean, request: Contact | null}>({isOpen: false, request: null});
   const filterRef = useRef<HTMLDivElement>(null);
+  const [hasUnreadRequests, setHasUnreadRequests] = useState(false);
+
+  useEffect(() => {
+    setHasUnreadRequests(connectionRequests.length > 0 && activeTab !== 'requests');
+  }, [connectionRequests, activeTab]);
+
+  const handleTabClick = (tab: 'connections' | 'requests') => {
+    setActiveTab(tab);
+    if (tab === 'requests') {
+      setHasUnreadRequests(false);
+    }
+  };
 
   // Handle direct message - open message modal
   const handleDirectMessage = (contact: Contact) => {
@@ -90,21 +103,43 @@ export default function DashboardContactPage() {
     setMessageText('');
   };
 
-  // Send message without navigating to inbox
-  const handleSendMessage = () => {
+  // Send message to backend so it appears in recipient's inbox
+  const handleSendMessage = async () => {
     if (!messageText.trim() || !messageModal.contact) return;
-    
-    // Store the conversation data for inbox page
-    const conversationData = {
-      contact: messageModal.contact,
-      initialMessage: messageText,
-      timestamp: new Date().toISOString()
-    };
-    
-    sessionStorage.setItem('newConversation', JSON.stringify(conversationData));
-    
-    // Close modal
-    handleCloseMessageModal();
+
+    const receiverId = messageModal.contact.userId;
+    if (!receiverId) {
+      toast.error('Cannot send message: missing receiver id');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/message/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          message: messageText.trim(),
+          receiverId,
+          status: 'PENDING',
+          tag: 'SUPPORT',
+          read: false,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || 'Failed to send message');
+      }
+
+      toast.success('Message sent');
+      handleCloseMessageModal();
+    } catch (e: any) {
+      console.error('Send message error:', e);
+      toast.error(e?.message || 'Failed to send message');
+    }
   };
 
   // Close dropdown when clicking outside
@@ -150,6 +185,7 @@ export default function DashboardContactPage() {
         // Map backend data to frontend Contact structure
         const mappedConnections: Contact[] = (data.requests || []).map((connection: any) => ({
           id: connection.id,
+          userId: connection.user?.id,
           name: connection.user?.fullName || 'Unknown User',
           title: connection.user?.title || 'No Title',
           company: connection.user?.company || 'No Company',
@@ -684,16 +720,18 @@ export default function DashboardContactPage() {
         <div className={styles.tabsContainer}>
           <div className={styles.tabs}>
             <button 
-              onClick={() => setActiveTab('connections')}
+              onClick={() => handleTabClick('connections')}
               className={`${styles.tabButton} ${activeTab === 'connections' ? styles.tabButtonActive : ''}`}
             >
               Connections
             </button>
             <button 
-              onClick={() => setActiveTab('requests')}
+              onClick={() => handleTabClick('requests')}
               className={`${styles.tabButton} ${activeTab === 'requests' ? styles.tabButtonActive : ''}`}
+              style={{ position: 'relative' }}
             >
               Requests
+              {hasUnreadRequests && <span className={styles.notificationDot}></span>}
             </button>
           </div>
           {activeTab === 'connections' ? (
@@ -1113,7 +1151,7 @@ export default function DashboardContactPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <p className={styles.modalBody}>
-                Approving will allow this person to connect with you and see your shared profile information.
+              Approving will allow this person to connect with you and see your card information, including your phone number, email, job title, and other shared details.
               </p>
               <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                 <button onClick={closeApproveModal} className={styles.modalCancelButton} style={{ flex: 1 }}>

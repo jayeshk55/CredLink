@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 // ====================================================================
 // START: DigitalCardPreview Component (Modified to accept theme)
@@ -35,7 +36,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   about = "Crafting engaging content & SEO strategies",
   skills = "SEO, Content Creation, Analytics, Social Media",
   portfolio = "[Link] Latest Campaigns",
-  experience = "Lead SEO Specialist @ TechCorp (2021-Present)",
+  experience = "Lead SEO Specialist (2021-Present)",
   services = "SEO Audits, Slogan Content Campaigns", // Added
   review = "John transformed our online presence!, Happy Client", // Added
   photo = "",
@@ -392,7 +393,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             border: "1px solid rgba(255, 255, 255, 0.4)"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
           </a>
           <a href={linkedin} style={{
@@ -610,7 +611,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
             display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 2 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ marginRight: 2 }}>
               <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
             Call
@@ -826,7 +827,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 6 }}>
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 013.08 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 013.08 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
               </svg>
             </a>
             <a href={linkedin} style={{
@@ -920,6 +921,7 @@ interface ExtraField {
 }
 
 const EditPage = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Display');
   const [selectedColor1, setSelectedColor1] = useState('');
   const [selectedColor2, setSelectedColor2] = useState(''); 
@@ -1561,9 +1563,7 @@ const EditPage = () => {
             </div>
             
             <div style={{ marginBottom: '30px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Cover Image
-              </h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>Cover Image</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
                 <input
                   type="file"
@@ -1925,104 +1925,7 @@ const EditPage = () => {
               </div>
             ))}
 
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Card Type</label>
-              <select
-                value={cardType}
-                onChange={(e) => setCardType(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '14px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  boxSizing: 'border-box',
-                  backgroundColor: 'white',
-                  color: '#555',
-                  outline: 'none'
-                }}
-              >
-                <option value="">Select card type...</option>
-                {getAllCardTypes().map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              
-              {/* Custom Type Input */}
-              {!showCustomTypeInput ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustomTypeInput(true)}
-                  style={{
-                    marginTop: '8px',
-                    padding: '6px 12px',
-                    fontSize: '12px',
-                    color: selectedColor1 || '#2563eb',
-                    background: 'transparent',
-                    border: `1px solid ${selectedColor1 || '#2563eb'}`,
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                >
-                  + Add custom type
-                </button>
-              ) : (
-                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <input
-                    type="text"
-                    value={customTypeInput}
-                    onChange={(e) => setCustomTypeInput(e.target.value)}
-                    placeholder="Enter custom type..."
-                    style={{
-                      flex: 1,
-                      padding: '6px 8px',
-                      fontSize: '12px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      outline: 'none'
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCustomType}
-                    style={{
-                      padding: '6px 12px',
-                      fontSize: '12px',
-                      color: 'white',
-                      background: selectedColor1 || '#2563eb',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      outline: 'none'
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowCustomTypeInput(false);
-                      setCustomTypeInput('');
-                    }}
-                    style={{
-                      padding: '6px 12px',
-                      fontSize: '12px',
-                      color: '#666',
-                      background: 'transparent',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      outline: 'none'
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
+            
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>About / Description</label>
@@ -2409,7 +2312,7 @@ const EditPage = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </span>
                     <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.72"></path></svg>
                       {field.name}
                     </span>
                     <span onClick={() => handleDeleteField(field.id)} style={{ cursor: 'pointer', color: '#888' }}>
@@ -2501,8 +2404,105 @@ const EditPage = () => {
                 }}
               />
             </div>
+                <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Card Type</label>
+              <select
+                value={cardType}
+                onChange={(e) => setCardType(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  boxSizing: 'border-box',
+                  outline: 'none'
+                }}
+              >
+                <option value="">Select card type...</option>
+                {getAllCardTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              
+              {/* Custom Type Input */}
+              {!showCustomTypeInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomTypeInput(true)}
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    color: selectedColor1 || '#2563eb',
+                    background: 'transparent',
+                    border: `1px solid ${selectedColor1 || '#2563eb'}`,
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  + Add custom type
+                </button>
+              ) : (
+                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={customTypeInput}
+                    onChange={(e) => setCustomTypeInput(e.target.value)}
+                    placeholder="Enter custom type..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      fontSize: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomType}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: 'white',
+                      background: selectedColor1 || '#2563eb',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomTypeInput(false);
+                      setCustomTypeInput('');
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#666',
+                      background: 'transparent',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
 
-            <div style={{ marginBottom: '15px' }}>
+            
+            {/* <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Card Type</label>
               <select
                 value={cardType}
@@ -2523,7 +2523,7 @@ const EditPage = () => {
                 <option value="Professional">Professional</option>
                 <option value="Business">Business</option>
               </select>
-            </div>
+            </div> */}
           </div>
         );
       default:
@@ -2637,7 +2637,10 @@ const EditPage = () => {
           {renderContent()}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-            <button style={{
+            <button 
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              style={{
               backgroundColor: 'transparent',
               border: '1px solid #ddd',
               borderRadius: '8px',

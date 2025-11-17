@@ -21,9 +21,11 @@ export default function Home() {
   // The header will show "Dashboard" button if authenticated
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <Homepage />
+      <main className="flex-1">
+        <Homepage />
+      </main>
       <Footer />
     </div>
   )

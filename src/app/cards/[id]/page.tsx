@@ -210,37 +210,187 @@ const handleDelete = async () => {
   };
 
   const downloadQR = () => {
-    const svg = document.querySelector("svg");
+    // Generate QR code for download regardless of current tab
+    // First, try to find existing QR in QR wrapper
+    let qrWrapper = document.querySelector(`.${styles.qrWrapper}`);
+    let svg = qrWrapper?.querySelector("svg");
+    
+    // If we're in Direct Link tab and no QR is visible, temporarily create one
+    if (!svg && shareMethod === "link") {
+      // Create a temporary hidden QR code
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '-9999px';
+      document.body.appendChild(tempDiv);
+      
+      // Import QRCode component dynamically and render
+      import('react-qr-code').then((QRCodeModule) => {
+        const QRCode = QRCodeModule.default;
+        const React = require('react');
+        const ReactDOM = require('react-dom/client');
+        
+        const root = ReactDOM.createRoot(tempDiv);
+        root.render(React.createElement(QRCode, { value: mockUserData.cardUrl, size: 180 }));
+        
+        // Wait a moment for render, then proceed with download
+        setTimeout(() => {
+          const tempSvg = tempDiv.querySelector('svg');
+          if (tempSvg) {
+            processQRDownload(tempSvg, () => {
+              document.body.removeChild(tempDiv);
+            });
+          }
+        }, 100);
+      });
+      return;
+    }
+    
     if (!svg) return;
+    processQRDownload(svg);
+  };
+  
+  const processQRDownload = (svg: Element, cleanup?: () => void) => {
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const img = new Image();
+    
     img.onload = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx?.drawImage(img, 0, 0);
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngFile;
-      downloadLink.download = "card_qr.png";
-      downloadLink.click();
+      
+      // Convert to blob for better file handling
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const downloadLink = document.createElement("a");
+          downloadLink.href = url;
+          downloadLink.download = `MyKard_QR_${cardId}.png`;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          URL.revokeObjectURL(url);
+        }
+        if (cleanup) cleanup();
+      }, "image/png");
     };
+    
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
+  // Mobile detection utility
+  const isMobile = () => {
+    if (typeof window === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
   const shareProfile = async () => {
+    const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nThis profile contains my contact information, social links, and business card.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
+    
     console.log('Navigator share available:', !!navigator.share);
-    if (navigator.share) {
-      await navigator.share({
-        title: "My Digital Card",
-        text: "Check out my digital business card!",
-        url: mockUserData.cardUrl,
-      });
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      copyToClipboard(mockUserData.cardUrl);
-      alert("Link copied to clipboard!");
+    console.log('Current share method:', shareMethod);
+    console.log('Is mobile device:', isMobile());
+    
+    const mobile = isMobile();
+    
+    // DIRECT LINK TAB - Always send message + link only (no QR)
+    if (shareMethod === "link") {
+      if (navigator.share && mobile) {
+        // Mobile: Use native share
+        await navigator.share({
+          title: "MyKard Profile",
+          text: shareMessage,
+          url: mockUserData.cardUrl,
+        });
+      } else {
+        // Desktop: Open WhatsApp Web
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+      return;
+    }
+    
+    // QR TAB - Different behavior for mobile vs desktop
+    if (shareMethod === "qr") {
+      if (navigator.share && mobile) {
+        // Mobile: 2-step share (QR first, then message + link)
+        try {
+          const qrWrapper = document.querySelector(`.${styles.qrWrapper}`);
+          const svg = qrWrapper?.querySelector("svg");
+          if (svg) {
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            
+            await new Promise((resolve) => {
+              img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx?.drawImage(img, 0, 0);
+                
+                canvas.toBlob(async (blob) => {
+                  if (blob) {
+                    const file = new File([blob], `MyKard_QR_${cardId}.png`, { type: 'image/png' });
+                    
+                    // Step 1: Share QR image only
+                    try {
+                      await navigator.share({
+                        files: [file]
+                      });
+                      
+                      // Step 2: After 300ms, share message + link
+                      setTimeout(async () => {
+                        try {
+                          await navigator.share({
+                            title: "MyKard Profile",
+                            text: shareMessage,
+                            url: mockUserData.cardUrl,
+                          });
+                        } catch (error) {
+                          console.log('Could not share message after QR:', error);
+                        }
+                      }, 300);
+                      
+                    } catch (error) {
+                      console.log('Could not share QR image, fallback to message only:', error);
+                      // Fallback: Share message + link only
+                      await navigator.share({
+                        title: "MyKard Profile",
+                        text: shareMessage,
+                        url: mockUserData.cardUrl,
+                      });
+                    }
+                  }
+                  resolve(null);
+                }, "image/png");
+              };
+              img.src = "data:image/svg+xml;base64," + btoa(svgData);
+            });
+          } else {
+            // No QR found, fallback to message + link only
+            await navigator.share({
+              title: "MyKard Profile",
+              text: shareMessage,
+              url: mockUserData.cardUrl,
+            });
+          }
+        } catch (error) {
+          console.log('QR share failed, fallback to message only:', error);
+          // Fallback: Share message + link only
+          await navigator.share({
+            title: "MyKard Profile",
+            text: shareMessage,
+            url: mockUserData.cardUrl,
+          });
+        }
+      } else {
+        // Desktop: WhatsApp Web cannot send images, send message + link only
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+        window.open(whatsappUrl, '_blank');
+      }
     }
   };
 
@@ -394,16 +544,31 @@ const handleDelete = async () => {
                 <div style={{ height: "16px" }}></div>
 
                 <div className={styles.actionButtons}>
-                  <button onClick={() => copyToClipboard(mockUserData.cardUrl)} className={styles.actionBtn}>
+                  <motion.button 
+                    onClick={() => copyToClipboard(mockUserData.cardUrl)} 
+                    className={styles.actionBtn}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.03 }}
+                  >
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copied ? "Copied!" : "Copy Link"}
-                  </button>
-                  <button onClick={downloadQR} className={styles.actionBtn}>
+                  </motion.button>
+                  <motion.button 
+                    onClick={downloadQR} 
+                    className={styles.actionBtn}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.03 }}
+                  >
                     <Download className="w-4 h-4" /> Download QR
-                  </button>
-                  <button onClick={shareProfile} className={styles.actionBtn}>
+                  </motion.button>
+                  <motion.button 
+                    onClick={shareProfile} 
+                    className={styles.actionBtn}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.03 }}
+                  >
                     <Share2 className="w-4 h-4" /> Share Profile
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
@@ -470,13 +635,13 @@ const handleDelete = async () => {
                 className={`${styles.tabContent} ${styles.settingsContent}`}
               >
                 {/* Card Configuration */}
-                <div className={styles.settingsCard}>
+                {/* <div className={styles.settingsCard}>
                   <h3 className={styles.settingsCardTitle}>
                     <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-primary-light)' }}></div> Card Configuration
-                  </h3>
+                  </h3> */}
                   
                   {/* Card Name */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Card Name</h4>
                       <p className={styles.settingsDescription}>Change the name of this card.</p>
@@ -488,10 +653,10 @@ const handleDelete = async () => {
                         className={styles.settingsInput}
                       />
                     </div>
-                  </div>
+                  </div> */}
                   
                   {/* QR Code Logo */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>QR Code Logo</h4>
                       <p className={styles.settingsDescription}>Change the logo inside the QR code.</p>
@@ -520,10 +685,10 @@ const handleDelete = async () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
                   
                   {/* Personalized Link */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Personalized Link</h4>
                       <p className={styles.settingsDescription}>Create your own link to further your brand.</p>
@@ -531,13 +696,13 @@ const handleDelete = async () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="https://MyKard.com/hi/XXXX"
+                        defaultValue="https://mykard.in/hi/XXXX"
                         className={styles.settingsInput}
                         readOnly
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Privacy & Visibility */}
                 <div className={`${styles.settingsCard} ${styles.privacyCard}`}>
@@ -567,13 +732,13 @@ const handleDelete = async () => {
                 </div>
 
                 {/* Advanced Settings */}
-                <div className={styles.settingsCard}>
-                  <h3 className={styles.settingsCardTitle}>
-                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings
-                  </h3>
+                {/* <div className={styles.settingsCard}> */}
+                  {/* <h3 className={styles.settingsCardTitle}> */}
+                    {/* <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings */}
+                  {/* </h3> */}
 
                   {/* Renew Link only */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Renew Link</h4>
                       <p className={styles.settingsDescription}>Renew the link to your card.</p>
@@ -584,7 +749,7 @@ const handleDelete = async () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
 
                 {/* Danger Zone */}

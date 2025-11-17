@@ -17,6 +17,13 @@ interface MessageItem {
   starred: boolean;
   tag: MessageTag;
   senderId: string;
+  // Full chronological thread for this conversation (incoming/outgoing)
+  thread?: Array<{
+    id?: string;
+    text: string;
+    date: string;
+    direction: 'in' | 'out';
+  }>;
   replies?: {
     text: string;
     date: string;
@@ -80,45 +87,62 @@ export default function MessagesPage() {
           FEEDBACK: 'Feedback',
         };
 
-        const mapped: MessageItem[] = inboxMessages.map((msg: any) => {
-          const sender = sendersMap[msg.senderId] || {};
-          return {
-            id: msg.id,
-            name: sender.fullName || "Unknown",
-            email: sender.email || "",
-            message: msg.text || msg.message || "",
-            date: msg.createdAt || msg.date || new Date().toISOString(),
-            status: statusMap[String(msg.status)] || "New",
-            read: typeof msg.read === 'boolean' ? msg.read : false,
-            starred: false,
-            tag: tagMap[String(msg.tag)] || null,
-            senderId: msg.senderId,
-            replies: [],
-          } as MessageItem;
+        // Build per-user conversation threads (incoming + outgoing)
+        const inboxBySender = new Map<string, any[]>();
+        (inboxMessages as any[]).forEach((m: any) => {
+          const arr = inboxBySender.get(m.senderId) || [];
+          arr.push(m);
+          inboxBySender.set(m.senderId, arr);
         });
 
-        // Build replies from messages the current user has sent
-        const repliesByReceiver = new Map<string, { text: string; date: string }[]>();
-        (sentMessages as any[]).forEach((msg: any) => {
-          if (!msg.receiverId) return;
-          const existing = repliesByReceiver.get(msg.receiverId) || [];
-          existing.push({
-            text: msg.text || msg.message || "",
-            date: msg.createdAt || msg.date || new Date().toISOString(),
-          });
-          repliesByReceiver.set(msg.receiverId, existing);
+        const sentByReceiver = new Map<string, any[]>();
+        (sentMessages as any[]).forEach((m: any) => {
+          if (!m.receiverId) return;
+          const arr = sentByReceiver.get(m.receiverId) || [];
+          arr.push(m);
+          sentByReceiver.set(m.receiverId, arr);
         });
 
-        // Group by senderId so the outer list shows one conversation per user
+        const allPartyIds = new Set<string>([
+          ...Array.from(inboxBySender.keys()),
+          ...Array.from(sentByReceiver.keys()),
+        ]);
+
         const groupedBySender = new Map<string, MessageItem>();
-        for (const msg of mapped) {
-          if (!msg.senderId) continue;
-          if (!groupedBySender.has(msg.senderId)) {
-            // messages are ordered from newest to oldest, so first one per sender is the latest
-            const replies = repliesByReceiver.get(msg.senderId) || [];
-            groupedBySender.set(msg.senderId, {
-              ...msg,
-              replies,
+        for (const partyId of allPartyIds) {
+          const sender = sendersMap[partyId] || {};
+
+          // Combine incoming and outgoing, then sort by date ASC so latest is at the bottom
+          const combined = [
+            ...((inboxBySender.get(partyId) || []).map((m: any) => ({
+              id: m.id,
+              text: m.text || m.message || '',
+              date: m.createdAt || m.date || new Date().toISOString(),
+              direction: 'in' as const,
+            }))),
+            ...((sentByReceiver.get(partyId) || []).map((m: any) => ({
+              id: m.id,
+              text: m.text || m.message || '',
+              date: m.createdAt || m.date || new Date().toISOString(),
+              direction: 'out' as const,
+            }))),
+          ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+          const latest = combined[combined.length - 1] || null;
+
+          if (latest) {
+            groupedBySender.set(partyId, {
+              id: latest.id,
+              name: sender.fullName || 'Unknown',
+              email: sender.email || '',
+              message: latest.text,
+              date: latest.date,
+              status: 'Read',
+              read: true,
+              starred: false,
+              tag: null,
+              senderId: partyId,
+              thread: combined,
             });
           }
         }
@@ -240,11 +264,12 @@ export default function MessagesPage() {
           ...m, 
           status: "Replied", 
           read: true,
-          replies: [
-            ...(m.replies || []),
+          thread: [
+            ...(m.thread || []),
             {
               text: replyText,
-              date: new Date().toISOString()
+              date: new Date().toISOString(),
+              direction: 'out',
             }
           ]
         } : m));
@@ -651,7 +676,7 @@ export default function MessagesPage() {
                       ref={conversationRef}
                       style={{
                         padding: isMobile ? 12 : 20,
-                        paddingBottom: isMobile ? 80 : 96,
+                        paddingBottom: isMobile ? 100 : 110,
                         overflowY: "auto",
                         flex: 1,
                         minHeight: 0,
@@ -665,49 +690,47 @@ export default function MessagesPage() {
                         <div style={{ flex: 1, height: 1, background: "#E0E0E0" }} />
                       </div>
 
-                      {/* Incoming message (sender) */}
-                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 16 }}>
-                        <div style={{
-                          width: 36, height: 36, borderRadius: "50%", background: "#0A66C2", color: "#fff",
-                          display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600
-                        }}>{getInitials(msg.name)}</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                            <span style={{ fontWeight: 700, color: "#000" }}>{msg.name}</span>
-                            <span style={{ fontSize: 12, color: "#666" }}>{formatDate(msg.date)}</span>
+                      {/* Full chronological thread (latest at bottom) */}
+                      {(msg.thread && msg.thread.length > 0 ? msg.thread : [
+                        { text: msg.message, date: msg.date, direction: 'in' as const }
+                      ]).map((item, idx) => {
+                        const isIncoming = item.direction === 'in';
+                        return (
+                          <div key={`${item.id || idx}`} style={{
+                            display: 'flex',
+                            gap: 12,
+                            alignItems: 'flex-start',
+                            marginBottom: 12,
+                            justifyContent: isIncoming ? 'flex-start' : 'flex-end',
+                          }}>
+                            {isIncoming && (
+                              <div style={{
+                                width: 36, height: 36, borderRadius: '50%', background: '#0A66C2', color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600
+                              }}>{getInitials(msg.name)}</div>
+                            )}
+                            <div style={{ maxWidth: '70%' }}>
+                              <div style={{ textAlign: isIncoming ? 'left' : 'right', fontSize: 12, color: '#666', marginBottom: 4 }}>
+                                {isIncoming ? `${msg.name} • ${formatDate(item.date)}` : `You • ${formatDate(item.date)}`}
+                              </div>
+                              <div style={{
+                                background: isIncoming ? '#F3F6F8' : '#E6F3FF',
+                                borderRadius: 8,
+                                padding: 12,
+                                color: '#000',
+                                lineHeight: 1.5,
+                                whiteSpace: 'pre-line',
+                              }}>{item.text}</div>
+                            </div>
+                            {!isIncoming && (
+                              <div style={{
+                                width: 28, height: 28, borderRadius: '50%', background: '#E0E0E0',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#555'
+                              }}>You</div>
+                            )}
                           </div>
-                          <div style={{
-                            marginTop: 6,
-                            background: "#F3F6F8",
-                            borderRadius: 8,
-                            padding: 12,
-                            color: "#000",
-                            lineHeight: 1.5,
-                            whiteSpace: "pre-line",
-                          }}>{msg.message}</div>
-                        </div>
-                      </div>
-
-                      {/* Replies (our messages) */}
-                      {(msg.replies || []).map((reply, idx) => (
-                        <div key={idx} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12, justifyContent: "flex-end" }}>
-                          <div style={{ maxWidth: "70%" }}>
-                            <div style={{ textAlign: "right", fontSize: 12, color: "#666", marginBottom: 4 }}>You • {formatDate(reply.date)}</div>
-                            <div style={{
-                              background: "#E6F3FF",
-                              borderRadius: 8,
-                              padding: 12,
-                              color: "#000",
-                              lineHeight: 1.5,
-                              whiteSpace: "pre-line",
-                            }}>{reply.text}</div>
-                          </div>
-                          <div style={{
-                            width: 28, height: 28, borderRadius: "50%", background: "#E0E0E0",
-                            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#555"
-                          }}>You</div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {/* Composer (sticky at bottom) */}
                       <div
@@ -716,19 +739,28 @@ export default function MessagesPage() {
                           bottom: 0,
                           borderTop: "3px solid #2A8C2F20",
                           paddingTop: 16,
-                          paddingBottom: 4,
+                          paddingBottom: `calc(8px + env(safe-area-inset-bottom))`,
                           backgroundColor: "#FFFFFF",
+                          zIndex: 10,
                         }}
                       >
                         <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
                           <textarea
                             value={replyText}
                             onChange={e => setReplyText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                if (replyText.trim()) {
+                                  sendReply();
+                                }
+                              }
+                            }}
                             placeholder="Write a message..."
                             className="w-full resize-none"
                             style={{
-                              minHeight: 60,
-                              maxHeight: 120,
+                              minHeight: 56,
+                              maxHeight: 140,
                               padding: 12,
                               border: "1px solid #E0E0E0",
                               borderRadius: 12,

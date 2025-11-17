@@ -46,7 +46,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   about = "Crafting engaging content & SEO strategies",
   skills = "SEO, Content Creation, Analytics, Social Media",
   portfolio = "[Link] Latest Campaigns",
-  experience = "Lead SEO Specialist @ TechCorp (2021-Present)",
+  experience = "Lead SEO Specialist (2021-Present)",
   photo = "",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
@@ -76,7 +76,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       {/* Header - Warm Orange/Red Gradient with cover */}
       <div
         style={{
-          background: "linear-gradient(180deg, #f59e0b 0%, #f97316 45%, #ef4444 100%)",
+          background: "linear-gradient(180deg, rgba(45, 111, 255, 1) 0%, #517cd7ff 45%, #00c0fd 100%)",
           padding: "22px",
           color: colors.white,
           position: "relative",
@@ -164,7 +164,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "8px 20px 16px", background: "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)", color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "8px 20px 16px", background: "linear-gradient(180deg, #00c0fd 0%, #00c0fd 100%)", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
@@ -513,32 +513,39 @@ const OnboardingPage: React.FC = () => {
           }}
         >
           <div style={{ maxWidth: '448px', textAlign: 'center', marginBottom: 0 }}>
-            <h1
-              style={{
-                fontSize: '36px',
-                fontWeight: '700',
-                color: '#1F2937',
-              }}
-            >
-              Welcome to{' '}
-              <span
-                style={{
-                  background: `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                MyKard
-              </span>
-            </h1>
-            <p
-              style={{
-                color: colors.textLight,
-                margin: '16px 0 32px',
-              }}
-            >
-              Build connections in your own unique way.
-            </p>
+  <h1
+  style={{
+    fontSize: "40px",
+    fontWeight: "700",
+    color: "#1F2937",
+    display: "flex",
+    alignItems: "flex-end",   
+    justifyContent: "center",
+    gap: "5px",
+    whiteSpace: "nowrap",
+    lineHeight: "1",
+    marginBottom: "20px",      
+  }}
+>
+  Welcome to
+  <img
+    src="/assets/myKard.png"
+    alt="MyKard Logo"
+    style={{
+      height: "150px",        
+      objectFit: "contain",
+      marginBottom: "-50px", 
+    }}
+  />
+</h1>
+           <p
+    style={{
+      color: colors.textLight,
+      margin: "0 0 32px",            
+    }}
+  >
+    Build connections in your own unique way.
+  </p>
             <button
               onClick={() => setStep(1)}
               style={{
@@ -680,9 +687,9 @@ const OnboardingPage: React.FC = () => {
                 color: colors.primary,
               }}
             >
-              {step === 1 && 'Your Full Name *'}
-              {step === 2 && 'Phone Number *'}
-              {step === 3 && 'Email Address *'}
+              {step === 1 && 'Full Name '}
+              {step === 2 && 'Phone Number '}
+              {step === 3 && 'Email Address '}
               {step === 4 && 'Professional Title'}
               {step === 5 && 'Company Name'}
               {step === 6 && 'Location'}

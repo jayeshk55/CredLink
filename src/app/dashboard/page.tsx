@@ -57,7 +57,7 @@ const renderCardPreview = (card: Card) => {
     about: card.bio || card.about || card.description || '',
     skills: card.skills || 'SEO, Content Creation, Analytics, Social Media',
     portfolio: card.portfolio || '[Link] Latest Campaigns',
-    experience: card.experience || `${card.title || 'Lead SEO Specialist'} @ ${card.company || 'TechCorp'} (2021-Present)`,
+    experience: card.experience || `${card.title || 'Lead SEO Specialist'}${card.company ? ` @ ${card.company}` : ''} (2021-Present)`,
     services: card.services || '',
     review: card.review || '',
     photo: card.profileImage || card.photo || '',

@@ -31,6 +31,14 @@ export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [formData, setFormData] = useState({ name: "", email: "", topic: "", message: "" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  React.useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const contactOptions = useMemo<ContactOption[]>(() => [
     {
@@ -39,12 +47,20 @@ export default function SupportPage() {
         "Drop us a note and our customer success team will respond within one business day.",
       icon: Mail,
       accentColor: "#2563eb",
-      action: { type: "link", label: "support@mykard.com", href: "mailto:support@mykard.com" },
+      action: { type: "link", label: "@mykard.in", href: "mailto:@mykard.in" },
     },
   ], []);
 
   const faqs = useMemo<Faq[]>(() => [
-      {
+    {
+      q: "What is MyKard?",
+      a: "MyKard is a digital business card platform that allows users to create and share their professional profiles online. It provides a modern, customizable, and shareable way to represent oneself in the digital age.",
+    },  
+   {
+      q: "How to create MyKard?",
+      a: "To create MyKard, you can follow these steps: 1) Go to dashboard and click on create card button. 2) Fill the form with your details. 3) Click on create card button .And you will get your MyKard.",
+    }, 
+    {
       q: "How does MyKard works",
       a: "1)Create Your Profile – Add your professional details.2) Customize Your Card – Personalize with themes and logos.3)Share Anywhere – Use your link or QR code instantly.4)Track Insights – Monitor views, leads, and engagement.",
     },
@@ -60,7 +76,7 @@ export default function SupportPage() {
 
     {
       q: "How much does it cost to get started?",
-      a: "You can get started for free with a basic MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
+      a: "You can get started for free with MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
     },
     {
       q: "How does MyKard help grow my professional network?",
@@ -121,7 +137,7 @@ export default function SupportPage() {
       const { name, email, topic, message } = formData;
       const subject = encodeURIComponent(`Support request${topic ? `: ${topic}` : ""}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`);
-      window.location.href = `mailto:support@mykard.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:@mykard.in?subject=${subject}&body=${body}`;
       setSubmitStatus("success");
       setTimeout(() => {
         setFormData({ name: "", email: "", topic: "", message: "" });
@@ -182,10 +198,10 @@ export default function SupportPage() {
               <div key={i} style={S.faqCard}>
                 <button style={S.faqButton} onClick={() => handleFaqToggle(i)}>
                   <span style={S.faqQ}>
-                    <HelpCircle className="w-5 h-5 text-[#2563eb] mr-2" />
+                    <HelpCircle size={isMobile ? 18 : 20} style={{ color: '#2563eb', marginRight: 8, flexShrink: 0 }} />
                     {faq.q}
                   </span>
-                  <span style={{ fontSize: 24, color: "#2563eb", transform: activeFaq === i ? "rotate(45deg)" : "none", transition: "0.2s" }}>+</span>
+                  <span style={{ fontSize: 24, color: '#2563eb', transform: activeFaq === i ? 'rotate(45deg)' : 'none', transition: '0.2s' }}>+</span>
                 </button>
                 {activeFaq === i && <p style={S.faqA}>{faq.a}</p>}
               </div>
@@ -256,7 +272,7 @@ export default function SupportPage() {
             <div style={S.modalCard}>
               <h3 style={S.modalTitle}>💬 Start Live Chat</h3>
               <p style={S.modalText}>
-                Our live chat system is being upgraded. Please use the contact form or email us at support@mykard.com.
+                Our live chat system is being upgraded. Please use the contact form or email us at @mykard.in.
               </p>
               <div style={S.modalActions}>
                 <button style={S.submitBtn} onClick={() => setShowChatModal(false)}>Okay</button>
@@ -302,9 +318,9 @@ const S: Record<string, React.CSSProperties> = {
   sectionTitle: { fontSize: "1.6rem", fontWeight: 600 },
   sectionSubtitle: { color: "#6b7280", marginTop: 8, lineHeight: 1.5 },
   faqList: { marginTop: 24, display: "flex", flexDirection: "column", gap: 16 },
-  faqCard: { background: "white", borderRadius: 14, padding: "1.2rem 1.5rem", boxShadow: "0 6px 15px rgba(0,0,0,0.05)" },
-  faqButton: { background: "none", border: "none", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 16, fontWeight: 500, cursor: "pointer" },
-  faqQ: { display: "flex", alignItems: "center", color: "#111827" },
+  faqCard: { background: "white", borderRadius: 14, padding: "1.2rem 1.5rem", boxShadow: "0 6px 15px rgba(0,0,0,0.05)", textAlign: "left" },
+  faqButton: { background: "none", border: "none", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 16, fontWeight: 500, cursor: "pointer", minHeight: 56, textAlign: "left" },
+  faqQ: { display: "flex", alignItems: "center", color: "#111827", flex: 1, textAlign: "left" },
   faqA: { color: "#6b7280", marginTop: 10, fontSize: 14, lineHeight: 1.6 },
   formSection: { background: "white", borderRadius: 20, padding: "2rem", boxShadow: "0 10px 20px rgba(0,0,0,0.05)" },
   form: { display: "flex", flexDirection: "column", gap: 20 },

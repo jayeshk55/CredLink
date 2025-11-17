@@ -57,37 +57,7 @@ export default function ContactsPage() {
       } catch (error: any) {
         console.error("Error fetching contacts:", error);
         toast.error("Failed to load contacts");
-        
-        // Mock data for development/testing
-        const mockContacts: ContactConnection[] = [
-          {
-            id: "1",
-            name: "John Smith",
-            email: "john.smith@example.com",
-            phone: "+1 (555) 123-4567",
-            sourceUrl: "https://credlink.com/cards/public/abc123",
-            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            card: { id: "abc123", fullName: "Professional Card", cardName: "Business" }
-          },
-          {
-            id: "2", 
-            name: "Sarah Johnson",
-            email: "sarah.j@company.com",
-            phone: "+1 (555) 987-6543",
-            createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            card: { id: "def456", fullName: "Creative Portfolio", cardName: "Portfolio" }
-          },
-          {
-            id: "3",
-            name: "Mike Chen",
-            email: "mike.chen@tech.io",
-            phone: "+1 (555) 456-7890",
-            sourceUrl: "https://credlink.com/cards/public/ghi789",
-            createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            card: { id: "ghi789", fullName: "Tech Lead Card", cardName: "Professional" }
-          }
-        ];
-        setContacts(mockContacts);
+        setContacts([]);
       } finally {
         setLoading(false);
       }
@@ -221,8 +191,11 @@ export default function ContactsPage() {
                         <div className={styles.contactDetails}>
                           <h3 className={styles.contactName}>{contact.name}</h3>
                           <p className={styles.contactCard}>
-                            Connected via <span className={styles.cardName}>
+                            Contacted via <span className={styles.cardName}>
                               {contact.card.cardName || contact.card.fullName}
+                              {contact.card.cardName && contact.card.fullName !== contact.card.cardName && (
+                                <span className={styles.cardType}> ({contact.card.fullName})</span>
+                              )}
                             </span>
                           </p>
                         </div>
