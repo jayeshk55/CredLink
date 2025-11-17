@@ -180,7 +180,7 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"name": "Help Center", "path": "/help"}, {"name": "FAQ", "path": "/faq"}, {"name": "Terms of Service", "path": "/terms"}, {"name": "Privacy Policy", "path": "/privacy"}]
+              {[{"name": "Help Center", "path": "/help"}, {"name": "FAQ", "path": "/#faq"}, {"name": "Terms of Service", "path": "/terms"}, {"name": "Privacy Policy", "path": "/privacy"}]
                 .map((link, idx) => (
                   <Link
                     key={idx}

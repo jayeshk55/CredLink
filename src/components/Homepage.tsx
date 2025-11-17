@@ -987,7 +987,111 @@ No more lost visiting cards or scattered links — just one personal link or QR 
 
       {/* Contact Form Section */}
       
+      
+      {/* FAQ (Enhanced) - placed at the end, above the footer */}
+      <section id="faq" className="section py-12 lg:py-20 px-4 sm:px-6 lg:px-12" style={{ background: 'transparent' }}>
+        <div className="container mx-auto max-w-4xl">
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h2 className="heading-2" style={{ color: '#0f172a', fontWeight: 500 }}>Frequently Asked <span className="gradient-text">Questions</span></h2>
+            <p className="body-text" style={{ color: '#64748B', marginTop: 8 }}>Everything you need to know to get started with MyKard.</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {[
+              {
+                q: 'How does MyKard works',
+                a: (
+                  <div>
+                    <div>Create Your Profile – Add your professional details.</div>
+                    <div>Customize Your Card – Personalize with themes and logos.</div>
+                    <div>Share Anywhere – Use your link or QR code instantly.</div>
+                    <div>Track Insights – Monitor views, leads, and engagement.</div>
+                  </div>
+                )
+              },
+              {
+                q: 'How can I search for a professional?',
+                a: 'In the Dashboard, use the Search feature at the top. You can search by name, category, or email to quickly find any professional profile.'
+              },
+              {
+                q: 'How can I see my connections?',
+                a: 'Go to your Dashboard and click on the Connections tab. You\'ll see all your active and pending connections in one place.'
+              },
+              {
+                q: 'How much does it cost to get started?',
+                a: 'You can get started for free with a basic MyKard. Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.'
+              },
+              {
+                q: 'How does MyKard help grow my professional network?',
+                a: 'MyKard helps you connect instantly through shareable QR or link — whether at events, meetings, or online. You can discover professionals, entrepreneurs, and creators nearby or in your industry, and stay connected effortlessly.'
+              }
+            ].map((item, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    borderRadius: 16,
+                    border: '1px solid #e7f0ff',
+                    boxShadow: isOpen ? '0 18px 40px rgba(231,240,255,0.6)' : '0 10px 24px rgba(2,6,23,0.06)',
+                    transition: 'all 0.25s ease',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '1rem 1.25rem',
+                      background: '#e7f0ff',
+                      color: '#0f172a',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.05)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.filter = 'none'; }}
+                  >
+                    <span style={{ fontSize: 16, fontWeight: 400, letterSpacing: '-0.01em' }}>{item.q}</span>
+                    <svg
+                      width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.25s ease' }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <div
+                    style={{
+                      padding: isOpen ? '14px 18px 18px 18px' : '0 18px',
+                      maxHeight: isOpen ? 500 : 0,
+                      opacity: isOpen ? 1 : 0,
+                      transition: 'all 0.3s ease',
+                      color: '#334155',
+                      background: 'linear-gradient(180deg, rgba(231,240,255,0.8) 0%, rgba(231,240,255,0.6) 100%)'
+                    }}
+                  >
+                    {typeof item.a === 'string' ? (
+                      <p style={{ margin: 0, lineHeight: 1.7, fontSize: 14 }}>{item.a}</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14, lineHeight: 1.7 }}>
+                        {item.a}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
     </div>
+  
   );
 }
