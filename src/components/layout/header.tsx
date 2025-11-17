@@ -124,250 +124,114 @@ export function Header() {
                     <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
                   </motion.button>
                 )}
-                {/* DROPDOWN MENU */}
+                {/* DROPDOWN MENU - use same style on all screen sizes so it works reliably on mobile */}
                 <AnimatePresence>
                   {isDropdownOpen && (
-                    isLgUp ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
-                        style={{
-                          position: "absolute",
-                          right: "0",
-                          marginTop: "8px",
-                          width: "220px",
-                          maxWidth: "calc(100vw - 32px)",
-                          background: "rgba(255, 255, 255, 0.95)",
-                          backdropFilter: "blur(8px)",
-                          border: "1px solid rgba(229, 231, 235, 0.5)",
-                          borderRadius: "12px",
-                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(147, 197, 253, 0.25) inset",
-                          paddingTop: "10px",
-                          paddingBottom: "10px",
-                          zIndex: 50,
-                          transform: "translateX(-16px)",
-                        }}
-                      >
-                        <Link
-                          href="/dashboard/notifications"
-                          onClick={() => setIsDropdownOpen(false)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            padding: "12px 16px",
-                            margin: "6px 0",
-                            fontSize: "14px",
-                            color: "#374151",
-                            textDecoration: "none",
-                            transition: "all 0.2s ease",
-                            borderRadius: "8px",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#eff6ff";
-                            e.currentTarget.style.color = "#1d4ed8";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                            e.currentTarget.style.color = "#374151";
-                          }}
-                        >
-                          <Bell style={{ width: "16px", height: "16px" }} />
-                          <span>Notifications</span>
-                        </Link>
-                        <Link
-                          href="/dashboard/settings"
-                          onClick={() => setIsDropdownOpen(false)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            padding: "12px 16px",
-                            margin: "6px 0",
-                            fontSize: "14px",
-                            color: "#374151",
-                            textDecoration: "none",
-                            transition: "all 0.2s ease",
-                            borderRadius: "8px",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#eff6ff";
-                            e.currentTarget.style.color = "#1d4ed8";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                            e.currentTarget.style.color = "#374151";
-                          }}
-                        >
-                          <User style={{ width: "16px", height: "16px" }} />
-                          <span>Account</span>
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            padding: "12px 16px",
-                            margin: "6px 0",
-                            fontSize: "14px",
-                            color: "#dc2626",
-                            backgroundColor: "transparent",
-                            border: "none",
-                            textAlign: "left",
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            borderRadius: "8px",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#fef2f2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                          }}
-                        >
-                          <LogOut style={{ width: "16px", height: "16px" }} />
-                          <span>Logout</span>
-                        </button>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        style={{
-                          position: "fixed",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          zIndex: 1000,
-                          background: "rgba(2, 6, 23, 0.45)",
-                          backdropFilter: "blur(4px)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "flex-start",
-                          padding: "12px",
-                          overflow: 'auto'
-                        }}
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      style={{
+                        position: "absolute",
+                        right: "0",
+                        marginTop: "8px",
+                        width: "220px",
+                        maxWidth: "calc(100vw - 32px)",
+                        background: "rgba(255, 255, 255, 0.98)",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(229, 231, 235, 0.5)",
+                        borderRadius: "12px",
+                        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(147, 197, 253, 0.25) inset",
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                        zIndex: 9999,
+                        transform: "translateX(-16px)",
+                      }}
+                    >
+                      <Link
+                        href="/dashboard/notifications"
                         onClick={() => setIsDropdownOpen(false)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 16px",
+                          margin: "6px 0",
+                          fontSize: "14px",
+                          color: "#374151",
+                          textDecoration: "none",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#eff6ff";
+                          e.currentTarget.style.color = "#1d4ed8";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#374151";
+                        }}
                       >
-                        <motion.div
-                          initial={{ x: 24, y: -8, opacity: 0, scale: 0.98 }}
-                          animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                          exit={{ x: 24, y: -8, opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.25, ease: "easeOut" }}
-                          style={{
-                            width: "min(88vw, 300px)",
-                            background: "rgba(255, 255, 255, 0.96)",
-                            border: "1px solid rgba(229, 231, 235, 0.6)",
-                            borderRadius: "16px",
-                            boxShadow:
-                              "0 20px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(147,197,253,0.35) inset",
-                            overflow: "hidden",
-                            marginTop: '60px', // Add some top margin to ensure it's below the header
-                            zIndex: 1001 // Ensure it's above the overlay
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "12px",
-                              padding: "12px",
-                              background:
-                                "linear-gradient(135deg, rgba(219,234,254,0.9), rgba(191,219,254,0.9))",
-                              borderBottom: "1px solid rgba(229, 231, 235, 0.6)",
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "9999px",
-                                background:
-                                  "radial-gradient(120% 120% at 30% 20%, #60a5fa 0%, #2563eb 40%, #1e40af 100%)",
-                                border: "2px solid white",
-                                boxShadow:
-                                  "0 6px 18px rgba(37, 99, 235, 0.35), inset 0 0 12px rgba(147, 197, 253, 0.35)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                              }}
-                            >
-                              <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "column" }}>
-                              <span style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
-                                {user?.fullName || "User"}
-                              </span>
-                              <span style={{ fontSize: 12, color: "#475569" }}>
-                                {user?.email || "No email"}
-                              </span>
-                            </div>
-                          </div>
-                          <div style={{ padding: "6px" }}>
-                            <Link
-                              href="/dashboard/notifications"
-                              onClick={() => setIsDropdownOpen(false)}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "10px",
-                                padding: "10px 12px",
-                                borderRadius: "10px",
-                                color: "#0f172a",
-                                textDecoration: "none",
-                              }}
-                            >
-                              <Bell style={{ width: "18px", height: "18px" }} />
-                              <span>Notifications</span>
-                            </Link>
-                            <Link
-                              href="/dashboard/settings"
-                              onClick={() => setIsDropdownOpen(false)}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "10px",
-                                padding: "10px 12px",
-                                borderRadius: "10px",
-                                color: "#0f172a",
-                                textDecoration: "none",
-                              }}
-                            >
-                              <User style={{ width: "18px", height: "18px" }} />
-                              <span>Account</span>
-                            </Link>
-                            <button
-                              onClick={handleLogout}
-                              style={{
-                                width: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "10px",
-                                padding: "10px 12px",
-                                borderRadius: "10px",
-                                color: "#dc2626",
-                                background: "transparent",
-                                border: "none",
-                                textAlign: "left",
-                                cursor: "pointer",
-                              }}
-                            >
-                              <LogOut style={{ width: "18px", height: "18px" }} />
-                              <span>Logout</span>
-                            </button>
-                          </div>
-                        </motion.div>
-                      </motion.div>
-                    )
+                        <Bell style={{ width: "16px", height: "16px" }} />
+                        <span>Notifications</span>
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => setIsDropdownOpen(false)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 16px",
+                          margin: "6px 0",
+                          fontSize: "14px",
+                          color: "#374151",
+                          textDecoration: "none",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#eff6ff";
+                          e.currentTarget.style.color = "#1d4ed8";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#374151";
+                        }}
+                      >
+                        <User style={{ width: "16px", height: "16px" }} />
+                        <span>Account</span>
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 16px",
+                          margin: "6px 0",
+                          fontSize: "14px",
+                          color: "#dc2626",
+                          backgroundColor: "transparent",
+                          border: "none",
+                          textAlign: "left",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#fef2f2";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <LogOut style={{ width: "16px", height: "16px" }} />
+                        <span>Logout</span>
+                      </button>
+                    </motion.div>
                   )}
                 </AnimatePresence>
               </div>
@@ -378,15 +242,6 @@ export function Header() {
         {/* Spacer */}
         <div style={{ height: "8px", visibility: "hidden" }}></div>
       </header>
-
-      {/* OUTSIDE CLICK HANDLER */}
-      {isDropdownOpen && (
-        <div 
-          className="fixed inset-0 z-40" 
-          style={{ zIndex: 999 }} // Ensure it's below the mobile menu but above other content
-          onClick={() => setIsDropdownOpen(false)} 
-        />
-      )}
     </>
   );
 }

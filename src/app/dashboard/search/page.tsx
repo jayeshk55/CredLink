@@ -6,6 +6,7 @@ import { Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
 import styles from "./search.module.css";
 import { Modal } from "@/components/ui/modal";
+import { useSearchParams } from "next/navigation";
 
 type Profile = {
   id: string;
@@ -21,6 +22,7 @@ type Profile = {
 };
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   
   // Dummy data for testing when API returns empty results
@@ -38,6 +40,12 @@ export default function SearchPage() {
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
   const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
+
+  // Initialize search query from URL (?q=...)
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    setQuery(q);
+  }, [searchParams]);
 
   // Fetch users from backend
   useEffect(() => {

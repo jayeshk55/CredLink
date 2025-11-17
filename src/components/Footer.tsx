@@ -6,6 +6,18 @@ import { Linkedin, Twitter, Instagram, Mail, MapPin, Phone, Sparkles } from "luc
 import '../app/globals.css';
 import { useState, useEffect } from 'react';
 
+// Smooth scroll helper for in-page navigation without changing URL
+const scrollToSection = (sectionId: string) => {
+  if (typeof document === 'undefined') return;
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+};
+
 export default function Footer() {
   const [currentYear, setCurrentYear] = useState(2025); // Default to a reasonable year
 
@@ -33,7 +45,7 @@ export default function Footer() {
       <div style={{
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: '4rem 1.5rem 2rem',
+        padding: '3rem 1.5rem 1rem',
         position: 'relative',
         zIndex: 1
       }}>
@@ -78,31 +90,62 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"name": "Home", "path": "/"}, {"name": "Features", "path": "#build-credibility"}, {"name": "Search", "path": "#find-digital-card"}, {"name": "About Us", "path": "#what-is-digital-card"}]
+              {[{ name: 'Home', path: '/' }, { name: 'Features', sectionId: 'build-credibility' }, { name: 'Search', sectionId: 'find-digital-card' }, { name: 'About Us', sectionId: 'what-is-digital-card' }]
                 .map((link, idx) => (
-                  <Link
-                    key={idx}
-                    href={link.path}
-                    style={{
-                      color: '#6B7280',
-                      fontSize: '0.95rem',
-                      fontWeight: '500',
-                      textDecoration: 'none',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#0066FF';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '#6B7280';
-                    }}
-                  >
-                    {link.name}
-                  </Link>
+                  link.path ? (
+                    <Link
+                      key={idx}
+                      href={link.path}
+                      style={{
+                        color: '#6B7280',
+                        fontSize: '0.95rem',
+                        fontWeight: '500',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#0066FF';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#6B7280';
+                      }}
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => scrollToSection(link.sectionId!)}
+                      style={{
+                        color: '#6B7280',
+                        fontSize: '0.95rem',
+                        fontWeight: '500',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#0066FF';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#6B7280';
+                      }}
+                    >
+                      {link.name}
+                    </button>
+                  )
                 ))}
             </div>
           </div>
@@ -196,7 +239,7 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"Icon": Mail, "text": "hello@mykard.com", "href": "mailto:hello@mykard.com"},  {"Icon": MapPin, "text": "India", "href": "#"}]
+              {[{"Icon": Mail, "text": "@mykard.in", "href": "mailto:@mykard.in"},  {"Icon": MapPin, "text": "India", "href": "#"}]
                 .map((item, idx) => (
                   <a
                     key={idx}

@@ -19,6 +19,15 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const isApiRequest = path.startsWith('/api')
 
+  // Allow static assets (images/icons) without auth so logos and hero images load for all users
+  const isStaticAsset =
+    path.startsWith('/assets/') ||
+    /\.(png|jpe?g|gif|svg|ico|webp)$/i.test(path)
+
+  if (isStaticAsset) {
+    return NextResponse.next()
+  }
+
   const publicPaths = [
     '/',
     '/auth/login',
