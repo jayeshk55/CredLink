@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Parse tags from JSON for each category
-    const categoriesWithParsedTags = categories.map(category => ({
+    const categoriesWithParsedTags = categories.map((category: any) => ({
       ...category,
       tags: Array.isArray(category.tags) ? category.tags : JSON.parse(category.tags as string)
     }))

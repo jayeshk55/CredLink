@@ -10,15 +10,18 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+const hasFirebaseConfig = Boolean(firebaseConfig.apiKey);
 
-if (!firebaseConfig.apiKey) {
-  throw new Error(
-    "Missing Firebase config. Ensure NEXT_PUBLIC_FIREBASE_API_KEY (and related NEXT_PUBLIC_FIREBASE_*) are set in .env.local and restart the dev server."
-  );
+let auth: ReturnType<typeof getAuth> | null = null;
+if (hasFirebaseConfig) {
+  // Reuse app on HMR to avoid re-initialization errors
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  auth = getAuth(app);
+} else {
+  if (typeof console !== 'undefined') {
+    // Avoid failing builds when env vars are missing (e.g., CI/prerender)
+    console.warn("Missing Firebase config. Auth features will be disabled until env vars are provided.");
+  }
 }
-
-// Reuse app on HMR to avoid re-initialization errors
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 export { auth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential, GoogleAuthProvider, signInWithPopup };

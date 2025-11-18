@@ -87,7 +87,10 @@ export default function SignupPage() {
       
       console.log('🔐 Starting Google sign-in...')
       const provider = new GoogleAuthProvider()
-      const result = await signInWithPopup(auth, provider)
+      if (!auth) {
+        throw new Error('Authentication is not configured. Please set Firebase env vars.')
+      }
+      const result = await signInWithPopup(auth as any, provider)
       
       console.log('✅ Google popup success, getting token...')
       const idToken = await result.user.getIdToken(true)
@@ -158,7 +161,10 @@ export default function SignupPage() {
 
     try {
       // Create user in Firebase Auth
-      const cred = await createUserWithEmailAndPassword(auth, email, password)
+      if (!auth) {
+        throw new Error('Authentication is not configured. Please set Firebase env vars.')
+      }
+      const cred = await createUserWithEmailAndPassword(auth as any, email, password)
       const idToken = await cred.user.getIdToken(true)
 
       // Call backend to create user in DB and set session

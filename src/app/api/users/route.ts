@@ -58,7 +58,7 @@ export async function GET() {
     })
 
     // Map database fields to frontend expected format
-    const mappedUsers = users.map(user => ({
+    const mappedUsers = users.map((user: any) => ({
       id: user.id,
       email: user.email,
       fullName: user.fullName,

@@ -73,7 +73,10 @@ export default function LoginPage() {
       setLoading(true)
       setError('')
       const provider = new GoogleAuthProvider()
-      const result = await signInWithPopup(auth, provider)
+      if (!auth) {
+        throw new Error('Authentication is not configured. Please set Firebase env vars.')
+      }
+      const result = await signInWithPopup(auth as any, provider)
       const idToken = await result.user.getIdToken(true)
 
       const res = await fetch('/api/auth/firebase', {

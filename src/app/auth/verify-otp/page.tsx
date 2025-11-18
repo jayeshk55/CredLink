@@ -29,7 +29,8 @@ function VerifyOtpContent() {
     if (recaptchaRef.current) return recaptchaRef.current
     const container = typeof document !== 'undefined' ? document.getElementById('recaptcha-container-verify') : null
     if (!container) throw new Error('reCAPTCHA container missing')
-    recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container-verify', { size: 'invisible' })
+    if (!auth) throw new Error('Authentication is not configured. Please set Firebase env vars.')
+    recaptchaRef.current = new RecaptchaVerifier(auth as any, 'recaptcha-container-verify', { size: 'invisible' })
     return recaptchaRef.current
   }
 
@@ -58,7 +59,8 @@ function VerifyOtpContent() {
 
       // Verify OTP with Firebase
       const credential = PhoneAuthProvider.credential(verificationId, otp)
-      await signInWithCredential(auth, credential)
+      if (!auth) throw new Error('Authentication is not configured. Please set Firebase env vars.')
+      await signInWithCredential(auth as any, credential)
       
       console.log('✅ Firebase OTP verified successfully!')
       
@@ -114,7 +116,8 @@ function VerifyOtpContent() {
         return
       }
       const verifier = setupRecaptcha()
-      const confirmation = await signInWithPhoneNumber(auth, target, verifier)
+      if (!auth) throw new Error('Authentication is not configured. Please set Firebase env vars.')
+      const confirmation = await signInWithPhoneNumber(auth as any, target, verifier)
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('verificationId', confirmation.verificationId)
         sessionStorage.setItem('otpPhone', target)
