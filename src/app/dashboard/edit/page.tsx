@@ -80,17 +80,32 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
   const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
 
-  const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
-          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+  const renderItem = (title: string, subtitle?: string) => {
+    const isUrl = /^https?:\/\//i.test(title) || /^[\w.-]+\.[a-z]{2,}/i.test(title);
+    const href = isUrl ? (/^https?:\/\//i.test(title) ? title : `https://${title}`) : undefined;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.5 2.5M16.5 16.5L19 19M5 19l2.5-2.5M16.5 7.5L19 5" />
+            </svg>
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            {isUrl ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 700, color: '#111827', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                {title}
+              </a>
+            ) : (
+              <div style={{ fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{title}</div>
+            )}
+            {subtitle && <div style={{ fontSize: 12, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
@@ -2241,24 +2256,19 @@ const EditPage = () => {
               {/* Portfolio */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                    </span> */}
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Portfolio
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  {/* blank */}
                 </div>
-                <textarea
+                <input
+                  type="url"
                   value={portfolio}
                   onChange={(e) => setPortfolio(e.target.value)}
-                  placeholder="e.g. Case Study 1, Project X"
-                  rows={3}
+                  placeholder="https://your-portfolio.com"
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -2267,7 +2277,6 @@ const EditPage = () => {
                     borderRadius: '8px',
                     boxSizing: 'border-box',
                     outline: 'none',
-                    resize: 'vertical'
                   }}
                 />
               </div>

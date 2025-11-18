@@ -2113,18 +2113,13 @@ const EditPage = () => {
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Portfolio
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  {/* blank */}
                 </div>
-                <textarea
+                <input
+                  type="url"
                   value={portfolio}
                   onChange={(e) => setPortfolio(e.target.value)}
-                  placeholder="e.g. Case Study 1, Project X"
-                  rows={3}
+                  placeholder="https://your-portfolio.com"
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -2132,8 +2127,7 @@ const EditPage = () => {
                     border: '1px solid #ddd',
                     borderRadius: '8px',
                     boxSizing: 'border-box',
-                    outline: 'none',
-                    resize: 'vertical'
+                    outline: 'none'
                   }}
                 />
               </div>

@@ -62,18 +62,29 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
   const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
 
-  const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}></div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
-          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+  const renderItem = (title: string, subtitle?: string) => {
+    const isUrl = /^https?:\/\//i.test(title) || /^[\w.-]+\.[a-z]{2,}/i.test(title);
+    const displayText = title;
+    const href = isUrl ? ( /^https?:\/\//i.test(title) ? title : `https://${title}` ) : undefined;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}></div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            {isUrl ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 700, color: '#111827', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                {displayText}
+              </a>
+            ) : (
+              <div style={{ fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{displayText}</div>
+            )}
+            {subtitle && <div style={{ fontSize: 12, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>}
+          </div>
         </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-    </div>
-  );
+    );
+  };
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
