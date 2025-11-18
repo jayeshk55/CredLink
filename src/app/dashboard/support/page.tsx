@@ -47,7 +47,7 @@ export default function SupportPage() {
         "Drop us a note and our customer success team will respond within one business day.",
       icon: Mail,
       accentColor: "#2563eb",
-      action: { type: "link", label: "@mykard.in", href: "mailto:@mykard.in" },
+      action: { type: "link", label: "support@mykard.in", href: "mailto:support@mykard.in" },
     },
   ], []);
 
@@ -137,7 +137,7 @@ export default function SupportPage() {
       const { name, email, topic, message } = formData;
       const subject = encodeURIComponent(`Support request${topic ? `: ${topic}` : ""}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`);
-      window.location.href = `mailto:@mykard.in?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:support@mykard.in?subject=${subject}&body=${body}`;
       setSubmitStatus("success");
       setTimeout(() => {
         setFormData({ name: "", email: "", topic: "", message: "" });
@@ -272,7 +272,7 @@ export default function SupportPage() {
             <div style={S.modalCard}>
               <h3 style={S.modalTitle}>💬 Start Live Chat</h3>
               <p style={S.modalText}>
-                Our live chat system is being upgraded. Please use the contact form or email us at @mykard.in.
+                Our live chat system is being upgraded. Please use the contact form or email us at support@mykard.in.
               </p>
               <div style={S.modalActions}>
                 <button style={S.submitBtn} onClick={() => setShowChatModal(false)}>Okay</button>

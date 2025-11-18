@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
 import { verifyUserToken } from '@/lib/jwt'
 
 export async function POST(request: NextRequest) {
@@ -29,23 +28,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    const { password, reasons } = body
-
-    if (!password) {
-      return NextResponse.json(
-        { error: 'Password is required to deactivate account' },
-        { status: 400 }
-      )
-    }
-
-    // Get user and verify password
+    // Get user
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
-        email: true,
-        password: true,
         status: true
       }
     })
@@ -61,16 +48,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Account is already deactivated' },
         { status: 400 }
-      )
-    }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Invalid password' },
-        { status: 401 }
       )
     }
 

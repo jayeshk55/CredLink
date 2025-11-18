@@ -303,11 +303,11 @@ export default function PrivacyPage() {
           </div>
           <p style={{ color: '#D1E5FF', margin: '0 0 16px 0' }}>For questions or requests related to privacy, reach out to us:</p>
           <div style={contactGrid}>
-            <a href="mailto:hello@mykard.in" style={contactCard}>
+            <a href="mailto:hellosupport@mykard.in" style={contactCard}>
               <div style={contactRow}>
                 <div>
                   <div style={{ fontSize: 12, color: '#DBEAFE' }}>Email</div>
-                  <div style={{ fontWeight: 600 }}>hello@mykard.in</div>
+                  <div style={{ fontWeight: 600 }}>hellosupport@mykard.in</div>
                 </div>
               </div>
             </a>

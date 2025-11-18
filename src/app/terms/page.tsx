@@ -151,7 +151,7 @@ export default function TermsPage() {
                   <li key={i} style={li}><div style={dot} /><span>{t}</span></li>
                 ))}
               </ul>
-              <p style={p}>If you suspect unauthorized access, inform us immediately at: <a href="mailto:hello@mykard.in" style={link}>hello@mykard.in</a></p>
+              <p style={p}>If you suspect unauthorized access, inform us immediately at: <a href="mailto:hellosupport@mykard.in" style={link}>hellosupport@mykard.in</a></p>
               <p style={p}>We may suspend or terminate your account if you violate these Terms.</p>
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function TermsPage() {
             <div style={sectionBody}>
               <p style={p}>For questions or concerns:</p>
               <ul style={ul}>
-                <li style={li}><div style={dot} /><span>Email: <a href="mailto:hello@mykard.in" style={link}>hello@mykard.in</a></span></li>
+                <li style={li}><div style={dot} /><span>Email: <a href="mailto:hellosupport@mykard.in" style={link}>hellosupport@mykard.in</a></span></li>
                 <li style={li}><div style={dot} /><span>India</span></li>
                 <li style={li}><div style={dot} /><span>Website: <a href="https://mykard.in" target="_blank" rel="noreferrer" style={link}>www.mykard.in</a></span></li>
               </ul>

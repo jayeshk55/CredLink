@@ -288,7 +288,7 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"Icon": Mail, "text": "@mykard.in", "href": "mailto:@mykard.in"},  {"Icon": MapPin, "text": "India", "href": "#"}]
+              {[{"Icon": Mail, "text": "support@mykard.in", "href": "mailto:support@mykard.in"},  {"Icon": MapPin, "text": "India", "href": "#"}]
                 .map((item, idx) => (
                   <a
                     key={idx}
