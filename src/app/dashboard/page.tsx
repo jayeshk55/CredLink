@@ -15,7 +15,11 @@ import SleekCardPreview from "@/components/cards/SleekCardPreview";
 // ----------------- Card Type Definition -----------------
 interface Card {
   id: string | number;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   fullName?: string;
+  cardName?: string;
   name?: string;
   title?: string;
   company?: string;
@@ -50,7 +54,10 @@ interface Card {
 const renderCardPreview = (card: Card) => {
   // Use EXACT same prop mapping as edit page
   const commonProps = {
-    name: card.fullName || card.name || '',
+    firstName: card.firstName || '',
+    middleName: card.middleName || '',
+    lastName: card.lastName || '',
+    cardName: card.cardName || '',
     title: card.title || '',
     company: card.company || '',
     location: card.location || '',
@@ -115,8 +122,8 @@ const Dashboard = () => {
     
     const data = await response.json();
     if (data.success) {
-      console.log('✅ Fetched cards:', data.cards);
-      console.log('🎨 Design values:', data.cards.map((c: any) => ({ id: c.id, design: c.selectedDesign })));
+     // console.log('✅ Fetched cards:', data.cards);
+      //console.log('🎨 Design values:', data.cards.map((c: any) => ({ id: c.id, design: c.selectedDesign })));
       setCardsData(data.cards);
       toast.success(`Loaded ${data.count} card(s)`);
     } else {

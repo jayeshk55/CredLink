@@ -8,7 +8,10 @@ import { toast } from 'react-hot-toast';
 // ====================================================================
 
 interface DigitalCardProps {
-  name: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  cardName?: string; // Card identifier - shows in top-right badge
   title: string;
   company?: string;
   location: string;
@@ -30,7 +33,10 @@ interface DigitalCardProps {
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
-  name = "",
+  firstName = "",
+  middleName = "",
+  lastName = "",
+  cardName = "",
   title = "",
   company = "",
   location = "",
@@ -50,7 +56,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   themeColor2, 
   fontFamily, 
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
   const parsedCompany = (() => {
     const atIndex = experience.indexOf('@');
     if (atIndex !== -1) {
@@ -147,6 +154,24 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       position: "relative",
       background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
     }}>
+      {/* Card Name Badge - Top Right */}
+      {cardName && (
+        <div style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          color: themeColor1,
+          padding: "6px 14px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          zIndex: 10,
+        }}>
+          {cardName}
+        </div>
+      )}
       {/* Header */}
       <div style={{
         padding: "22px",
@@ -186,7 +211,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             )}
           </div>
 
-          {name && <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{name}</h3>}
+          <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{fullName}</h3>
           {(title || companyFinal) && (
             <div style={{ display: "flex", gap: "12px", alignItems: "center", color: "#ffffff", opacity: 0.95 }}>
               {title && <span style={{ fontSize: "14px", fontWeight: 700 }}>{title}</span>}
@@ -299,11 +324,13 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
 // Flat Template
 const FlatCardPreview: React.FC<DigitalCardProps> = ({
-  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  firstName = "", middleName = "", lastName = "", cardName = "",
+  title = "", company = "", location = "", about = "", photo = "", cover = "",
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
@@ -370,6 +397,24 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
       background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `3px solid ${themeColor1}`,
       position: 'relative'
     }}>
+      {/* Card Name Badge - Top Right */}
+      {cardName && (
+        <div style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          color: themeColor1,
+          padding: "6px 14px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          zIndex: 10,
+        }}>
+          {cardName}
+        </div>
+      )}
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "120px", overflow: "hidden",
@@ -394,7 +439,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             <span style={{ fontSize: "32px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
           )}
         </div>
-        {name && <h3 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+        {fullName && <h3 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>{fullName}</h3>}
         {title && <p style={{ margin: "0 0 4px", fontSize: "16px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
         {company && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{company}</p>}
         {location && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
@@ -502,11 +547,13 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
 
 // Modern Template
 const ModernCardPreview: React.FC<DigitalCardProps> = ({
-  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  firstName = "", middleName = "", lastName = "", cardName = "",
+  title = "", company = "", location = "", about = "", photo = "", cover = "",
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
@@ -573,6 +620,24 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
       border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(10px)", position: 'relative'
     }}>
+      {/* Card Name Badge - Top Right */}
+      {cardName && (
+        <div style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          color: themeColor1,
+          padding: "6px 14px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          zIndex: 10,
+        }}>
+          {cardName}
+        </div>
+      )}
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "140px", overflow: "hidden",
@@ -601,7 +666,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
             )}
           </div>
           <div>
-            {name && <h3 style={{ margin: "0 0 4px", fontSize: "22px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+            {fullName && <h3 style={{ margin: "0 0 4px", fontSize: "22px", fontWeight: 700, color: "#FFFFFF" }}>{fullName}</h3>}
             {title && <p style={{ margin: "0 0 2px", fontSize: "14px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
             {company && <p style={{ margin: "0", fontSize: "13px", color: "#FFFFFF" }}>{company}</p>}
           </div>
@@ -723,11 +788,13 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
 
 // Sleek Template
 const SleekCardPreview: React.FC<DigitalCardProps> = ({
-  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  firstName = "", middleName = "", lastName = "", cardName = "",
+  title = "", company = "", location = "", about = "", photo = "", cover = "",
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
@@ -793,6 +860,24 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
       backgroundImage: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
     }}>
+      {/* Card Name Badge - Top Right */}
+      {cardName && (
+        <div style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          color: themeColor1,
+          padding: "6px 14px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          zIndex: 10,
+        }}>
+          {cardName}
+        </div>
+      )}
       <div style={{
         height: "120px", 
         backgroundImage: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
@@ -820,7 +905,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
           )}
         </div>
         <div style={{ marginLeft: "16px", color: "white", position: "relative", zIndex: 2 }}>
-          {name && <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>{name}</h3>}
+          {fullName && <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>{fullName}</h3>}
           {title && <p style={{ margin: "0", fontSize: "13px", opacity: 0.9, color: "#FFFFFF" }}>{title}</p>}
         </div>
       </div>
@@ -1072,7 +1157,7 @@ const EditPage = () => {
           console.log('✅ Loaded card for editing:', data.card);
           const card = data.card;
           
-          setFirstName(card.fullName || card.firstName || '');
+          setFirstName(card.firstName || '');
           setMiddleName(card.middleName || '');
           setLastName(card.lastName || '');
           setPrefix(card.prefix || '');
@@ -1438,7 +1523,10 @@ const EditPage = () => {
   // Function to render the appropriate template based on selectedDesign
   const renderTemplatePreview = () => {
     const commonProps = {
-      name: cardName || `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim(),
+      firstName,
+      middleName,
+      lastName,
+      cardName,
       title,
       company,
       location: cardLocation,

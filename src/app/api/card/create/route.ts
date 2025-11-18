@@ -20,32 +20,30 @@ export async function POST(req: NextRequest) {
     // Parse form data
     const formData = await req.formData();
     
+    // Extract name fields and construct fullName
+    const firstName = formData.get('firstName') as string || '';
+    const middleName = formData.get('middleName') as string || '';
+    const lastName = formData.get('lastName') as string || '';
+    const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ').trim() || 'Unnamed';
+
     // Extract card fields
     const cardData: any = {
       userId: decoded.userId,
-      fullName: formData.get('fullName') as string,
-      firstName: formData.get('firstName') as string || undefined,
-      middleName: formData.get('middleName') as string || undefined,
-      lastName: formData.get('lastName') as string || undefined,
+      cardName: formData.get('cardName') as string,
+      fullName: fullName,
+      cardActive: true,
+      firstName: firstName || undefined,
+      middleName: middleName || undefined,
+      lastName: lastName || undefined,
       prefix: formData.get('prefix') as string || undefined,
       suffix: formData.get('suffix') as string || undefined,
-      preferredName: formData.get('preferredName') as string || undefined,
-      maidenName: formData.get('maidenName') as string || undefined,
-      pronouns: formData.get('pronouns') as string || undefined,
       title: formData.get('title') as string || undefined,
       company: formData.get('company') as string || undefined,
-      department: formData.get('department') as string || undefined,
-      affiliation: formData.get('affiliation') as string || undefined,
-      headline: formData.get('headline') as string || undefined,
-      accreditations: formData.get('accreditations') as string || undefined,
       email: formData.get('email') as string || undefined,
       phone: formData.get('phone') as string || undefined,
-      emailLink: formData.get('emailLink') as string || undefined,
-      phoneLink: formData.get('phoneLink') as string || undefined,
       location: formData.get('location') as string || undefined,
       linkedinUrl: formData.get('linkedinUrl') as string || undefined,
       websiteUrl: formData.get('websiteUrl') as string || undefined,
-      cardName: formData.get('cardName') as string || undefined,
       cardType: formData.get('cardType') as string || undefined,
       selectedDesign: formData.get('selectedDesign') as string || undefined,
       selectedColor: formData.get('selectedColor') as string || undefined,
@@ -115,8 +113,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate required fields
-    if (!cardData.fullName) {
-      return NextResponse.json({ error: 'Full name is required' }, { status: 400 });
+    if (!cardData.cardName) {
+      return NextResponse.json({ error: 'Card name is required' }, { status: 400 });
     }
 
     // Create card

@@ -333,6 +333,15 @@ const PublicCardPage = () => {
         
         if (data.success && data.card) {
           console.log('✅ Fetched public card:', data.card);
+          
+          // Check if card is active (not paused)
+          if (data.card.cardActive === false) {
+            toast.error('This card is currently unavailable');
+            setCard(null);
+            setIsLoading(false);
+            return;
+          }
+          
           setCard(data.card);
           
           // Increment view count for public access

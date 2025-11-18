@@ -642,7 +642,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
 
     try {
-      const response = await fetch('/api/auth/delete-account', {
+      const response = await fetch('/api/auth/deactivate-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -665,15 +665,15 @@ export default function AccountSettingsPage(): React.JSX.Element {
       setDeletePassword("");
       setDeleteReasons([]);
       
-      alert("Your account has been deleted successfully. You will be logged out.");
+      alert("Your account has been deactivated successfully. You will be logged out.");
       
       // Redirect to home page after a short delay
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
     } catch (error) {
-      console.error('Delete account error:', error);
-      alert('Failed to delete account. Please try again.');
+      console.error('Deactivate account error:', error);
+      alert('Failed to deactivate account. Please try again.');
     }
   };
 

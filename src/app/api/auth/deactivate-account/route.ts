@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (!password) {
       return NextResponse.json(
-        { error: 'Password is required to delete account' },
+        { error: 'Password is required to deactivate account' },
         { status: 400 }
       )
     }
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (user.status !== 'active') {
       return NextResponse.json(
-        { error: 'Account is already deleted' },
+        { error: 'Account is already deactivated' },
         { status: 400 }
       )
     }
@@ -87,12 +87,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Account deleted successfully'
+      message: 'Account deactivated successfully'
     })
   } catch (error: any) {
-    console.error('Delete account error:', error)
+    console.error('Deactivate account error:', error)
     return NextResponse.json(
-      { error: error.message || 'An error occurred while deleting account' },
+      { error: error.message || 'An error occurred while deactivating account' },
       { status: 500 }
     )
   }

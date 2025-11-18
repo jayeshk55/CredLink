@@ -24,37 +24,31 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         userId: true,
+        cardName: true,
         fullName: true,
         firstName: true,
         middleName: true,
         lastName: true,
         prefix: true,
         suffix: true,
-        preferredName: true,
-        maidenName: true,
-        pronouns: true,
         title: true,
         company: true,
-        department: true,
-        affiliation: true,
-        headline: true,
-        accreditations: true,
         email: true,
         phone: true,
-        emailLink: true,
-        phoneLink: true,
         location: true,
         linkedinUrl: true,
         websiteUrl: true,
-        cardName: true,
+        cardActive: true,
         cardType: true,
         selectedDesign: true,
         selectedColor: true,
+        selectedColor2: true,
         selectedFont: true,
         displayTypes: true,
         profileImage: true,
         bannerImage: true,
         coverImage: true,
+        documentUrl: true,
         bio: true,
         description: true,
         skills: true,
@@ -73,35 +67,21 @@ export async function GET(req: NextRequest) {
             username: true,
           }
         }
-      }
+      } as any
     });
 
-    // Add selectedColor2 using a separate query for now
-    const cardsWithColor2 = await Promise.all(
-      cards.map(async (card) => {
-        const color2Result = await prisma.$queryRaw`
-          SELECT selected_color2 as selectedColor2 FROM cards WHERE id = ${card.id}
-        ` as any[];
-        
-        return {
-          ...card,
-          selectedColor2: color2Result[0]?.selectedColor2 || null
-        };
-      })
-    );
-
     console.log('📊 Fetched cards for user:', decoded.userId);
-    console.log('📋 Number of cards:', cardsWithColor2.length);
-    if (cardsWithColor2.length > 0) {
-      console.log('🎨 First card design:', cardsWithColor2[0].selectedDesign);
-      console.log('🎨 First card selectedColor2:', cardsWithColor2[0].selectedColor2);
-      console.log('🔍 First card data:', JSON.stringify(cardsWithColor2[0], null, 2));
+    console.log('📋 Number of cards:', cards.length);
+    if (cards.length > 0) {
+      console.log('🎨 First card design:', cards[0].selectedDesign);
+      console.log('🎨 First card selectedColor2:', cards[0].selectedColor2);
+      console.log('🔍 First card data:', JSON.stringify(cards[0], null, 2));
     }
 
     return NextResponse.json({ 
       success: true,
-      cards: cardsWithColor2,
-      count: cardsWithColor2.length
+      cards: cards,
+      count: cards.length
     });
 
   } catch (error: any) {

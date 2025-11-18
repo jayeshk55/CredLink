@@ -4,7 +4,11 @@ import React, { useEffect, useState } from "react";
 import styles from './cardType.module.css';
 
 export interface DigitalCardProps {
-  name: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  cardName?: string; // Card identifier - shows in top-right badge
+  name?: string; // Deprecated - kept for backwards compatibility
   title: string;
   company?: string;
   location: string;
@@ -25,7 +29,11 @@ export interface DigitalCardProps {
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
-  name = "",
+  firstName = "",
+  middleName = "",
+  lastName = "",
+  cardName = "",
+  name = "", // Deprecated
   title = "",
   company = "",
   location = "",
@@ -43,7 +51,9 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   themeColor2 = "#2563eb",
   cardType = "",
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  // Construct full name from firstName, middleName, lastName
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || name || 'Your Name';
+  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : (name ? name.charAt(0).toUpperCase() : "J");
   const parsedCompany = (() => {
     const atIndex = experience.indexOf('@');
     if (atIndex !== -1) {
@@ -77,6 +87,24 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         position: "relative",
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
       }}>
+      {/* Card Name Badge - Top Right */}
+      {cardName && (
+        <div style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          color: themeColor1,
+          padding: "6px 14px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "700",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          zIndex: 10,
+        }}>
+          {cardName}
+        </div>
+      )}
       {/* Card Type Pill */}
       {cardType && cardType.trim() !== "" && (
         <div 
@@ -127,7 +155,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             )}
           </div>
 
-          {name && <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{name}</h3>}
+          <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{fullName}</h3>
           {(title || companyFinal) && (
             <div style={{ display: "flex", gap: "12px", alignItems: "center", color: "#ffffff", opacity: 0.95 }}>
               {title && <span style={{ fontSize: "14px", fontWeight: 700 }}>{title}</span>}

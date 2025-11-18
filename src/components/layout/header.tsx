@@ -14,6 +14,7 @@ export function Header() {
   const { user, isAuthenticated, checkAuth, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLgUp, setIsLgUp] = useState(false); // ✅ detect screen size
+  const [activeCardName, setActiveCardName] = useState<string>("");
 
   // ✅ Detect large screen
   useEffect(() => {
@@ -23,6 +24,31 @@ export function Header() {
     mql.addEventListener("change", onChange);
     return () => mql.removeEventListener("change", onChange);
   }, []);
+
+  // Fetch user's active card
+  useEffect(() => {
+    const fetchActiveCard = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        const response = await fetch('/api/cards');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.cards && data.cards.length > 0) {
+            // Get the first active card
+            const activeCard = data.cards.find((card: any) => card.cardActive !== false);
+            if (activeCard) {
+              setActiveCardName(activeCard.cardName || "My Card");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching active card:", error);
+      }
+    };
+
+    fetchActiveCard();
+  }, [isAuthenticated]);
 
   // Ensure auth check runs on mount
   useEffect(() => {
@@ -54,15 +80,31 @@ export function Header() {
       <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-end items-center h-16 relative">
-            {/* RIGHT SIDE - Profile */}
+            {/* RIGHT SIDE - Card Name & Profile */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "flex-end",
+                gap: "16px",
                 paddingRight: "32px",
               }}
             >
+              {/* Active Card Name */}
+              {activeCardName && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  style={{
+                    fontSize: "14px",
+                    color: "#6b7280",
+                    fontWeight: 500,
+                  }}
+                >
+                  {activeCardName}
+                </motion.div>
+              )}
+              
               <div className="relative">
                 {isLgUp ? (
                   <motion.button

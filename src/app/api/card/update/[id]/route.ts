@@ -41,10 +41,7 @@ export async function PATCH(
     // Extract card fields
     const updateData: any = {};
     
-    // Personal Information
-    const fullName = formData.get('fullName') as string;
-    if (fullName !== null) updateData.fullName = fullName;
-    
+    // Personal Information - Extract name fields
     const firstName = formData.get('firstName') as string;
     if (firstName !== null) updateData.firstName = firstName || undefined;
     
@@ -53,6 +50,16 @@ export async function PATCH(
     
     const lastName = formData.get('lastName') as string;
     if (lastName !== null) updateData.lastName = lastName || undefined;
+    
+    // Construct fullName from firstName/middleName/lastName
+    if (firstName !== null || middleName !== null || lastName !== null) {
+      const names = [
+        firstName || existingCard.firstName || '',
+        middleName || existingCard.middleName || '',
+        lastName || existingCard.lastName || ''
+      ];
+      updateData.fullName = names.filter(Boolean).join(' ').trim() || 'Unnamed';
+    }
     
     const prefix = formData.get('prefix') as string;
     if (prefix !== null) updateData.prefix = prefix || undefined;

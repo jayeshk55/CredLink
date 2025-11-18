@@ -19,6 +19,7 @@ import {
   FiGlobe,
   
 } from "react-icons/fi";
+
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
 import FlatCardPreview from "@/components/cards/FlatCardPreview";
 import ModernCardPreview from "@/components/cards/ModernCardPreview";
@@ -43,6 +44,8 @@ interface Card {
   id: string;
   fullName?: string;
   name?: string;
+  cardName?: string;
+  cardActive?: boolean;
   title?: string;
   company?: string;
   location?: string;
@@ -52,6 +55,8 @@ interface Card {
   skills?: string;
   portfolio?: string;
   experience?: string;
+  services?: string;
+  review?: string;
   photo?: string;
   profileImage?: string;
   cover?: string;
@@ -90,6 +95,8 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       skills: card.skills || '',
       portfolio: card.portfolio || '',
       experience: card.experience || '',
+      services: card.services || '',
+      review: card.review || '',
       photo: card.profileImage || card.photo || '',
       cover: card.coverImage || card.bannerImage || card.cover || '',
       email: card.email || '',
@@ -140,8 +147,37 @@ const CardDetailsPage = () => {
   const [shareMethod, setShareMethod] = useState<"qr" | "link">("link");
   const [card, setCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
 
   const qrRef = useRef<HTMLDivElement>(null);
+const handleToggleActive = async () => {
+    if (isTogglingActive || !card) return;
+    
+    setIsTogglingActive(true);
+    try {
+      const response = await fetch(`/api/card/${cardId}/toggle-active`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to toggle card status");
+      }
+
+      const data = await response.json();
+      setCard(prev => prev ? { ...prev, cardActive: data.card.cardActive } : null);
+      toast.success(data.message);
+    } catch (error: any) {
+      console.error("Error toggling card status:", error);
+      toast.error(error.message || "Failed to toggle card status");
+    } finally {
+      setIsTogglingActive(false);
+    }
+  };
+
 const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this card? This action cannot be undone.")) {
       return;
@@ -714,14 +750,17 @@ const handleDelete = async () => {
                   <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Pause Card</h4>
-                      <p className={styles.settingsDescription}>Disable this card temporarily.</p>
+                      <p className={styles.settingsDescription}>
+                        {card?.cardActive ? 'Card is active and shareable. Click to pause.' : 'Card is paused and cannot be shared. Click to activate.'}
+                      </p>
                     </div>
                     <div className={styles.settingsControl}>
                       <button
-                        onClick={() => setSearchIndexing(!searchIndexing)}
+                        onClick={handleToggleActive}
                         className={styles.toggleBtn}
+                        disabled={isTogglingActive}
                       >
-                        {searchIndexing ? (
+                        {card?.cardActive ? (
                           <FiToggleRight className={`${styles.toggleIcon} ${styles.active}`} />
                         ) : (
                           <FiToggleLeft className={`${styles.toggleIcon} ${styles.inactive}`} />

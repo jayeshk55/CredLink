@@ -27,17 +27,8 @@ model User {
   lastName         String?
   prefix           String?
   suffix           String?
-  preferredName    String?
-  maidenName       String?
-  pronouns         String?
   title            String?
   company          String?
-  department       String?
-  affiliation      String?
-  headline         String?
-  accreditations   String?
-  emailLink        String?
-  phoneLink        String?
   location         String?
   cardName         String?
   cardType         String?   @default("Personal")
@@ -112,24 +103,22 @@ model Card {
   id               String   @id @default(cuid()) @map("id")
   userId           String   @map("user_id")
   
-  // Personal Information
+  // Card Name (Main identifier)
+  cardName         String?  @map("card_name") @db.VarChar(255)
+  
+  // Full Name (auto-constructed from firstName/middleName/lastName)
   fullName         String   @map("full_name") @db.VarChar(255)
+  
+  // Personal Information (optional detailed fields)
   firstName        String?  @map("first_name") @db.VarChar(100)
   middleName       String?  @map("middle_name") @db.VarChar(100)
   lastName         String?  @map("last_name") @db.VarChar(100)
   prefix           String?  @db.VarChar(20)
   suffix           String?  @db.VarChar(20)
-  preferredName    String?  @map("preferred_name") @db.VarChar(100)
-  maidenName       String?  @map("maiden_name") @db.VarChar(100)
-  pronouns         String?  @db.VarChar(50)
   
   // Professional Information
   title            String?  @db.VarChar(255)
   company          String?  @db.VarChar(255)
-  department       String?  @db.VarChar(100)
-  affiliation      String?  @db.VarChar(255)
-  headline         String?  @db.VarChar(500)
-  accreditations   String?  @db.Text
   
   // Contact Information
   email            String?  @db.VarChar(320)
@@ -141,7 +130,7 @@ model Card {
   websiteUrl       String?  @map("website_url") @db.VarChar(2048)
 
   // Card Customization
-  cardName         String?  @map("card_name") @db.VarChar(100)
+  cardActive       Boolean  @map("card_active") @default(true)
   cardType         String?  @map("card_type") @default("Personal") @db.VarChar(50)
   selectedDesign   String?  @map("selected_design") @default("Classic") @db.VarChar(50)
   selectedColor    String?  @map("selected_color") @default("#145dfd") @db.VarChar(20)
