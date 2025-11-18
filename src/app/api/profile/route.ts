@@ -36,7 +36,15 @@ export async function GET() {
       )
     }
 
-    return NextResponse.json({ user })
+    // Check if user has a real password (not OAuth user)
+    const hasRealPassword = user.password && user.password.length > 0 && !user.password.startsWith('oauth_')
+
+    return NextResponse.json({ 
+      user: {
+        ...user,
+        hasPassword: hasRealPassword
+      }
+    })
   } catch (error) {
     console.error('Get profile error:', error)
     return NextResponse.json(

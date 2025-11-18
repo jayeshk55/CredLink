@@ -336,7 +336,10 @@ const PublicCardPage = () => {
           
           // Check if card is active (not paused)
           if (data.card.cardActive === false) {
-            toast.error('This card is currently unavailable');
+            toast.error('This card has been deactivated by the owner', {
+              duration: 5000,
+              icon: '🚫',
+            });
             setCard(null);
             setIsLoading(false);
             return;
@@ -444,9 +447,9 @@ const PublicCardPage = () => {
     return (
       <div className={styles.pageContainer}>
         <div className={styles.errorContainer}>
-          <h1 className={styles.errorTitle}>Card Not Found</h1>
+          <h1 className={styles.errorTitle}>Card Unavailable</h1>
           <p className={styles.errorMessage}>
-            The card you're looking for doesn't exist or has been removed.
+            This card has been deactivated by the owner or does not exist.
           </p>
           <a href="/" className={styles.errorButton}>
             Go to Homepage

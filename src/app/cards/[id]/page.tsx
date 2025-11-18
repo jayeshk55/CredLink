@@ -579,12 +579,38 @@ const handleDelete = async () => {
 
                 <div style={{ height: "16px" }}></div>
 
+                {/* Warning message when card is paused */}
+                {!card?.cardActive && (
+                  <div style={{ 
+                    padding: '12px 16px', 
+                    backgroundColor: '#fef3c7', 
+                    border: '1px solid #fbbf24',
+                    borderRadius: '8px', 
+                    marginBottom: '16px',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{ 
+                      color: '#92400e', 
+                      fontSize: '14px', 
+                      fontWeight: '500',
+                      margin: 0
+                    }}>
+                      ⚠️ This card is paused. Activate it in Settings to enable sharing.
+                    </p>
+                  </div>
+                )}
+
                 <div className={styles.actionButtons}>
                   <motion.button 
                     onClick={() => copyToClipboard(mockUserData.cardUrl)} 
                     className={styles.actionBtn}
-                    whileTap={{ scale: 0.95 }}
-                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: card?.cardActive ? 0.95 : 1 }}
+                    whileHover={{ scale: card?.cardActive ? 1.03 : 1 }}
+                    disabled={!card?.cardActive}
+                    style={{
+                      opacity: card?.cardActive ? 1 : 0.5,
+                      cursor: card?.cardActive ? 'pointer' : 'not-allowed'
+                    }}
                   >
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copied ? "Copied!" : "Copy Link"}
@@ -592,16 +618,26 @@ const handleDelete = async () => {
                   <motion.button 
                     onClick={downloadQR} 
                     className={styles.actionBtn}
-                    whileTap={{ scale: 0.95 }}
-                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: card?.cardActive ? 0.95 : 1 }}
+                    whileHover={{ scale: card?.cardActive ? 1.03 : 1 }}
+                    disabled={!card?.cardActive}
+                    style={{
+                      opacity: card?.cardActive ? 1 : 0.5,
+                      cursor: card?.cardActive ? 'pointer' : 'not-allowed'
+                    }}
                   >
                     <Download className="w-4 h-4" /> Download QR
                   </motion.button>
                   <motion.button 
                     onClick={shareProfile} 
                     className={styles.actionBtn}
-                    whileTap={{ scale: 0.95 }}
-                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: card?.cardActive ? 0.95 : 1 }}
+                    whileHover={{ scale: card?.cardActive ? 1.03 : 1 }}
+                    disabled={!card?.cardActive}
+                    style={{
+                      opacity: card?.cardActive ? 1 : 0.5,
+                      cursor: card?.cardActive ? 'pointer' : 'not-allowed'
+                    }}
                   >
                     <Share2 className="w-4 h-4" /> Share Profile
                   </motion.button>
