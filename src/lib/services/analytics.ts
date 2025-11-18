@@ -103,11 +103,11 @@ export async function getAnalyticsData(filters: { usersPeriod?: string } = {}) {
       const dateStr = date.toISOString().split('T')[0];
       const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
       
-      const registrationsForDay = dailyRegistrations.filter(reg => 
+      const registrationsForDay = dailyRegistrations.filter((reg: any) => 
         reg.createdAt.toISOString().split('T')[0] === dateStr
       );
       
-      const visits = registrationsForDay.reduce((sum, reg) => sum + reg._count.id, 0);
+      const visits = registrationsForDay.reduce((sum: number, reg: any) => sum + reg._count.id, 0);
       
       trafficData.push({
         name: dayName,
@@ -202,7 +202,7 @@ export async function getAnalyticsData(filters: { usersPeriod?: string } = {}) {
       // keep latest dates first
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    const engagementData = usersByTitle.map(titleGroup => ({
+    const engagementData = usersByTitle.map((titleGroup: any) => ({
       name: titleGroup.title || 'Other',
       value: titleGroup._count.id
     }));
@@ -242,7 +242,7 @@ export async function getAnalyticsData(filters: { usersPeriod?: string } = {}) {
         newMessages,
         activeCities: activeCitiesCount
       },
-      activitySummary: recentUsers.map(user => ({
+      activitySummary: recentUsers.map((user: any) => ({
         id: user.id,
         name: user.fullName,
         city: user.location || 'Unknown',

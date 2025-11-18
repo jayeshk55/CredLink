@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Parse permissions for each admin
-    const adminsWithParsedPermissions = admins.map(admin => ({
+    const adminsWithParsedPermissions = admins.map((admin: any) => ({
       ...admin,
       permissions: JSON.parse(admin.permissions)
     }))
