@@ -3,22 +3,24 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
     try {
-        // Extract user ID from middleware headers
+        // Extract user ID from middleware headers (if available)
         const userId = req.headers.get('x-user-id');
-        if (!userId) {
-            return NextResponse.json({ 
-                ok: false, 
-                error: "Unauthorized - User not authenticated" 
-            }, { status: 401 });
+
+        // Build base where clause for active users
+        const where: any = {
+            status: 'active',
+        };
+
+        // When authenticated, exclude the requesting user from the results
+        if (userId) {
+            where.NOT = {
+                id: userId,
+            };
         }
-        // Fetch all active users except the requesting user
+
+        // Fetch all active users (excluding current user if logged in)
         const users = await prisma.user.findMany({
-            where: {
-                NOT: {
-                    id: userId
-                },
-                status: 'active'
-            },
+            where,
             select: {
                 id: true,
                 fullName: true,
@@ -39,7 +41,7 @@ export async function GET(req: NextRequest) {
             }
         });
 
-        return NextResponse.json({ ok: true, users });
+        return NextResponse.json({ ok: true, users, isAuthenticated: !!userId });
     } catch (error) {
         console.error("Error fetching users:", error);
         return NextResponse.json({ ok: false, error: "Failed to fetch users" }, { status: 500 });

@@ -88,7 +88,11 @@ export default function Homepage() {
         designation: user.title || undefined,
       }));
 
-      setIsLoggedIn(true);
+      if (typeof data.isAuthenticated === 'boolean') {
+        setIsLoggedIn(data.isAuthenticated);
+      } else {
+        setIsLoggedIn(true);
+      }
 
       const filtered = mapped.filter((p) => {
         const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city}`.toLowerCase();
