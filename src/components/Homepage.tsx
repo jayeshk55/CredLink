@@ -125,6 +125,7 @@ export default function Homepage() {
         const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city ?? ''}`.toLowerCase();
         const city = (p.city || '').toLowerCase();
 
+        
         const keywordsMatch = keywords.length === 0 || keywords.every((k) => hay.includes(k));
         const locationMatch = !locationPart || city.includes(locationPart);
         return keywordsMatch && locationMatch;
