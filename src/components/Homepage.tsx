@@ -439,10 +439,9 @@ export default function Homepage() {
                     border: 'none'
                   }}
                 >
-                  Search
+                Search
                 </button>
               </div>
-
               {hasSearched && (
                 <div className="mt-10" style={{ marginTop: '3.5rem' }}>
                   {searchLoading ? (
