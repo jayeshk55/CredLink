@@ -16,6 +16,8 @@ export interface DigitalCardProps {
   skills: string;
   portfolio: string;
   experience: string;
+  services?: string;
+  review?: string;
   photo?: string;
   cover?: string;
   email?: string;
@@ -25,6 +27,7 @@ export interface DigitalCardProps {
   design?: string; // Classic, Flat, Modern, Sleek
   themeColor1?: string;
   themeColor2?: string;
+  fontFamily?: string;
   cardType?: string;
 }
 
@@ -88,34 +91,54 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
       }}>
       {/* Card Name Badge - Top Right */}
-      {cardName && (
-        <div style={{
-          position: "absolute",
-          top: "16px",
-          right: "16px",
+     {/* Card Name + Card Type (Unified Badge Row) */}
+{(cardName || cardType) && (
+  <div
+    style={{
+      position: "absolute",
+      top: "16px",
+      right: "16px",
+      display: "flex",
+      gap: "8px",
+      zIndex: 20,
+    }}
+  >
+    {/* Card Name */}
+    {cardName && (
+      <div
+        style={{
           background: "rgba(255, 255, 255, 0.95)",
           color: themeColor1,
           padding: "6px 14px",
           borderRadius: "20px",
           fontSize: "12px",
-          fontWeight: "700",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          zIndex: 10,
-        }}>
-          {cardName}
-        </div>
-      )}
-      {/* Card Type Pill */}
-      {cardType && cardType.trim() !== "" && (
-        <div 
-          className={styles.cardTypePill}
-          style={{ 
-            '--pill-bg': themeColor1 || '#2563eb'
-          } as React.CSSProperties}
-        >
-          {cardType}
-        </div>
-      )}
+          fontWeight: 700,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        }}
+      >
+        {cardName}
+      </div>
+    )}
+
+    {/* Card Type */}
+    {cardType && (
+      <div
+        style={{
+          background: "rgba(255,255,255,0.85)",
+          color: themeColor1,
+          padding: "6px 12px",
+          borderRadius: "14px",
+          fontSize: "11px",
+          fontWeight: 700,
+          border: `1px solid ${themeColor1}`,
+        }}
+      >
+        {cardType}
+      </div>
+    )}
+  </div>
+)}
+     
       {/* Header */}
       <div style={{
         padding: "22px",

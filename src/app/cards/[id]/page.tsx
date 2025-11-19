@@ -86,27 +86,31 @@ interface Card {
 // ----------------- Card Preview -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
   const renderCardPreview = () => {
-    const commonProps = {
-      name: card.fullName || card.name || '',
-      title: card.title || '',
-      company: card.company || '',
-      location: card.location || '',
-      about: card.bio || card.about || card.description || '',
-      skills: card.skills || '',
-      portfolio: card.portfolio || '',
-      experience: card.experience || '',
-      services: card.services || '',
-      review: card.review || '',
-      photo: card.profileImage || card.photo || '',
-      cover: card.coverImage || card.bannerImage || card.cover || '',
-      email: card.email || '',
-      phone: card.phone || '',
-      linkedin: card.linkedinUrl || card.linkedin || '',
-      website: card.websiteUrl || card.website || '',
-      themeColor1: card.selectedColor || '#3b82f6',
-      themeColor2: card.selectedColor2 || '#2563eb',
-      cardType: card.cardType || '',
-    };
+   const commonProps = {
+  firstName: card.fullName || card.name || '',
+  middleName: '',
+  lastName: '',
+  cardName: card.cardName || '',
+  title: card.title || '',
+  company: card.company || '',
+  location: card.location || '',
+  about: card.bio || card.about || card.description || '',
+  skills: card.skills || '',
+  portfolio: card.portfolio || '',
+  experience: card.experience || '',
+  services: card.services || '',
+  review: card.review || '',
+  photo: card.profileImage || card.photo || '',
+  cover: card.coverImage || card.bannerImage || card.cover || '',
+  email: card.email || '',
+  phone: card.phone || '',
+  linkedin: card.linkedinUrl || card.linkedin || '',
+  website: card.websiteUrl || card.website || '',
+  themeColor1: card.selectedColor || '#3b82f6',
+  themeColor2: card.selectedColor2 || '#2563eb',
+   fontFamily: card.selectedFont || 'system-ui, sans-serif',
+  cardType: card.cardType || '',
+};
 
     const design = card.selectedDesign || 'Classic';
     

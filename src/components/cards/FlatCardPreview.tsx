@@ -1,15 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
-import styles from './cardType.module.css';
+import styles from "./cardType.module.css";
 
-const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; themeColor2?: string }> = ({
-  name = "",
+const FlatCardPreview: React.FC<DigitalCardProps> = ({
+  firstName = "",
+  middleName = "",
+  lastName = "",
+  cardName = "",
+  cardType = "",
   title = "",
   company = "",
   location = "",
-  about = "Crafting engaging content & SEO strategies",
+  about = "",
   photo = "",
   cover = "",
   email = "",
@@ -18,127 +22,480 @@ const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; theme
   website = "",
   themeColor1 = "#3b82f6",
   themeColor2 = "#60a5fa",
-  cardType = "",
+  fontFamily = "system-ui, sans-serif",
+  skills = "",
+  portfolio = "",
+  experience = "",
+  services = "",
+  review = "",
 }) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  const fullName =
+    [firstName, middleName, lastName].filter(Boolean).join(" ") ||
+    "Your Name";
+
+  const firstLetter = fullName.charAt(0).toUpperCase();
+
+  type Section = "Services" | "Portfolio" | "Skills" | "Experience" | "Review";
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () =>
+      setIsMobile(
+        typeof window !== "undefined" && window.innerWidth < 768
+      );
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Prepare list values
+  const skillsList = skills.split(",").map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(",").map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(",").map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(",").map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(",").map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        background: "#fff",
+        borderRadius: 12,
+        padding: "12px 14px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        marginBottom: 10,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: themeColor1,
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 700,
+          }}
+        >
+          ★
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, color: "#111827" }}>{title}</div>
+          {subtitle && (
+            <div style={{ fontSize: 12, color: "#6B7280" }}>{subtitle}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    const mapSection = {
+      Skills: skillsList,
+      Services: servicesList,
+      Portfolio: portfolioList,
+      Experience: experienceList,
+      Review: reviewList,
+    };
+
+    return (
+      <div style={{ padding: isMobile ? 12 : 16 }}>
+        {mapSection[section].map((it, idx) => (
+          <div key={idx}>{renderItem(it)}</div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
-      <div style={{
+    <div
+      style={{
         width: "360px",
         borderRadius: "12px",
         overflow: "hidden",
         boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-        fontFamily: "system-ui, sans-serif",
-        position: "relative",
+        fontFamily,
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
         border: `3px solid ${themeColor1}`,
-      }}>
-        {/* Card Type Pill */}
-        {cardType && cardType.trim() !== "" && (
-          <div 
-            className={styles.cardTypePill}
-            style={{ 
-              '--pill-bg': themeColor1 || '#2563eb'
-            } as React.CSSProperties}
-          >
-            {cardType}
-          </div>
-        )}
-        {/* Cover Image Section - Exact copy from edit page */}
-        <div style={{
-          width: "100%", 
-          height: "120px", 
+        position: "relative",
+      }}
+    >
+      {/* Card Name Badge */}
+      {cardName && (
+        <div
+  style={{
+    position: "absolute",
+    top: "16px",
+    right: "16px",
+    display: "flex",
+    gap: "8px",
+    zIndex: 20,
+  }}
+>
+  {/* Card Name Badge */}
+  {cardName && (
+    <div
+      style={{
+        background: "rgba(255, 255, 255, 0.95)",
+        color: themeColor1,
+        padding: "6px 14px",
+        borderRadius: "20px",
+        fontSize: "12px",
+        fontWeight: 700,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+      }}
+    >
+      {cardName}
+    </div>
+  )}
+
+  {/* Card Type Pill */}
+  {cardType && (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.85)",
+        color: themeColor1,
+        padding: "6px 12px",
+        borderRadius: "14px",
+        fontSize: "11px",
+        fontWeight: 700,
+        border: `1px solid ${themeColor1}`,
+      }}
+    >
+      {cardType}
+    </div>
+  )}
+</div>
+      )}
+
+      {/* Cover */}
+      <div
+        style={{
+          width: "100%",
+          height: "120px",
           overflow: "hidden",
-          backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+          backgroundImage: cover
+            ? "none"
+            : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
           backgroundSize: cover ? "cover" : "auto",
-          backgroundPosition: cover ? "center" : "initial",
-          backgroundColor: cover ? "transparent" : "transparent"
-        }}>
-          {cover && (
-            <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          backgroundPosition: "center",
+        }}
+      >
+        {cover && (
+          <img
+            src={cover}
+            alt="Cover"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        )}
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "24px", textAlign: "center" }}>
+        {/* Photo */}
+        <div
+          style={{
+            width: "80px",
+            height: "80px",
+            borderRadius: "12px",
+            overflow: "hidden",
+            margin: "0 auto 16px",
+            background: photo ? "transparent" : themeColor1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {photo ? (
+            <img
+              src={photo}
+              alt="Profile"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <span
+              style={{
+                fontSize: "32px",
+                fontWeight: 700,
+                color: "white",
+              }}
+            >
+              {firstLetter}
+            </span>
           )}
         </div>
-        
-        {/* Main Content Section - Exact copy from edit page */}
-        <div style={{ padding: "24px", textAlign: "center" }}>
-          <div style={{
-            width: "80px", 
-            height: "80px", 
-            borderRadius: "12px", 
-            overflow: "hidden",
-            margin: "0 auto 16px", 
-            background: photo ? "transparent" : themeColor1,
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center"
-          }}>
-            {photo ? (
-              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              <span style={{ fontSize: "32px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+
+        {/* Name */}
+        <h3
+          style={{
+            margin: "0 0 8px",
+            fontSize: "24px",
+            fontWeight: 700,
+            color: "#FFFFFF",
+          }}
+        >
+          {fullName}
+        </h3>
+
+        {title && (
+          <p
+            style={{
+              margin: "0 0 4px",
+              fontSize: "16px",
+              color: "#FFFFFF",
+              fontWeight: 600,
+              opacity: 0.95,
+            }}
+          >
+            {title}
+          </p>
+        )}
+
+        {company && (
+          <p
+            style={{
+              margin: "0 0 16px",
+              fontSize: "14px",
+              color: "#FFFFFF",
+            }}
+          >
+            {company}
+          </p>
+        )}
+
+        {location && (
+          <p
+            style={{
+              margin: "0 0 16px",
+              fontSize: "14px",
+              color: "#FFFFFF",
+            }}
+          >
+            {location}
+          </p>
+        )}
+
+        <p
+          style={{
+            fontSize: "13px",
+            lineHeight: 1.5,
+            color: "#FFFFFF",
+            margin: "0 0 20px",
+            opacity: 0.9,
+          }}
+        >
+          {about}
+        </p>
+
+        {/* Social Row */}
+        {(email || phone || linkedin || website) && (
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            {email && (
+              <a
+                href={`mailto:${email}`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <rect x="4" y="6" width="16" height="12" rx="2" ry="2" />
+                  <path d="M4 8l8 5 8-5" />
+                </svg>
+              </a>
+            )}
+
+            {phone && (
+              <a
+                href={`tel:${phone}`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 013.08 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                </svg>
+              </a>
+            )}
+
+            {linkedin && (
+              <a
+                href={linkedin}
+                target="_blank"
+                rel="noopener"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                  <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z" />
+                </svg>
+              </a>
+            )}
+
+            {website && (
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z" />
+                </svg>
+              </a>
             )}
           </div>
-          {name && <h3 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
-          {title && <p style={{ margin: "0 0 4px", fontSize: "16px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
-          {company && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{company}</p>}
-          {location && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
-          <p style={{ fontSize: "13px", lineHeight: 1.5, color: "#FFFFFF", margin: "0 0 20px", opacity: 0.9 }}>{about}</p>
-          
-          {/* Social Icons - Only show when data exists */}
-          {(email || phone || linkedin || website) && (
-            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-              {email && (
-                <a href={`mailto:${email}`} style={{
-                  width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.4)"
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                    <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-                    <path d="M4 8l8 5 8-5"/>
-                  </svg>
-                </a>
-              )}
-              {phone && (
-                <a href={`tel:${phone}`} style={{
-                  width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.4)"
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 01 3.08 2h3a2 2 0 01 2 1.72 12.84 12.84 0 00 .7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 00 6 6l1.27-1.27a2 2 0 01 2.11-.45 12.84 12.84 0 00 2.81.7A2 2 0 01 22 16.92z"/>
-                  </svg>
-                </a>
-              )}
-              {linkedin && (
-                <a href={linkedin} target="_blank" rel="noopener noreferrer" style={{
-                  width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.4)"
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
-                    <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
-                  </svg>
-                </a>
-              )}
-              {website && (
-                <a href={website} target="_blank" rel="noopener noreferrer" style={{
-                  width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.4)"
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="2" y1="12" x2="22" y2="12"/>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  </svg>
-                </a>
-              )}
-            </div>
-          )}
+        )}
+
+        {/* Pills */}
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginTop: "16px",
+          }}
+        >
+          {[
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+            .filter((b) => b.value && b.value.trim() !== "")
+            .map((b) => (
+              <button
+                key={b.text}
+                onClick={() => setActivePanel(b.text as Section)}
+                style={{
+                  padding: "8px 14px",
+                  background: "rgba(255,255,255,0.2)",
+                  color: "#FFFFFF",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: "12px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+                }}
+              >
+                {b.text}
+              </button>
+            ))}
         </div>
       </div>
+
+      {/* MODAL */}
+      {activePanel && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+          onClick={() => setActivePanel(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              borderRadius: 16,
+              width: isMobile ? "100%" : "calc(100% - 24px)",
+              maxWidth: 520,
+              maxHeight: isMobile ? "100%" : "80%",
+              overflow: "hidden",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+            }}
+          >
+            <div
+              style={{
+                padding: isMobile ? 12 : 16,
+                borderBottom: "1px solid #f0f0f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <h3 style={{ margin: 0, color: "#111827", fontWeight: 700 }}>
+                {activePanel}
+              </h3>
+              <button
+                onClick={() => setActivePanel(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 18,
+                  cursor: "pointer",
+                  color: "#9CA3AF",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div
+              style={{
+                maxHeight: isMobile ? "calc(80vh - 60px)" : 400,
+                overflow: "auto",
+              }}
+            >
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

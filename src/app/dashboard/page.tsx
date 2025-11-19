@@ -57,7 +57,7 @@ const renderCardPreview = (card: Card) => {
     firstName: card.firstName || '',
     middleName: card.middleName || '',
     lastName: card.lastName || '',
-    cardName: card.cardName || '',
+     cardName: card.cardName || card.name || '',
     title: card.title || '',
     company: card.company || '',
     location: card.location || '',
@@ -202,7 +202,8 @@ const Dashboard = () => {
       <div className="h-10"></div>
 
       {/* Cards Bento Layout */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 mt-4" style={{ columnGap: '1.5rem' }}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+
         {isLoadingCards ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green mx-auto mb-4"></div>
