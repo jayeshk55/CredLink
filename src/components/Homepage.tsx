@@ -101,15 +101,37 @@ export default function Homepage() {
         setIsLoggedIn(true);
       }
 
+      // Parse query into keywords and optional location, like dashboard search
+      let keywordsPart = q;
+      let locationPart = '';
+
+      const inIdx = q.lastIndexOf(' in ');
+      if (inIdx > -1) {
+        keywordsPart = q.slice(0, inIdx).trim();
+        locationPart = q.slice(inIdx + 4).trim();
+      }
+
+      if (!locationPart) {
+        const parts = q.split(',').map((s) => s.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          keywordsPart = parts[0];
+          locationPart = parts.slice(1).join(', ');
+        }
+      }
+
+      const keywords = keywordsPart.split(/\s+/).filter(Boolean);
+
       const filtered = mapped.filter((p) => {
-        const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city}`.toLowerCase();
-        return hay.includes(q);
+        const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city ?? ''}`.toLowerCase();
+        const city = (p.city || '').toLowerCase();
+
+        
+        const keywordsMatch = keywords.length === 0 || keywords.every((k) => hay.includes(k));
+        const locationMatch = !locationPart || city.includes(locationPart);
+        return keywordsMatch && locationMatch;
       });
 
-      const finalResults =
-        filtered.length > 0
-          ? filtered
-          : mapped;
+      const finalResults = filtered.length > 0 ? filtered : mapped;
 
       setSearchResults(finalResults);
     } catch (error) {
@@ -417,10 +439,9 @@ export default function Homepage() {
                     border: 'none'
                   }}
                 >
-                  Search
+                Search
                 </button>
               </div>
-
               {hasSearched && (
                 <div className="mt-10" style={{ marginTop: '3.5rem' }}>
                   {searchLoading ? (
