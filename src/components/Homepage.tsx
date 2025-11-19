@@ -101,17 +101,37 @@ export default function Homepage() {
         setIsLoggedIn(true);
       }
 
+      // Parse query into keywords and optional location, like dashboard search
+      let keywordsPart = q;
+      let locationPart = '';
+
+      const inIdx = q.lastIndexOf(' in ');
+      if (inIdx > -1) {
+        keywordsPart = q.slice(0, inIdx).trim();
+        locationPart = q.slice(inIdx + 4).trim();
+      }
+
+      if (!locationPart) {
+        const parts = q.split(',').map((s) => s.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          keywordsPart = parts[0];
+          locationPart = parts.slice(1).join(', ');
+        }
+      }
+
+      const keywords = keywordsPart.split(/\s+/).filter(Boolean);
+
       const filtered = mapped.filter((p) => {
-        const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city}`.toLowerCase();
-        return hay.includes(q);
+        const hay = `${p.name} ${p.designation ?? ''} ${p.company ?? ''} ${p.city ?? ''}`.toLowerCase();
+        const city = (p.city || '').toLowerCase();
+
+        
+        const keywordsMatch = keywords.length === 0 || keywords.every((k) => hay.includes(k));
+        const locationMatch = !locationPart || city.includes(locationPart);
+        return keywordsMatch && locationMatch;
       });
 
-      const finalResults =
-        filtered.length > 0
-          ? filtered
-          : mapped;
-
-      setSearchResults(finalResults);
+      setSearchResults(filtered);
     } catch (error) {
       console.error('Error searching users:', error);
       setIsLoggedIn(false);
@@ -392,11 +412,11 @@ export default function Homepage() {
                   style={{ 
                     background: '#FFFFFF',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                    paddingLeft: '3.5rem',
-                    paddingRight: '10rem',
-                    paddingTop: '1.1rem',
-                    paddingBottom: '1.1rem',
-                    fontSize: '1rem',
+                    paddingLeft: '3rem',
+                    paddingRight: '7.5rem',
+                    paddingTop: '1rem',
+                    paddingBottom: '1rem',
+                    fontSize: '0.9rem',
                     color: 'var(--primary-purple)'
                   }}
                 />
@@ -417,10 +437,9 @@ export default function Homepage() {
                     border: 'none'
                   }}
                 >
-                  Search
+                Search
                 </button>
               </div>
-
               {hasSearched && (
                 <div className="mt-10" style={{ marginTop: '3.5rem' }}>
                   {searchLoading ? (
@@ -442,23 +461,22 @@ export default function Homepage() {
                               >
                                 <div
                                   className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-semibold"
-                                  style={{ filter: isLoggedIn === false ? 'blur(2px)' : 'none' }}
                                 >
                                   {profile.name.charAt(0)}
                                 </div>
                                 <div>
-                                  <div className="font-semibold text-gray-900">
+                                  <div
+                                    className="font-semibold text-gray-900"
+                                    style={{ filter: isLoggedIn === false ? 'blur(3px)' : 'none' }}
+                                  >
                                     {profile.name}
                                   </div>
                                   {profile.designation && (
-                                    <div className="text-sm text-gray-600">
+                                    <div className="fontSize-[14px] text-gray-600">
                                       {profile.designation}
                                     </div>
                                   )}
-                                  <div
-                                    className="text-sm text-gray-500"
-                                    style={{ filter: isLoggedIn === false ? 'blur(2px)' : 'none' }}
-                                  >
+                                  <div className="text-sm text-gray-500">
                                     📍 {profile.city}
                                   </div>
                                 </div>
@@ -477,13 +495,19 @@ export default function Homepage() {
                                   sentRequests.has(profile.id) ||
                                   acceptedConnections.has(profile.id)
                                 }
-                                className="rounded-sm bg-blue-600 px-8 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                                style={{ minWidth: '130px', textAlign: 'center', marginRight: '16px' }}
+                                className={`rounded-sm px-4 py-2 text-sm font-semibold text-white shadow transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                                  acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
+                                    ? 'bg-green-600 hover:bg-green-800'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
+                                style={{ minWidth: '90px', textAlign: 'center', marginRight: '12px' }}
                               >
                                 {connectingUserId === profile.id
                                   ? 'Connecting...'
-                                  : acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
+                                  : acceptedConnections.has(profile.id)
                                   ? 'Connected'
+                                  : sentRequests.has(profile.id)
+                                  ? 'Sent'
                                   : 'Connect'}
                               </button>
                             </div>

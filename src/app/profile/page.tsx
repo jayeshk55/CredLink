@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { Mail, Phone, Linkedin, Globe } from "lucide-react";
 import Image from "next/image";
@@ -36,8 +35,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
-  const { user: zustandUser, isAuthenticated } = useAuth();
+  const { user: zustandUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +69,7 @@ export default function ProfilePage() {
     }
   };
 
-  const user = userProfile || session?.user || zustandUser;
+  const user = userProfile || zustandUser;
 
   const displayUser = user
     ? {

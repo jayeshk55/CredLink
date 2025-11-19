@@ -12,12 +12,12 @@ model ConnectionTest {
 }
 
 model User {
-  id                  String           @id @default(uuid())
-  email               String           @unique
+  id                  String              @id @default(uuid())
+  email               String              @unique
   password            String
   fullName            String
   phone               String?
-  username            String           @unique
+  username            String              @unique
   firstName           String?
   middleName          String?
   lastName            String?
@@ -27,25 +27,26 @@ model User {
   company             String?
   location            String?
   cardName            String?
-  cardType            String?          @default("Personal")
-  selectedDesign      String?          @default("Classic")
-  selectedColor       String?          @default("#145dfd")
-  selectedFont        String?          @default("Arial, sans-serif")
-  profileImage        String?          @db.Text
-  bannerImage         String?          @db.Text
-  bio                 String?          @db.Text
-  status              String?          @default("draft")
-  views               Int              @default(0)
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-  isActive            Boolean          @default(true)
-  role                String?          @default("user")
-  cardConnections     CardConnection[] @relation("CardConnectionOwner")
-  cards               Card[]           @relation("UserCards")
-  receivedConnections Connection[]     @relation("ReceivedConnections")
-  sentConnections     Connection[]     @relation("SentConnections")
-  receivedMessages    Message[]        @relation("ReceivedMessages")
-  sentMessages        Message[]        @relation("SentMessages")
+  cardType            String?             @default("Personal")
+  selectedDesign      String?             @default("Classic")
+  selectedColor       String?             @default("#145dfd")
+  selectedFont        String?             @default("Arial, sans-serif")
+  profileImage        String?             @db.Text
+  bannerImage         String?             @db.Text
+  bio                 String?             @db.Text
+  status              String?             @default("draft")
+  views               Int                 @default(0)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  isActive            Boolean             @default(true)
+  role                String?             @default("user")
+  cardConnections     CardConnection[]    @relation("CardConnectionOwner")
+  cards               Card[]              @relation("UserCards")
+  receivedConnections Connection[]        @relation("ReceivedConnections")
+  sentConnections     Connection[]        @relation("SentConnections")
+  receivedMessages    Message[]           @relation("ReceivedMessages")
+  sentMessages        Message[]           @relation("SentMessages")
+  passwordResetTokens PasswordResetToken[]
 
   @@index([username])
   @@map("users")
@@ -221,4 +222,19 @@ enum MessageTag {
   SUPPORT
   PRICING
   FEEDBACK
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
