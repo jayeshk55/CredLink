@@ -442,12 +442,14 @@ export default function Homepage() {
                               >
                                 <div
                                   className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-semibold"
-                                  style={{ filter: isLoggedIn === false ? 'blur(2px)' : 'none' }}
                                 >
                                   {profile.name.charAt(0)}
                                 </div>
                                 <div>
-                                  <div className="font-semibold text-gray-900">
+                                  <div
+                                    className="font-semibold text-gray-900"
+                                    style={{ filter: isLoggedIn === false ? 'blur(3px)' : 'none' }}
+                                  >
                                     {profile.name}
                                   </div>
                                   {profile.designation && (
@@ -455,10 +457,7 @@ export default function Homepage() {
                                       {profile.designation}
                                     </div>
                                   )}
-                                  <div
-                                    className="text-sm text-gray-500"
-                                    style={{ filter: isLoggedIn === false ? 'blur(2px)' : 'none' }}
-                                  >
+                                  <div className="text-sm text-gray-500">
                                     📍 {profile.city}
                                   </div>
                                 </div>
@@ -477,13 +476,19 @@ export default function Homepage() {
                                   sentRequests.has(profile.id) ||
                                   acceptedConnections.has(profile.id)
                                 }
-                                className="rounded-sm bg-blue-600 px-8 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                className={`rounded-sm px-8 py-2 text-sm font-semibold text-white shadow transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                                  acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
+                                    ? 'bg-green-600 hover:bg-green-700'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
                                 style={{ minWidth: '130px', textAlign: 'center', marginRight: '16px' }}
                               >
                                 {connectingUserId === profile.id
                                   ? 'Connecting...'
-                                  : acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
+                                  : acceptedConnections.has(profile.id)
                                   ? 'Connected'
+                                  : sentRequests.has(profile.id)
+                                  ? 'Sent'
                                   : 'Connect'}
                               </button>
                             </div>
