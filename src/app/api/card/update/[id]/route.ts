@@ -163,6 +163,17 @@ export async function PATCH(
     const status = formData.get('status') as string;
     if (status !== null) updateData.status = status;
 
+    // Handle document upload (optional)
+    const documentFile = formData.get('document') as File;
+    if (documentFile && documentFile.size > 0) {
+      const buffer = Buffer.from(await documentFile.arrayBuffer());
+      const uploadResult: any = await uploadToCloudinary(buffer, {
+        folder: 'credlink/cards/documents',
+        public_id: `${decoded.userId}_document_${Date.now()}`,
+      });
+      updateData.documentUrl = uploadResult.secure_url;
+    }
+
     // Handle profile image upload
     const profileImageFile = formData.get('profileImage') as File;
     if (profileImageFile && profileImageFile.size > 0) {

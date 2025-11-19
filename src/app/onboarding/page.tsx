@@ -281,6 +281,7 @@ const OnboardingPage: React.FC = () => {
   const [step, setStep] = useState(0);
   const router = useRouter();
   const [showPartyPopup, setShowPartyPopup] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [formData, setFormData] = useState({
     photo: "",
     photoFile: null as File | null,
@@ -297,6 +298,30 @@ const OnboardingPage: React.FC = () => {
   });
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [isLargeScreen, setIsLargeScreen] = useState(true);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          // Not authenticated, redirect to login
+          router.push('/auth/login');
+          return;
+        }
+        
+        setIsCheckingAuth(false);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/auth/login');
+      }
+    };
+    
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     const check = () => setIsLargeScreen(window.innerWidth >= 1024);
@@ -357,6 +382,7 @@ const OnboardingPage: React.FC = () => {
         const cardFormData = new FormData();
         
         // Required fields from signup
+        cardFormData.append('cardName', formData.name || 'My Card');
         cardFormData.append('fullName', formData.name || '');
         cardFormData.append('phone', formData.phone || '');
         cardFormData.append('email', formData.email || '');
@@ -478,6 +504,37 @@ const OnboardingPage: React.FC = () => {
     color: '#1F2937',
     ...(focusedInput === id ? { borderBottom: `2px solid ${colors.primary}` } : {}),
   });
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#f8fafc'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #E5E7EB',
+            borderTopColor: '#3B82F6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p style={{ color: '#6B7280', fontSize: '16px' }}>Verifying access...</p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   /* -------------------------------------------------
      STEP 0: WELCOME SCREEN

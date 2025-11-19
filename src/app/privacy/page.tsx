@@ -193,7 +193,7 @@ export default function PrivacyPage() {
               <div style={heroMetaRow}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={metaDot} />
-                  <span>Effective Date: <strong>[Add Date]</strong></span>
+                  <span>Effective Date: <strong>[19/11/25]</strong></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={metaDot} />

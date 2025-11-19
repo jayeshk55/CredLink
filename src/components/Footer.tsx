@@ -195,7 +195,6 @@ export default function Footer() {
               gap: '1rem'
             }}>
               {[
-                { name: 'Help Center', path: '/help' },
                 { name: 'FAQ', sectionId: 'faq' as const },
                 { name: 'Terms of Service', path: '/terms' },
                 { name: 'Privacy Policy', path: '/privacy' }

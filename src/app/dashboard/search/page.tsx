@@ -166,16 +166,43 @@ function SearchPageContent() {
 
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return profiles.filter((p) => {
-      const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
+    const raw = query.trim().toLowerCase();
+    if (!raw) return [];
 
-      if (q && !hay.includes(q)) return false;
-      if (category && p.category !== category) return false;
+    // Parse query into keywords and location
+    let keywordsPart = raw;
+    let locationPart = "";
 
-      return true;
-    }).slice(0, 6);
+    // Pattern: "<keywords> in <location>"
+    const inIdx = raw.lastIndexOf(" in ");
+    if (inIdx > -1) {
+      keywordsPart = raw.slice(0, inIdx).trim();
+      locationPart = raw.slice(inIdx + 4).trim();
+    }
+
+    // Fallback: comma-separated: "<keywords>, <location>"
+    if (!locationPart) {
+      const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        keywordsPart = parts[0];
+        locationPart = parts.slice(1).join(", ");
+      }
+    }
+
+    const keywords = keywordsPart.split(/\s+/).filter(Boolean);
+
+    return profiles
+      .filter((p) => {
+        const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city ?? ""}`.toLowerCase();
+        const city = (p.city || "").toLowerCase();
+
+        const keywordsMatch = keywords.length === 0 || keywords.every((k) => hay.includes(k));
+        const locationMatch = !locationPart || city.includes(locationPart);
+        if (category && p.category !== category) return false;
+
+        return keywordsMatch && locationMatch;
+      })
+      .slice(0, 50);
   }, [query, category, profiles]);
 
   return (

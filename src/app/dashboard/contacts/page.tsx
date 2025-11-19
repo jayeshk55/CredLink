@@ -54,6 +54,9 @@ export default function ContactsPage() {
 
         const data = await response.json();
         setContacts(data.contacts || []);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('contacts-updated'));
+        }
       } catch (error: any) {
         console.error("Error fetching contacts:", error);
         toast.error("Failed to load contacts");

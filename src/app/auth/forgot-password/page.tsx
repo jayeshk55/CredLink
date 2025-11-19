@@ -5,76 +5,53 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import "../../globals.css"
 
-type Step = "phone" | "otp" | "reset"
-
 export default function ForgotPasswordPage() {
   const router = useRouter()
 
-  const [step, setStep] = useState<Step>("phone")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [passwordMismatch, setPasswordMismatch] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [email, setEmail] = useState("")
 
-  // Phone
-  const [phone, setPhone] = useState("")
-
-  // OTP
-  const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", "", "", ""]) 
-
-  // Reset password
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    setPasswordMismatch(false)
+    setSuccess(false)
 
-    if (step === "phone") {
-      const normalized = phone.replace(/\D/g, "")
-      if (!normalized || normalized.length !== 10) {
-        setError("Please enter a valid 10-digit phone number")
-        return
-      }
-      setLoading(true)
-      // UI-only: move to OTP step
-      setTimeout(() => {
-        setLoading(false)
-        setStep("otp")
-      }, 300)
+    if (!email) {
+      setError("Please enter your email address")
       return
     }
 
-    if (step === "otp") {
-      const otp = otpDigits.join("")
-      if (!otp || otp.length < 6) {
-        setError("Please enter the 6-digit code")
-        return
-      }
-      setLoading(true)
-      // UI-only: move to reset step
-      setTimeout(() => {
-        setLoading(false)
-        setStep("reset")
-      }, 300)
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address")
       return
     }
 
-    if (step === "reset") {
-      if (!password || password.length < 8) {
-        setError("Password must be at least 8 characters")
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'An error occurred. Please try again.')
         return
       }
-      if (password !== confirm) {
-        setPasswordMismatch(true)
-        return
-      }
-      setLoading(true)
-      // UI-only: pretend success and redirect to login
-      setTimeout(() => {
-        router.push("/auth/login")
-      }, 300)
-      return
+
+      setSuccess(true)
+    } catch (error) {
+      console.error('Forgot password error:', error)
+      setError('An error occurred. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -86,139 +63,65 @@ export default function ForgotPasswordPage() {
             <h1 className="auth-logo">MyKard</h1>
           </Link>
           <h2 className="auth-title">
-            {step === "phone" && "Forgot your password?"}
-            {step === "otp" && "Enter the OTP"}
-            {step === "reset" && "Set a new password"}
+            {success ? "Check your email" : "Forgot your password?"}
           </h2>
           <p className="auth-subtitle">
-            {step === "phone" && "Enter your phone number to receive an OTP."}
-            {step === "otp" && (
-              <>We sent a 6-digit code to {phone ? <span className="font-medium">+91 {phone}</span> : "your phone"}.</>
-            )}
-            {step === "reset" && (
-              <>{phone ? <>For <span className="font-medium">+91 {phone}</span></> : "Enter your new password below."}</>
-            )}
+            {success 
+              ? "We've sent a password reset link to your email address."
+              : "Enter your email address and we'll send you a link to reset your password."
+            }
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form space-y-6">
-          {step === "phone" && (
-            <div className="auth-input-group">
-              <label htmlFor="phone" className="label">Phone Number</label>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-2 border-2 border-[var(--background-light-blue)] rounded-md bg-[var(--background-white)] text-sm text-gray-600 select-none">
-                  +91
-                </span>
-                <input
-                  id="phone"
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]{10}"
-                  maxLength={10}
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="auth-input"
-                  placeholder="Enter 10-digit phone number"
-                  required
-                />
-              </div>
+        {success ? (
+          <div className="auth-form space-y-6">
+            <div className="text-center p-6 bg-green-50 border border-green-200 rounded-lg">
+              <div className="text-green-600 text-4xl mb-4">✓</div>
+              <h3 className="text-lg font-semibold text-green-800 mb-2">Email sent successfully!</h3>
+              <p className="text-green-700 text-sm mb-4">
+                If an account with <strong>{email}</strong> exists, we've sent a password reset link to that email address.
+              </p>
+              <p className="text-green-600 text-xs">
+                The link will expire in 1 hour for security reasons.
+              </p>
             </div>
-          )}
-
-          {step === "otp" && (
-            <div className="auth-input-group">
-              <label className="label">OTP Code</label>
-              <div className="flex gap-2 sm:gap-3 justify-between">
-                {otpDigits.map((d, i) => (
-                  <input
-                    key={i}
-                    id={`fp-otp-${i}`}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    value={d}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "").slice(0,1)
-                      const next = [...otpDigits]
-                      next[i] = val
-                      setOtpDigits(next)
-                      if (val && i < 5) {
-                        const nextEl = document.getElementById(`fp-otp-${i+1}`) as HTMLInputElement | null
-                        nextEl?.focus()
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if ((e as React.KeyboardEvent<HTMLInputElement>).key === 'Backspace' && !otpDigits[i] && i > 0) {
-                        const prevEl = document.getElementById(`fp-otp-${i-1}`) as HTMLInputElement | null
-                        prevEl?.focus()
-                      }
-                    }}
-                    onPaste={(e) => {
-                      const pasted = e.clipboardData.getData('text').replace(/\D/g, "").slice(0,6)
-                      if (pasted) {
-                        e.preventDefault()
-                        const next = [...otpDigits]
-                        for (let k=0; k<6; k++) next[k] = pasted[k] || ''
-                        setOtpDigits(next)
-                        const lastIndex = Math.min(5, pasted.length - 1)
-                        const el = document.getElementById(`fp-otp-${Math.max(0,lastIndex)}`) as HTMLInputElement | null
-                        el?.focus()
-                      }
-                    }}
-                    className="w-12 h-12 sm:w-14 sm:h-12 text-center text-2xl sm:text-xl font-mono auth-input px-0"
-                    style={{ padding: 0, lineHeight: '3rem' }}
-                    required
-                  />
-                ))}
-              </div>
-              <div className="mt-2 text-right">
-                <button type="button" className="text-sm text-primary-green hover:text-primary-green-dark" disabled={loading}>
-                  Resend code
-                </button>
-              </div>
+            
+            <div className="text-center">
+              <button 
+                onClick={() => {
+                  setSuccess(false)
+                  setEmail("")
+                  setError("")
+                }}
+                className="text-sm text-primary-green hover:text-primary-green-dark"
+              >
+                Send another email
+              </button>
             </div>
-          )}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="auth-form space-y-6">
+            <div className="auth-input-group">
+              <label htmlFor="email" className="label">Email Address</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-input"
+                placeholder="Enter your email address"
+                required
+                disabled={loading}
+              />
+            </div>
 
-          {step === "reset" && (
-            <>
-              <div className="auth-input-group">
-                <label htmlFor="new-password" className="label">New Password</label>
-                <input
-                  id="new-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="auth-input"
-                  placeholder="Enter new password"
-                  required
-                />
-              </div>
+            {error && <p className="text-sm text-red-600">{error}</p>}
 
-              <div className="auth-input-group">
-                <label htmlFor="confirm-password" className="label">Confirm New Password</label>
-                <input
-                  id="confirm-password"
-                  type="password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className={`auth-input ${passwordMismatch ? 'border-red-600' : ''}`}
-                  placeholder="Re-enter new password"
-                  required
-                />
-              </div>
-              {passwordMismatch && <p className="mt-2 text-sm text-red-600">Passwords do not match</p>}
-            </>
-          )}
-
-          {error && !passwordMismatch && <p className="mt-2 text-sm text-red-600">{error}</p>}
-
-          <button type="submit" disabled={loading} className="auth-submit-button w-full">
-            {step === "phone" && (loading ? "Continuing..." : "Send OTP")}
-            {step === "otp" && (loading ? "Verifying..." : "Verify")}
-            {step === "reset" && (loading ? "Saving..." : "Save and sign in")}
-          </button>
-        </form>
+            <button type="submit" disabled={loading} className="auth-submit-button w-full">
+              {loading ? "Sending..." : "Send Reset Link"}
+            </button>
+          </form>
+        )}
 
         <div className="mt-4 text-center">
           <Link href="/auth/login" className="text-sm text-primary-green hover:text-primary-green-dark">

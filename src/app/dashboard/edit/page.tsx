@@ -1436,6 +1436,10 @@ const EditPage = () => {
         formData.append('bannerImage', bannerImageFile);
       }
 
+      if (resumeFile) {
+        formData.append('document', resumeFile);
+      }
+
       // Determine if we're updating or creating
       const isUpdating = existingCardId || cardId;
       const endpoint = isUpdating 
@@ -2155,7 +2159,7 @@ const EditPage = () => {
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Upload Document</label>
               <input
                 type="file"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf, .doc, .docx"
                 style={{ display: 'none' }}
                 id="resume-upload"
                 onChange={(e) => {
