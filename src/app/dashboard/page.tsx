@@ -165,6 +165,8 @@ const Dashboard = () => {
         </div>
       </div>
     );
+
+    // Middleware protects this route; no client-side redirect needed
   }
 
   return (
