@@ -29,6 +29,7 @@ const Sidebar = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
   const [pendingConnections, setPendingConnections] = useState(0);
+  const [contactsCount, setContactsCount] = useState(0);
 
   useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -97,6 +98,34 @@ const Sidebar = () => {
       clearInterval(intervalId);
       if (typeof window !== 'undefined') {
         window.removeEventListener('connections-updated', onUpdated as any);
+      }
+    };
+  }, []);
+
+  // Fetch contacts count for Contacts badge (matches Contacts page data source)
+  useEffect(() => {
+    let intervalId: any;
+    const fetchContacts = async () => {
+      try {
+        const res = await fetch('/api/contacts', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        setContactsCount((data.contacts || []).length);
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    fetchContacts();
+    intervalId = setInterval(fetchContacts, 20000);
+    const onUpdated = () => fetchContacts();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('contacts-updated', onUpdated as any);
+    }
+    return () => {
+      clearInterval(intervalId);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('contacts-updated', onUpdated as any);
       }
     };
   }, []);
@@ -190,6 +219,9 @@ const Sidebar = () => {
                 )}
                 {item.name === "Connections" && pendingConnections > 0 && pathname !== "/dashboard/connections" && (
                   <span className="navBadge">{pendingConnections}</span>
+                )}
+                {item.name === "Contacts" && contactsCount > 0 && pathname !== "/dashboard/contacts" && (
+                  <span className="navBadge">{contactsCount}</span>
                 )}
               </Link>
             );
