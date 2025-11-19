@@ -39,6 +39,20 @@ export default function Header() {
     return () => mql.removeEventListener("change", onChange);
   }, []);
 
+  // Auto-close mobile menu on scroll
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleScroll = () => {
+      if (window.innerWidth < 1024) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMenuOpen]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -80,16 +94,16 @@ export default function Header() {
           overflow: 'visible'
         }}
       >
-      <nav className="max-w-7xl mx-auto px-8 py-4" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
+      <nav className="max-w-7xl mx-auto px-8 pt-6 pb-2" style={{ paddingLeft: '2rem', paddingRight: '2rem',paddingTop: '0.5rem' }}>
         <div className="flex items-center justify-between h-16">
           {/* Logo - Left Side */}
           <Link href="/" className="flex items-center group">
             <Image
-              src="/assets/finalogo.png"
+              src="/assets/headerlogo.png"
               alt="Logo"
               width={144}
               height={144}
-              className="w-36 h-36 object-cover transition-all duration-300 group-hover:scale-105"
+              className="w-48 h-12 object-cover transition-all duration-300 group-hover:scale-105"
               priority
               unoptimized
               onError={(e) => {
@@ -409,7 +423,9 @@ export default function Header() {
                   <a href="/auth/login" className="px-5 py-2.5 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50" style={{ textDecoration: 'none' }}>
                     Login
                   </a>
-                  <a href="/auth/signup" className="relative px-12 py-2.5 text-[15px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group text-center" style={{ minWidth: '120px', minHeight: '40px', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <a href="/auth/signup" className="relative px-12 py-2.5 text-[15px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group border-none cursor-pointer"
+                    style={{ minWidth: '120px', minHeight: '40px', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
                     <span className="relative z-10 flex items-center justify-center">
                       Create Card
                     </span>
@@ -438,7 +454,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden pt-6 border-t border-blue-100/50 animate-in fade-in slide-in-from-top-2 duration-300" style={{ paddingBottom: '0rem' }}>
+          <div className="lg:hidden pt-12 border-t border-blue-100/50 animate-in fade-in slide-in-from-top-2 duration-300" style={{ paddingBottom: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button 
                 onClick={() => {
@@ -519,6 +535,7 @@ export default function Header() {
                     ? 'text-blue-600 bg-blue-50/50 font-semibold' 
                     : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
                 }`}
+                style={{ marginBottom: '24px' }}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${
                   activeSection === 'how-it-works' ? 'bg-blue-600' : 'bg-transparent'
@@ -527,7 +544,8 @@ export default function Header() {
               </button>
               
             </div>
-            <div className="pt-8 pb-8 px-2 mt-6 border-t border-blue-100/50">
+            <div className="pt-10 pb-8 px-2 mt-6 border-t border-blue-100/50">
+
               {!isAuthenticated ? (
                 <div className="flex gap-3 w-full">
                   <button 

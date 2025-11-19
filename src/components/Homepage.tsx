@@ -131,9 +131,7 @@ export default function Homepage() {
         return keywordsMatch && locationMatch;
       });
 
-      const finalResults = filtered.length > 0 ? filtered : mapped;
-
-      setSearchResults(finalResults);
+      setSearchResults(filtered);
     } catch (error) {
       console.error('Error searching users:', error);
       setIsLoggedIn(false);
@@ -414,11 +412,11 @@ export default function Homepage() {
                   style={{ 
                     background: '#FFFFFF',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                    paddingLeft: '3.5rem',
-                    paddingRight: '10rem',
-                    paddingTop: '1.1rem',
-                    paddingBottom: '1.1rem',
-                    fontSize: '1rem',
+                    paddingLeft: '3rem',
+                    paddingRight: '7.5rem',
+                    paddingTop: '1rem',
+                    paddingBottom: '1rem',
+                    fontSize: '0.9rem',
                     color: 'var(--primary-purple)'
                   }}
                 />
@@ -474,7 +472,7 @@ export default function Homepage() {
                                     {profile.name}
                                   </div>
                                   {profile.designation && (
-                                    <div className="text-sm text-gray-600">
+                                    <div className="fontSize-[14px] text-gray-600">
                                       {profile.designation}
                                     </div>
                                   )}
@@ -497,12 +495,12 @@ export default function Homepage() {
                                   sentRequests.has(profile.id) ||
                                   acceptedConnections.has(profile.id)
                                 }
-                                className={`rounded-sm px-8 py-2 text-sm font-semibold text-white shadow transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                                className={`rounded-sm px-4 py-2 text-sm font-semibold text-white shadow transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                                   acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
-                                    ? 'bg-green-600 hover:bg-green-700'
+                                    ? 'bg-green-600 hover:bg-green-800'
                                     : 'bg-blue-600 hover:bg-blue-700'
                                 }`}
-                                style={{ minWidth: '130px', textAlign: 'center', marginRight: '16px' }}
+                                style={{ minWidth: '90px', textAlign: 'center', marginRight: '12px' }}
                               >
                                 {connectingUserId === profile.id
                                   ? 'Connecting...'
