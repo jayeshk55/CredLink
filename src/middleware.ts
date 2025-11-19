@@ -42,7 +42,8 @@ export function middleware(request: NextRequest) {
     '/faq',
     '/terms',
     '/privacy',
-    '/cards/*',
+    '/admin/login',
+    '/cards/public/*',
     '/api/message/receive',
     '/api/message/send'
   ]
@@ -54,12 +55,12 @@ export function middleware(request: NextRequest) {
   const isContactPath = path === '/contact' || path.startsWith('/contact/')
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
 
-  const isCombinedPublicPath = publicPaths.some(publicPath => {
+  const isPublicPath = publicPaths.some(publicPath => {
     if (publicPath.endsWith('*')) {
       return path.startsWith(publicPath.slice(0, -1))
     }
     return publicPath === path
-  }) || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
+  }) || isPricingPath || isContactPath || isDashboardContactPath
 
   const userToken = request.cookies.get('user_token')?.value
   const adminToken = request.cookies.get('admin_token')?.value
@@ -68,10 +69,8 @@ export function middleware(request: NextRequest) {
     ? authHeader.substring('Bearer '.length).trim()
     : undefined
   
-  const isAuthenticated = request.cookies.has('user_token') || 
-                          request.cookies.has('admin_token') ||
-                          request.cookies.has('next-auth.session-token') || 
-                          request.cookies.has('__Secure-next-auth.session-token')
+  const hasUserToken = request.cookies.has('user_token')
+  const hasAdminToken = request.cookies.has('admin_token')
 
   let userId: string | null = null
   let adminId: string | null = null
@@ -108,17 +107,29 @@ export function middleware(request: NextRequest) {
 
   // Redirect logic
   if (!isApiRequest) {
-    // Allow access to auth pages (no redirect even if authenticated)
-    if (isAuthPath) {
+    // Always allow auth pages and explicit public pages
+    if (isAuthPath || isPublicPath) {
       return NextResponse.next({
         request: {
           headers: requestHeaders,
         },
       })
     }
-    
-    // Protect other pages - redirect to login if not authenticated
-    if (!isAuthenticated && !isCombinedPublicPath) {
+
+    // Admin routes require admin token
+    if (isAdminPath) {
+      if (!hasAdminToken) {
+        return NextResponse.redirect(new URL('/admin/login', request.url))
+      }
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
+    }
+
+    // Dashboard and other non-public app pages require user token
+    if (!hasUserToken) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
   }
