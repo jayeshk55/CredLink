@@ -31,6 +31,11 @@ export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [formData, setFormData] = useState({ name: "", email: "", topic: "", message: "" });
+  // Format steps like "1) Do this 2) Do that" into separate lines
+const formatAnswer = (text: string) => {
+  return text.replace(/(\d\))/g, "\n$1").trim();
+};
+
   const [isMobile, setIsMobile] = useState(false);
 
   React.useEffect(() => {
@@ -39,6 +44,7 @@ export default function SupportPage() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+  
 
   const contactOptions = useMemo<ContactOption[]>(() => [
     {
@@ -203,7 +209,16 @@ export default function SupportPage() {
                   </span>
                   <span style={{ fontSize: 24, color: '#2563eb', transform: activeFaq === i ? 'rotate(45deg)' : 'none', transition: '0.2s' }}>+</span>
                 </button>
-                {activeFaq === i && <p style={S.faqA}>{faq.a}</p>}
+             {activeFaq === i && (
+  <p style={S.faqA}>
+    {formatAnswer(faq.a).split("\n").map((line, i) => (
+      <div key={i} style={{ marginBottom: 6 }}>
+        {line}
+      </div>
+    ))}
+  </p>
+)}
+
               </div>
             ))}
           </div>
