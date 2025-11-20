@@ -174,14 +174,14 @@ export default function SupportPage() {
         toast.success(`Ticket marked as ${newStatus.toLowerCase()} (Email service error)`);
         
         // Log the email details for debugging
-        console.log('Status update details:', {
-          ticketId: id,
-          userEmail: ticket.userEmail,
-          userName: ticket.userName,
-          oldStatus: ticket.status,
-          newStatus: newStatus,
-          timestamp: new Date().toISOString()
-        });
+        // console.log('Status update details:', {
+        //   ticketId: id,
+        //   userEmail: ticket.userEmail,
+        //   userName: ticket.userName,
+        //   oldStatus: ticket.status,
+        //   newStatus: newStatus,
+        //   timestamp: new Date().toISOString()
+        // });
       }
     } catch (error) {
       console.error('Error updating ticket status:', error);

@@ -204,7 +204,7 @@ const handleDelete = async () => {
     const fetchCard = async () => {
       try {
         setIsLoading(true);
-        console.log('🔍 Fetching card with ID:', cardId);
+      //  console.log('🔍 Fetching card with ID:', cardId);
         
         const response = await fetch(`/api/card/${cardId}`);
         
@@ -215,7 +215,7 @@ const handleDelete = async () => {
         const data = await response.json();
         
         if (data.success && data.card) {
-          console.log('✅ Fetched card:', data.card);
+        //  console.log('✅ Fetched card:', data.card);
           setCard(data.card);
         } else {
           toast.error('Card not found');
@@ -325,7 +325,7 @@ const handleDelete = async () => {
   const shareProfile = async () => {
     const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nThis profile contains my contact information, social links, and business card.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
     
-    console.log('Navigator share available:', !!navigator.share);
+   // console.log('Navigator share available:', !!navigator.share);
     console.log('Current share method:', shareMethod);
     console.log('Is mobile device:', isMobile());
     

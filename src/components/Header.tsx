@@ -104,8 +104,6 @@ export default function Header() {
               width={144}
               height={144}
               className="w-48 h-12 object-cover transition-all duration-300 group-hover:scale-105"
-              priority
-              unoptimized
               onError={(e) => {
                 console.log('Image failed to load:', e);
                 e.currentTarget.style.display = 'none';

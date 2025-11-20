@@ -69,11 +69,11 @@ export default function ProfilesPage() {
   })
 
   const handleApprove = (profileId: number) => {
-    console.log("Approving profile:", profileId)
+    //console.log("Approving profile:", profileId)
   }
 
   const handleReject = (profileId: number) => {
-    console.log("Rejecting profile:", profileId)
+    //console.log("Rejecting profile:", profileId)
   }
 
   return (
