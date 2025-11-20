@@ -3,8 +3,10 @@ import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
 import { prisma } from "@/lib/prisma";
 import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
+import { adminStorageBucket } from "@/lib/firebase-admin";
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
+const MAX_DOCUMENT_SIZE_BYTES = 1024 * 1024; // 1MB
 
 export async function PATCH(
   req: NextRequest,
@@ -163,15 +165,39 @@ export async function PATCH(
     const status = formData.get('status') as string;
     if (status !== null) updateData.status = status;
 
-    // Handle document upload (optional)
+    // Handle document upload (optional, Firebase Storage)
     const documentFile = formData.get('document') as File;
     if (documentFile && documentFile.size > 0) {
-      const buffer = Buffer.from(await documentFile.arrayBuffer());
-      const uploadResult: any = await uploadToCloudinary(buffer, {
-        folder: 'credlink/cards/documents',
-        public_id: `${decoded.userId}_document_${Date.now()}`,
+      if (documentFile.size > MAX_DOCUMENT_SIZE_BYTES) {
+        return NextResponse.json(
+          { error: 'Document size must be 1MB or less' },
+          { status: 400 }
+        );
+      }
+
+      const arrayBuffer = await documentFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const originalName = (documentFile as any).name || 'document.pdf';
+      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
+      const timestamp = Date.now();
+      const filePath = `cards/documents/${decoded.userId}/${timestamp}-${safeName}`;
+
+      const fileRef = adminStorageBucket.file(filePath);
+
+      await fileRef.save(buffer, {
+        resumable: false,
+        metadata: {
+          contentType: documentFile.type || 'application/octet-stream',
+        },
       });
-      updateData.documentUrl = uploadResult.secure_url;
+
+      const [signedUrl] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '2100-01-01',
+      });
+
+      updateData.documentUrl = signedUrl;
     }
 
     // Handle profile image upload
