@@ -473,9 +473,9 @@ export default function DashboardContactPage() {
             <div className={styles.headerFlexContainer}>
               <div className={styles.flexOne}>
                 <h1 className={styles.pageTitle}>Connections</h1>
-                <p className={styles.pageSubtitle}>Manage and grow your connections</p>
+                
                 {/* Mobile-only: View toggle under title */}
-                <div className={styles.mobileOnly}>
+                <div className={`${styles.mobileOnly} ${styles.hiddenInHeader}`}>
                   <div className={styles.viewToggleContainer}>
                     <div 
                       className={`${styles.viewToggleBackground} ${
@@ -517,7 +517,7 @@ export default function DashboardContactPage() {
               </div>
               
               {/* Stats and Controls - Mobile Responsive */}
-              <div className={styles.controlsFlexContainer}>
+              <div className={`${styles.controlsFlexContainer} ${styles.hiddenInHeader}`}>
                 <div className={styles.statsBox}>
                   {/* Content removed to save space */}
                 </div>
@@ -533,7 +533,7 @@ export default function DashboardContactPage() {
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={styles.filterButton}
                           >
-                            <Filter className={styles.filterIcon} />
+                            
                             <span className={styles.filterText}>Sort by: {selectedSortOption === 'a-z' ? 'A-Z' : selectedSortOption === 'z-a' ? 'Z-A' : selectedSortOption === 'recent' ? 'Recent' : 'Oldest'}</span>
                             <ChevronDown className={`${styles.chevronIcon} ${isFilterOpen ? styles.rotate180 : ''}`} />
                           </button>
@@ -637,17 +637,134 @@ export default function DashboardContactPage() {
             <div className={styles.searchBarSection}>
               <div className={styles.searchBarWrapper}>
                 <div className={styles.searchBarInner}>
-                  <div className={styles.relativeContainer}>
-                    <div className={styles.searchIconContainer}>
-                      <Search className={styles.searchIcon} />
+                  {/* Mobile layout: search + filter row and view toggle */}
+                  <div className={styles.mobileOnly}>
+                    <div className={styles.searchFilterRow}>
+                      <div className={styles.searchColumn}>
+                        <div className={styles.relativeContainer}>
+                          <div className={styles.searchIconContainer}>
+                            <Search className={styles.searchIcon} />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Search Connections..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={`${styles.searchInput} ${styles.searchInputCompact}`}
+                          />
+                        </div>
+                      </div>
+                      {!isSidebarOpen && (
+                        <div className={styles.filterColumn}>
+                          <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
+                            <button 
+                              onClick={() => setIsFilterOpen(!isFilterOpen)}
+                              className={`${styles.filterButton} ${styles.filterButtonCompact}`}
+                            >
+                             
+                              <span className={styles.filterText}>Filter</span>
+                              <ChevronDown className={`${styles.chevronIcon} ${isFilterOpen ? styles.rotate180 : ''}`} />
+                            </button>
+                            {isFilterOpen && (
+                              <div className={styles.filterDropdown}>
+                                <div className={styles.filterDropdownContent}>
+                                  <button 
+                                    onClick={() => {
+                                      setSortBy('a-z');
+                                      setSelectedSortOption('a-z');
+                                      setIsFilterOpen(false);
+                                    }}
+                                    className={`${styles.filterOption} ${selectedSortOption === 'a-z' ? styles.filterOptionActive : ''}`}
+                                  >
+                                    Sort A-Z
+                                  </button>
+                                  <button 
+                                    onClick={() => {
+                                      setSortBy('z-a');
+                                      setSelectedSortOption('z-a');
+                                      setIsFilterOpen(false);
+                                    }}
+                                    className={`${styles.filterOption} ${selectedSortOption === 'z-a' ? styles.filterOptionActive : ''}`}
+                                  >
+                                    Sort Z-A
+                                  </button>
+                                  <button 
+                                    onClick={() => {
+                                      setSortBy('recent');
+                                      setSelectedSortOption('recent');
+                                      setIsFilterOpen(false);
+                                    }}
+                                    className={`${styles.filterOption} ${selectedSortOption === 'recent' ? styles.filterOptionActive : ''}`}
+                                  >
+                                    Sort by Recent
+                                  </button>
+                                  <button 
+                                    onClick={() => {
+                                      setSortBy('oldest');
+                                      setSelectedSortOption('oldest');
+                                      setIsFilterOpen(false);
+                                    }}
+                                    className={`${styles.filterOption} ${selectedSortOption === 'oldest' ? styles.filterOptionActive : ''}`}
+                                  >
+                                    Sort by Oldest
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <input
-                      type="text"
-                      placeholder="Search your professional network..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className={styles.searchInput}
-                    />
+
+                    <div className={styles.viewToggleContainer}>
+                      <div 
+                        className={`${styles.viewToggleBackground} ${
+                          viewMode === 'table' ? styles.viewToggleTableActive : styles.viewToggleCardsActive
+                        }`}
+                      />
+                      <button 
+                        onClick={() => setViewMode('table')}
+                        className={`${styles.viewToggleButton} ${
+                          viewMode === 'table' 
+                            ? styles.viewToggleActiveText 
+                            : styles.viewToggleInactiveText
+                        }`}
+                      >
+                        <span className={styles.flexCenter}>
+                          
+                          Table View
+                        </span>
+                      </button>
+                      <button 
+                        onClick={() => setViewMode('cards')}
+                        className={`${styles.viewToggleButton} ${
+                          viewMode === 'cards' 
+                            ? styles.viewToggleActiveText 
+                            : styles.viewToggleInactiveText
+                        }`}
+                      >
+                        <span className={styles.flexCenter}>
+                          
+                          Cards View
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Desktop layout: original search bar only */}
+                  <div className={styles.desktopOnly}>
+                    <div className={styles.relativeContainer}>
+                      <div className={styles.searchIconContainer}>
+                        <Search className={styles.searchIcon} />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search your professional network..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className={styles.searchInput}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -657,7 +774,7 @@ export default function DashboardContactPage() {
 
         {/* Mobile-only Filter under search bar */}
         {!isSidebarOpen && (
-          <div className={styles.mobileOnly}>
+          <div className={`${styles.mobileOnly} ${styles.hiddenInHeader}`}>
             <div className={styles.controlsFlexContainer}>
               <div className={styles.controlsGroup}>
                 <div className={styles.controlsInnerFlex}>
@@ -667,7 +784,7 @@ export default function DashboardContactPage() {
                       className={styles.filterButton}
                     >
                       <Filter className={styles.filterIcon} />
-                      <span className={styles.filterText}>Sort by: {selectedSortOption === 'a-z' ? 'A-Z' : selectedSortOption === 'z-a' ? 'Z-A' : selectedSortOption === 'recent' ? 'Recent' : 'Oldest'}</span>
+                      <span className={styles.filterText}>Filter</span>
                       <ChevronDown className={`${styles.chevronIcon} ${isFilterOpen ? styles.rotate180 : ''}`} />
                     </button>
                     {isFilterOpen && (

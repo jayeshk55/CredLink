@@ -29,12 +29,18 @@
   }
 }
 
+@media (max-width: 639px) {
+  .hiddenInHeader {
+    display: none !important;
+  }
+}
+
 /* --- Hero Section & Header --- */
 .heroSection {
   position: relative;
   padding: 16px 12px; /* tighter on mobile */
   background-color: white;
-  overflow: hidden;
+  overflow: visible;
 }
 
 @media (min-width: 640px) {
@@ -83,10 +89,18 @@
 .heroContentWrapper {
   position: relative;
   max-width: 1280px;
-  margin-left: 0;
+  margin-left: auto;
   margin-right: auto;
   overflow: visible;
   padding-left: 16px;
+  padding-right: 16px; /* add right padding to center */
+  text-align: center; /* center the content */
+}
+
+@media (min-width: 1024px) {
+  .heroContentWrapper {
+    text-align: left;
+  }
 }
 
 .headerFlexContainer {
@@ -94,7 +108,8 @@
   flex-direction: column;
   gap: 12px; /* tighter */
   overflow: visible;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
@@ -116,6 +131,8 @@
   color: #111827; /* text-gray-900 */
   margin-bottom: 4px; /* tighter */
   letter-spacing: -0.025em; /* tracking-tight */
+  text-align: center;
+  width: 100%;
 }
 
 @media (min-width: 640px) {
@@ -127,6 +144,8 @@
 @media (min-width: 1024px) {
   .pageTitle {
     font-size: 28px; /* match Messages desktop */
+    text-align: left;
+    width: auto;
   }
 }
 
@@ -282,7 +301,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 10;
+  z-index: 9999;
 }
 
 .filterDropdownContent {
@@ -343,6 +362,12 @@
   height: 40px; /* shorter */
   box-sizing: border-box;
   order: 1;
+}
+
+@media (max-width: 639px) {
+  .viewToggleContainer {
+    margin-top: 16px;
+  }
 }
 
 @media (min-width: 640px) {
@@ -487,6 +512,35 @@
 @media (min-width: 1024px) {
   .searchBarInner {
     padding: 24px; /* reduced */
+  }
+}
+
+@media (max-width: 639px) {
+  .searchFilterRow {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 95%;
+    margin: 0 auto;
+  }
+
+  .searchColumn {
+    flex: 0 0 70%;
+  }
+
+  .filterColumn {
+    flex: 0 0 30%;
+  }
+
+  .searchInputCompact {
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .filterButtonCompact {
+    padding: 6px 8px;
+    font-size: 13px;
   }
 }
 
@@ -1882,7 +1936,7 @@
 
 /* Connection Requests Styles */
 .tabsContainer {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
 }
 

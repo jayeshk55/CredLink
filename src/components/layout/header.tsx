@@ -55,6 +55,25 @@ export function Header() {
     checkAuth();
   }, [checkAuth]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      if (!target.closest('[data-profile-menu]')) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   // Dynamic page title
   const getPageTitle = () => {
     const path = pathname.split("/").filter(Boolean);
@@ -105,7 +124,7 @@ export function Header() {
                 </motion.div>
               )}
               
-              <div className="relative">
+              <div className="relative" data-profile-menu>
                 {isLgUp ? (
                   <motion.button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
