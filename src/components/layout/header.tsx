@@ -109,21 +109,6 @@ export function Header() {
                 paddingRight: "32px",
               }}
             >
-              {/* Active Card Name */}
-              {activeCardName && (
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  style={{
-                    fontSize: "14px",
-                    color: "#6b7280",
-                    fontWeight: 500,
-                  }}
-                >
-                  {activeCardName}
-                </motion.div>
-              )}
-              
               <div className="relative" data-profile-menu>
                 {isLgUp ? (
                   <motion.button
