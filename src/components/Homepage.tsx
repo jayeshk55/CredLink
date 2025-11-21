@@ -186,7 +186,7 @@ export default function Homepage() {
       {/* Header removed: page.tsx renders the global header */}
       
       {/* Hero Section */}
-      <section className="section flex items-center px-4 sm:px-6 lg:px-12" style={{ 
+      <section className="section flex items-center px-4 sm:px-6 lg:px-12 hero-section" style={{ 
         background: 'transparent',
         minHeight: '100vh', // Use full viewport height
         paddingTop: '1rem', // Minimal top padding to use available space

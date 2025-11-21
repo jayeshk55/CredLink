@@ -460,7 +460,7 @@ export default function Header() {
                   window.location.href = '/';
                   setIsMenuOpen(false);
                 }}
-                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-semibold rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 text-[18px] font-semibold rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
                   activeSection === 'home' 
                     ? 'text-blue-600 bg-blue-50/50' 
                     : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
@@ -477,7 +477,7 @@ export default function Header() {
                   scrollToSection('find-digital-card');
                   setIsMenuOpen(false);
                 }}
-                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 text-[18px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
                   activeSection === 'find-digital-card' 
                     ? 'text-blue-600 bg-blue-50/50 font-semibold' 
                     : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
