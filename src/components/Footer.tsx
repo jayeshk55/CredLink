@@ -432,8 +432,6 @@ export default function Footer() {
                 width={112}
                 height={112}
                 className="w-28 h-16 object-contain"
-                priority
-                unoptimized
               />
               powered by BoostNow
             </p>

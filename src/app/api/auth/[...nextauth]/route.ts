@@ -1,10 +1,11 @@
-import NextAuth from "next-auth"
+import NextAuth, { AuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
+import { randomUUID } from "crypto"
 import { prisma } from "@/lib/prisma"
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -57,6 +58,46 @@ const handler = NextAuth({
     signIn: '/auth/login',
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      try {
+        if (account?.provider === 'google') {
+          const email = (user.email || '').toLowerCase().trim()
+          if (!email) return false
+
+          let existing = await prisma.user.findUnique({ where: { email } })
+          if (!existing) {
+            const rawName = user.name || email.split('@')[0]
+            // Create a URL-safe username base
+            const base = rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 20) || 'user'
+            let candidate = base
+            let attempt = 0
+            while (attempt < 5) {
+              const found = await prisma.user.findUnique({ where: { username: candidate } })
+              if (!found) break
+              candidate = `${base}-${Math.floor(Math.random() * 1000)}`
+              attempt++
+            }
+            const hashedTempPassword = await bcrypt.hash(randomUUID(), 10)
+            existing = await prisma.user.create({
+              data: {
+                email,
+                password: hashedTempPassword,
+                fullName: rawName,
+                username: candidate,
+                status: 'active',
+                cardName: rawName,
+              }
+            })
+          }
+          // Attach our internal id so jwt callback can persist it
+          user.id = existing.id
+        }
+        return true
+      } catch (e) {
+        console.error('Google signIn error', e)
+        return false
+      }
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
@@ -84,6 +125,8 @@ const handler = NextAuth({
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

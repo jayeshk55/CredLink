@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import Header from './Header';
 import '../app/globals.css';
 
 type Profile = {
@@ -184,8 +183,7 @@ export default function Homepage() {
       maxWidth: '100vw',
       width: '100%'
     }}>
-      {/* Header */}
-      <Header />
+      {/* Header removed: page.tsx renders the global header */}
       
       {/* Hero Section */}
       <section className="section flex items-center px-4 sm:px-6 lg:px-12" style={{ 
