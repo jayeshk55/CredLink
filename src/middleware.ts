@@ -96,20 +96,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Handle preflight OPTIONS requests for CORS
-  if (request.method === 'OPTIONS' && isApiRequest) {
-    return new NextResponse(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-CSRF-Token, X-Requested-With',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400',
-      },
-    })
-  }
-
   // Add user/admin IDs to headers
   const requestHeaders = new Headers(request.headers)
   if (userId !== null) {
@@ -119,26 +105,15 @@ export function middleware(request: NextRequest) {
     requestHeaders.set('x-admin-id', adminId)
   }
 
-  // Add CORS headers to response for API requests
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  })
-
-  if (isApiRequest) {
-    const origin = request.headers.get('origin')
-    if (origin) {
-      response.headers.set('Access-Control-Allow-Origin', origin)
-      response.headers.set('Access-Control-Allow-Credentials', 'true')
-    }
-  }
-
   // Redirect logic
   if (!isApiRequest) {
     // Always allow auth pages and explicit public pages
     if (isAuthPath || isPublicPath) {
-      return response
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
     }
 
     // Admin routes require admin token
@@ -146,7 +121,11 @@ export function middleware(request: NextRequest) {
       if (!hasAdminToken) {
         return NextResponse.redirect(new URL('/admin/login', request.url))
       }
-      return response
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
     }
 
     // Dashboard and other non-public app pages require user token
@@ -155,7 +134,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  return response
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {

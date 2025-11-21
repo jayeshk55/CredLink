@@ -373,7 +373,7 @@ export default function AnalyticsPage() {
               .filter((item: any) => item.name !== 'Users')
               .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
             const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
-            console.debug('[Analytics] categoryData (poll)', mapped);
+           // console.debug('[Analytics] categoryData (poll)', mapped);
             setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
           }
           setEngagementData(data.trafficData);
@@ -395,7 +395,7 @@ export default function AnalyticsPage() {
               .filter((item: any) => item.name !== 'Users')
               .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
             const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
-            console.debug('[Analytics] categoryData (sse)', mapped);
+           // console.debug('[Analytics] categoryData (sse)', mapped);
             setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
           }
           setEngagementData(payload.trafficData);

@@ -8,7 +8,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
   firstName = "", middleName = "", lastName = "", cardName = "",cardType = "",
   title = "", company = "", location = "", about = "", photo = "", cover = "",
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
-  skills = "", portfolio = "", experience = "", services = "", review = ""
+  skills = "", portfolio = "", experience = "", services = "", review = "", documentUrl,
 }) => {
 
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
@@ -231,7 +231,10 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
           .map((b) => (
             <button
               key={b.text}
-              onClick={() => setActivePanel(b.text as Section)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActivePanel(b.text as Section);
+              }}
               style={{
                 padding: "8px 14px",
                 background: "rgba(255, 255, 255, 0.2)",
@@ -247,6 +250,30 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
               {b.text}
             </button>
           ))}
+
+          {documentUrl && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (typeof window !== 'undefined') {
+                  window.open(documentUrl, '_blank', 'noopener');
+                }
+              }}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              Docs
+            </button>
+          )}
         </div>
       </div>
 

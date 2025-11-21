@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
-import { uploadToCloudinary, deleteFromCloudinary } from '@/lib/cloudinary'
+import { deleteFromCloudinary } from '@/lib/cloudinary'
+import { adminStorageBucket } from '@/lib/firebase-admin'
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
 
@@ -97,24 +98,31 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Upload new image to Cloudinary
-    const uploadResult = await uploadToCloudinary(buffer, {
-      folder: 'MyKard/profile-images',
-      public_id: `profile_${decoded.userId}_${Date.now()}`,
-      transformation: {
-        width: 400,
-        height: 400,
-        crop: 'fill',
-        quality: 'auto',
-        format: 'auto'
-      }
-    }) as any
+    // Upload new image to Firebase Storage
+    const originalName = (file as any).name || 'profile.jpg'
+    const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase()
+    const timestamp = Date.now()
+    const filePath = `users/profile-images/${decoded.userId}/${timestamp}-${safeName}`
+
+    const fileRef = adminStorageBucket.file(filePath)
+
+    await fileRef.save(buffer, {
+      resumable: false,
+      metadata: {
+        contentType: file.type || 'application/octet-stream',
+      },
+    })
+
+    const [signedUrl] = await fileRef.getSignedUrl({
+      action: 'read',
+      expires: '2100-01-01',
+    })
 
     // Update user profile in database
-    console.log('🔄 Upload API: Updating user profile with image URL:', uploadResult.secure_url);
+    console.log('🔄 Upload API: Updating user profile with image URL:', signedUrl);
     const updatedUser = await prisma.user.update({
       where: { id: decoded.userId },
-      data: { profileImage: uploadResult.secure_url } as any,
+      data: { profileImage: signedUrl } as any,
       select: {
         id: true,
         email: true,
@@ -128,7 +136,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Profile image uploaded successfully',
       user: updatedUser,
-      imageUrl: uploadResult.secure_url
+      imageUrl: signedUrl
     })
 
   } catch (error) {
