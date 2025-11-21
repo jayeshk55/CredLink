@@ -36,6 +36,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if account is deactivated
+    if (user.status === 'inactive') {
+      console.log('❌ Account is deactivated:', email)
+      return NextResponse.json(
+        { error: 'Your account has been deactivated. Please contact support to reactivate your account.' },
+        { status: 403 }
+      )
+    }
+
     // Check if user has a password set
     if (!user.password) {
       console.log('❌ User has no password set:', email)

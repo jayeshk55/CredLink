@@ -65,6 +65,13 @@ export const authOptions: AuthOptions = {
           if (!email) return false
 
           let existing = await prisma.user.findUnique({ where: { email } })
+          
+          // Check if account exists but is deactivated
+          if (existing && existing.status === 'inactive') {
+            console.log('❌ Attempted login to deactivated account via Google:', email)
+            return false
+          }
+          
           if (!existing) {
             const rawName = user.name || email.split('@')[0]
             // Create a URL-safe username base

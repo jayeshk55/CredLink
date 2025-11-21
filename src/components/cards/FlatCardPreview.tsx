@@ -29,6 +29,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
   services = "",
   review = "",
   documentUrl,
+  onDocumentClick,
 }) => {
   const fullName =
     [firstName, middleName, lastName].filter(Boolean).join(" ") ||
@@ -439,8 +440,8 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (typeof window !== "undefined") {
-                  window.open(documentUrl, "_blank", "noopener");
+                if (onDocumentClick) {
+                  onDocumentClick(documentUrl);
                 }
               }}
               style={{

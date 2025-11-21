@@ -165,39 +165,46 @@ export async function PATCH(
     const status = formData.get('status') as string;
     if (status !== null) updateData.status = status;
 
-    // Handle document upload (optional, Firebase Storage)
+    // Handle document upload (optional, Firebase Storage with conversion)
     const documentFile = formData.get('document') as File;
     if (documentFile && documentFile.size > 0) {
-      if (documentFile.size > MAX_DOCUMENT_SIZE_BYTES) {
+      const maxDocSize = 10 * 1024 * 1024; // 10MB
+      if (documentFile.size > maxDocSize) {
         return NextResponse.json(
-          { error: 'Document size must be 1MB or less' },
+          { error: 'Document size must be less than 10MB' },
           { status: 400 }
         );
       }
 
-      const arrayBuffer = await documentFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      try {
+        // Use the document conversion API for DOC/DOCX conversion
+        const convertFormData = new FormData();
+        convertFormData.append('file', documentFile);
+        
+        // Make internal API call to convert document
+        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+        const convertResponse = await fetch(`${baseUrl}/api/document/convert`, {
+          method: 'POST',
+          body: convertFormData,
+          headers: {
+            'Cookie': `user_token=${token}`
+          }
+        });
 
-      const originalName = (documentFile as any).name || 'document.pdf';
-      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
-      const timestamp = Date.now();
-      const filePath = `cards/documents/${decoded.userId}/${timestamp}-${safeName}`;
+        if (!convertResponse.ok) {
+          const errorData = await convertResponse.json();
+          throw new Error(errorData.error || 'Failed to process document');
+        }
 
-      const fileRef = adminStorageBucket.file(filePath);
-
-      await fileRef.save(buffer, {
-        resumable: false,
-        metadata: {
-          contentType: documentFile.type || 'application/octet-stream',
-        },
-      });
-
-      const [signedUrl] = await fileRef.getSignedUrl({
-        action: 'read',
-        expires: '2100-01-01',
-      });
-
-      updateData.documentUrl = signedUrl;
+        const convertResult = await convertResponse.json();
+        updateData.documentUrl = convertResult.url;
+      } catch (error: any) {
+        console.error('Error converting document:', error);
+        return NextResponse.json(
+          { error: error.message || 'Failed to process document' },
+          { status: 500 }
+        );
+      }
     }
 
     // Handle profile image upload

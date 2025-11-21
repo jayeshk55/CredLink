@@ -8,7 +8,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
   firstName = "", middleName = "", lastName = "", cardName = "",cardType = "",
   title = "", company = "", location = "", about = "", photo = "", cover = "",
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
-  skills = "", portfolio = "", experience = "", services = "", review = "", documentUrl,
+  skills = "", portfolio = "", experience = "", services = "", review = "", documentUrl, onDocumentClick,
 }) => {
 
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
@@ -255,8 +255,8 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (typeof window !== 'undefined') {
-                  window.open(documentUrl, '_blank', 'noopener');
+                if (onDocumentClick) {
+                  onDocumentClick(documentUrl);
                 }
               }}
               style={{

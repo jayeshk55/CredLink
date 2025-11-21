@@ -625,6 +625,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   const handleDeactivateAccount = async () => {
     try {
+      // Show loading toast
+      const loadingToast = toast.loading('Deactivating your account...');
+
       const response = await fetch('/api/auth/deactivate-account', {
         method: 'POST',
         headers: {
@@ -636,22 +639,57 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
       const data = await response.json();
 
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+
       if (!response.ok) {
-        toast.error(data.error || 'Failed to deactivate account');
+        // Handle specific error cases
+        if (response.status === 401) {
+          toast.error('⚠️ Session expired. Please log in again.');
+          setTimeout(() => {
+            window.location.href = '/auth/login';
+          }, 1500);
+          return;
+        }
+        
+        if (response.status === 400 && data.error?.includes('already deactivated')) {
+          toast.error('ℹ️ Your account is already deactivated.');
+          setShowDeactivateConfirm(false);
+          return;
+        }
+        
+        if (response.status === 404) {
+          toast.error('⚠️ User account not found.');
+          setShowDeactivateConfirm(false);
+          return;
+        }
+
+        // Generic error
+        toast.error(data.error || '❌ Failed to deactivate account. Please try again.');
         return;
       }
 
+      // Success
       setShowDeactivateConfirm(false);
       
-      toast.success("Your account has been deactivated successfully. You will be logged out.");
+      toast.success('✅ Your account has been deactivated successfully. Logging out...', {
+        duration: 3000,
+        icon: '👋',
+      });
       
       // Redirect to home page after a short delay
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Deactivate account error:', error);
-      toast.error('Failed to deactivate account. Please try again.');
+      
+      // Handle network or unexpected errors
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('🌐 Network error. Please check your internet connection.');
+      } else {
+        toast.error('❌ Something went wrong. Please try again later.');
+      }
     }
   };
 
@@ -1204,21 +1242,90 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
       {/* Deactivate Confirmation Modal */}
       {showDeactivateConfirm && (
-        <div style={S.modalBackdrop}>
+        <div style={S.modalBackdrop} onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowDeactivateConfirm(false);
+          }
+        }}>
           <div style={S.modal}>
-            <h4 style={{ color: "#ef4444", marginBottom: "16px" }}>Deactivate Account</h4>
-            <p style={{ color: "#4B5563", marginBottom: "24px" }}>
-              Are you sure you want to deactivate your account? Your data will be preserved but you won't be able to log in.
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: "20px"
+            }}>
+              <div style={{
+                fontSize: "48px",
+                marginBottom: "12px"
+              }}>⚠️</div>
+              <h4 style={{ 
+                color: "#ef4444", 
+                marginBottom: "8px",
+                fontSize: "20px",
+                fontWeight: 700,
+                textAlign: "center"
+              }}>
+                Deactivate Account?
+              </h4>
+            </div>
+            
+            <div style={{
+              background: "#FEF2F2",
+              border: "1px solid #FEE2E2",
+              borderRadius: "8px",
+              padding: "12px 16px",
+              marginBottom: "16px"
+            }}>
+              <p style={{ 
+                color: "#991B1B", 
+                marginBottom: "12px",
+                fontSize: "14px",
+                lineHeight: "1.5"
+              }}>
+                <strong>What happens when you deactivate:</strong>
+              </p>
+              <ul style={{
+                color: "#7F1D1D",
+                fontSize: "13px",
+                margin: 0,
+                paddingLeft: "20px",
+                lineHeight: "1.6"
+              }}>
+                <li>Your profile will no longer be accessible</li>
+                <li>You won't be able to log in</li>
+                <li>Your data will be preserved</li>
+                <li>You can contact support to reactivate</li>
+              </ul>
+            </div>
+            
+            <p style={{ 
+              color: "#4B5563", 
+              marginBottom: "24px",
+              fontSize: "14px",
+              textAlign: "center"
+            }}>
+              Are you sure you want to continue?
             </p>
+            
             <div style={S.modalActions}>
               <button 
-                style={S.ghost} 
+                style={{
+                  ...S.ghost,
+                  padding: "10px 20px",
+                  fontWeight: 600,
+                  flex: 1
+                }}
                 onClick={() => setShowDeactivateConfirm(false)}
               >
                 Cancel
               </button>
               <button 
-                style={merge(S.delete, { fontWeight: 600 })} 
+                style={{
+                  ...S.delete, 
+                  fontWeight: 600,
+                  padding: "10px 20px",
+                  flex: 1
+                }} 
                 onClick={handleDeactivateAccount}
               >
                 Yes, Deactivate

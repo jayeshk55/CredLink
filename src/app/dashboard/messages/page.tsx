@@ -52,7 +52,7 @@ export default function MessagesPage() {
   }, []);
 
   const fetchMessages = async () => {
-    try{
+    try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/message/receive', { 
         method: 'GET',

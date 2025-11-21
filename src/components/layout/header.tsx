@@ -31,7 +31,7 @@ export function Header() {
       if (!isAuthenticated) return;
       
       try {
-        const response = await fetch('/api/cards');
+        const response = await fetch('/api/card');
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.cards && data.cards.length > 0) {

@@ -1141,7 +1141,7 @@ const EditPage = () => {
 
       try {
         setIsLoading(true);
-        console.log('🔍 Fetching card for edit:', cardId);
+      //  console.log('🔍 Fetching card for edit:', cardId);
         
         const response = await fetch(`/api/card/${cardId}`, {
           credentials: 'include'
@@ -1154,7 +1154,7 @@ const EditPage = () => {
         const data = await response.json();
         
         if (data.success && data.card) {
-          console.log('✅ Loaded card for editing:', data.card);
+       //   console.log('✅ Loaded card for editing:', data.card);
           const card = data.card;
           
           setFirstName(card.firstName || '');
@@ -1447,7 +1447,7 @@ const EditPage = () => {
         : '/api/card/create';
       const method = isUpdating ? 'PATCH' : 'POST';
 
-      console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
+      // console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
 
       // Make API call
       const response = await fetch(endpoint, {
@@ -1490,7 +1490,7 @@ const EditPage = () => {
 
     try {
       setIsDeleting(true);
-      console.log('🗑️ Deleting card:', existingCardId || cardId);
+   ///   console.log('🗑️ Deleting card:', existingCardId || cardId);
 
       const response = await fetch('/api/card/delete', {
         method: 'POST',
@@ -2531,6 +2531,78 @@ const EditPage = () => {
                 />
               </div>
 
+              {/* Document Upload (Resume/Portfolio) */}
+              <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Document (Resume/Portfolio)
+                  </span>
+                  <button 
+                    onClick={() => { setIsPopupOpen(true); setPopupMessage('Upload PDF, DOC, or DOCX files. Documents will be converted to PDF for viewing.'); }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
+                  </button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    style={{ display: 'none' }}
+                    id="document-upload"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const file = e.target.files[0];
+                        const maxSize = 10 * 1024 * 1024; // 10MB
+                        if (file.size > maxSize) {
+                          toast.error('File size must be less than 10MB');
+                          return;
+                        }
+                        setResumeFile(file);
+                        toast.success(`Selected: ${file.name}`);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('document-upload')?.click()}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: `1px solid ${selectedColor1}`,
+                      borderRadius: '8px',
+                      padding: '10px 15px',
+                      fontSize: '14px',
+                      color: selectedColor1,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      outline: 'none',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    {resumeFile ? `Change Document (${resumeFile.name})` : 'Upload Document'}
+                  </button>
+                  {resumeFile && (
+                    <div style={{ fontSize: '12px', color: '#666', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '6px' }}>
+                      <strong>Selected:</strong> {resumeFile.name} ({(resumeFile.size / 1024).toFixed(2)} KB)
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* ====================================================== */}
               {/* END: Added Fields                                    */}
               {/* ====================================================== */}
@@ -2880,7 +2952,7 @@ const EditPage = () => {
             {(existingCardId || cardId) && (
               <div 
                 onClick={() => {
-                  console.log('🗑️ DIV Delete clicked - opening custom dialog');
+                 // console.log('🗑️ DIV Delete clicked - opening custom dialog');
                   setIsDeleteConfirmOpen(true);
                 }}
                 style={{

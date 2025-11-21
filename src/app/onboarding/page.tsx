@@ -386,7 +386,7 @@ const OnboardingPage: React.FC = () => {
         cardFormData.append('fullName', formData.name || '');
         cardFormData.append('phone', formData.phone || '');
         cardFormData.append('email', formData.email || '');
-        
+        cardFormData.append('name', formData.name || '');
         // Optional fields
         if (formData.title) cardFormData.append('title', formData.title);
         if (formData.company) cardFormData.append('company', formData.company);
@@ -586,7 +586,7 @@ const OnboardingPage: React.FC = () => {
 >
   Welcome to
   <img
-    src="/assets/myKard.png"
+    src="/assets/mykard.png"
     alt="MyKard Logo"
     style={{
       height: "150px",        

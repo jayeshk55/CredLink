@@ -332,8 +332,8 @@ const handleDelete = async () => {
     const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nThis profile contains my contact information, social links, and business card.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
     
    // console.log('Navigator share available:', !!navigator.share);
-    console.log('Current share method:', shareMethod);
-    console.log('Is mobile device:', isMobile());
+   // console.log('Current share method:', shareMethod);
+   // console.log('Is mobile device:', isMobile());
     
     const mobile = isMobile();
     
