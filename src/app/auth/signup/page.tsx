@@ -200,9 +200,13 @@ export default function SignupPage() {
       <div className={`auth-card ${styles.card}`}>
         {/* Logo */}
         <div className="auth-header">
-          <Link href="/" className="block">
-            <h1 className="auth-logo">MyKard</h1>
-          </Link>
+          <Link href="/" className="flex justify-center w-full">
+  <img
+    src="/assets/headerlogo.png"
+    alt="MyKard Logo"
+    className="h-12 w-auto"
+  />
+</Link>
         </div>
 
         {/* STEP 1: Email Input */}

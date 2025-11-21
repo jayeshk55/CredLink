@@ -117,9 +117,13 @@ export default function LoginPage() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <Link href="/" className="block">
-            <h1 className="auth-logo">MyKard</h1>
-          </Link>
+          <Link href="/" className="flex justify-center w-full">
+  <img
+    src="/assets/headerlogo.png"
+    alt="MyKard Logo"
+    className="h-12 w-auto"
+  />
+</Link>
           <h2 className="auth-title">
             Sign in to your account
           </h2>
