@@ -53,7 +53,7 @@ export default function MessagesPage() {
   const fetchMessages = async () => {
     try{
       const token = localStorage.getItem('token');
-      console.log('token', token);
+     // console.log('token', token);
       const response = await fetch('/api/message/receive', { 
         method: 'GET',
         headers: {
@@ -149,7 +149,7 @@ export default function MessagesPage() {
 
         setMessages(Array.from(groupedBySender.values()));
       }
-      console.log(response);
+    //  console.log(response);
     }catch(err){
       console.error('Error fetching messages:', err);
     }

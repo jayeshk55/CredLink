@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { cookies } from 'next/headers';
+import { verify } from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || '';
 
 export async function POST(req: NextRequest) {
   try {
     // Get session to verify user is authenticated
-    const session = await getServerSession();
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const cookieStore = await cookies();
+       const token = cookieStore.get('user_token')?.value;
+   
+       if (!token) {
+         return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+       }
+   
+       const decoded = verify(token, JWT_SECRET) as { userId: string };
+   
 
     const { phone } = await req.json();
 
@@ -25,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Update user's phone number in database
     const updatedUser = await prisma.user.update({
-      where: { email: session.user.email },
+      where: { id: decoded.userId },
       data: { phone: phone.trim() },
       select: {
         id: true,

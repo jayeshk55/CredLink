@@ -1141,7 +1141,7 @@ const EditPage = () => {
 
       try {
         setIsLoading(true);
-        console.log('🔍 Fetching card for edit:', cardId);
+      //  console.log('🔍 Fetching card for edit:', cardId);
         
         const response = await fetch(`/api/card/${cardId}`, {
           credentials: 'include'
@@ -1154,7 +1154,7 @@ const EditPage = () => {
         const data = await response.json();
         
         if (data.success && data.card) {
-          console.log('✅ Loaded card for editing:', data.card);
+       //   console.log('✅ Loaded card for editing:', data.card);
           const card = data.card;
           
           setFirstName(card.firstName || '');
@@ -1447,7 +1447,7 @@ const EditPage = () => {
         : '/api/card/create';
       const method = isUpdating ? 'PATCH' : 'POST';
 
-      console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
+      // console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
 
       // Make API call
       const response = await fetch(endpoint, {
@@ -1490,7 +1490,7 @@ const EditPage = () => {
 
     try {
       setIsDeleting(true);
-      console.log('🗑️ Deleting card:', existingCardId || cardId);
+   ///   console.log('🗑️ Deleting card:', existingCardId || cardId);
 
       const response = await fetch('/api/card/delete', {
         method: 'POST',
@@ -2880,7 +2880,7 @@ const EditPage = () => {
             {(existingCardId || cardId) && (
               <div 
                 onClick={() => {
-                  console.log('🗑️ DIV Delete clicked - opening custom dialog');
+                 // console.log('🗑️ DIV Delete clicked - opening custom dialog');
                   setIsDeleteConfirmOpen(true);
                 }}
                 style={{

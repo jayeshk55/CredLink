@@ -48,3 +48,4 @@ clear-sessions.js
 auto-cleanup.ts
 CLEANUP_README.md
 cleanup-ttl.ts
+certificates
