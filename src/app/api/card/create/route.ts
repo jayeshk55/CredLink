@@ -151,32 +151,44 @@ export async function POST(req: NextRequest) {
       cardData.coverImage = signedUrl;
     }
 
-    // Handle document upload (Firebase Storage)
+    // Handle document upload (Firebase Storage with conversion)
     const documentFile = formData.get('document') as File;
     if (documentFile && documentFile.size > 0) {
-      const arrayBuffer = await documentFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      const maxDocSize = 10 * 1024 * 1024; // 10MB
+      if (documentFile.size > maxDocSize) {
+        return NextResponse.json(
+          { error: 'Document size must be less than 10MB' },
+          { status: 400 }
+        );
+      }
 
-      const originalName = (documentFile as any).name || 'document.pdf';
-      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
-      const timestamp = Date.now();
-      const filePath = `cards/documents/${decoded.userId}/${timestamp}-${safeName}`;
+      try {
+        // Use the document conversion API for DOC/DOCX conversion
+        const convertFormData = new FormData();
+        convertFormData.append('file', documentFile);
+        
+        // Make internal API call to convert document
+        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+        const convertResponse = await fetch(`${baseUrl}/api/document/convert`, {
+          method: 'POST',
+          body: convertFormData,
+          headers: {
+            'Cookie': `user_token=${token}`
+          }
+        });
 
-      const fileRef = adminStorageBucket.file(filePath);
+        if (!convertResponse.ok) {
+          const errorData = await convertResponse.json();
+          throw new Error(errorData.error || 'Failed to process document');
+        }
 
-      await fileRef.save(buffer, {
-        resumable: false,
-        metadata: {
-          contentType: documentFile.type || 'application/octet-stream',
-        },
-      });
-
-      const [signedUrl] = await fileRef.getSignedUrl({
-        action: 'read',
-        expires: '2100-01-01',
-      });
-
-      cardData.documentUrl = signedUrl;
+        const convertResult = await convertResponse.json();
+        cardData.documentUrl = convertResult.url;
+      } catch (error: any) {
+        console.error('Error converting document:', error);
+        // Don't fail the entire card creation if document upload fails
+        // Just log the error and continue
+      }
     }
 
     // Validate required fields

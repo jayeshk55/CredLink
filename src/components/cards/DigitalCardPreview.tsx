@@ -30,10 +30,12 @@ export interface DigitalCardProps {
   fontFamily?: string;
   cardType?: string;
   documentUrl?: string;
+  onDocumentClick?: (url: string) => void;
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   firstName = "",
+  onDocumentClick,
   middleName = "",
   lastName = "",
   cardName = "",
@@ -255,8 +257,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 if (b.text === 'Portfolio') {
                   openPortfolio();
                 } else if (b.text === 'Docs' && documentUrl) {
-                  if (typeof window !== 'undefined') {
-                    window.open(documentUrl, '_blank', 'noopener');
+                  if (onDocumentClick) {
+                    onDocumentClick(documentUrl);
                   }
                 } else {
                   setActivePanel(b.text as Section);

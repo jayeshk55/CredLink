@@ -51,8 +51,16 @@ interface Card {
   cardType?: string;
 }
 
-// ----------------- Card Preview Renderer (Exact Copy from Edit Page) -----------------
-const renderCardPreview = (card: Card) => {
+// ----------------- Main Dashboard -----------------
+const Dashboard = () => {
+  const router = useRouter();
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
+ const [cardsData, setCardsData] = useState<Card[]>([]);
+ const [isLoadingCards, setIsLoadingCards] = useState(false);
+ const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null);
+
+ // Card Preview Renderer (Exact Copy from Edit Page)
+ const renderCardPreview = (card: Card) => {
   // Use EXACT same prop mapping as edit page
   const commonProps = {
     firstName: card.firstName || '',
@@ -79,6 +87,7 @@ const renderCardPreview = (card: Card) => {
     fontFamily: card.selectedFont || 'system-ui, sans-serif',
     cardType: card.cardType || '',
     documentUrl: card.documentUrl || '',
+    onDocumentClick: (url: string) => setSelectedDocumentUrl(url),
   };
 
   const selectedDesign = card.selectedDesign || 'Classic';
@@ -95,14 +104,7 @@ const renderCardPreview = (card: Card) => {
     default:
       return <DigitalCardPreview {...commonProps} />;
   }
-};
-
-// ----------------- Main Dashboard -----------------
-const Dashboard = () => {
-  const router = useRouter();
-  const { user, isAuthenticated, logout, isLoading } = useAuth();
- const [cardsData, setCardsData] = useState<Card[]>([]);
- const [isLoadingCards, setIsLoadingCards] = useState(false);
+ };
 
  useEffect(() => {
     if (isAuthenticated && !isLoading) {
@@ -223,11 +225,12 @@ const Dashboard = () => {
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 block w-full"
+                className="transition-all duration-300 break-inside-avoid mb-6 block w-full relative"
                 style={{ marginBottom: '1.5rem' }}
-                onClick={() => router.push(`/cards/${card.id}`)}
               >
-{renderCardPreview(card)}
+                <div onClick={() => router.push(`/cards/${card.id}`)} className="cursor-pointer">
+                  {renderCardPreview(card)}
+                </div>
               </motion.div>
             );
           })
@@ -258,6 +261,56 @@ const Dashboard = () => {
           </>
         )}
       </div>
+
+      {/* Split-Screen Document Viewer */}
+      {selectedDocumentUrl && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="fixed top-0 right-0 w-1/2 h-full bg-white shadow-2xl z-50 flex flex-col"
+        >
+          {/* Document Header */}
+          <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+            <h3 className="text-lg font-semibold text-gray-900">Document Viewer</h3>
+            <div className="flex items-center gap-2">
+              <a
+                href={selectedDocumentUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download
+              </a>
+              <button
+                onClick={() => setSelectedDocumentUrl(null)}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* PDF Iframe */}
+          <div className="flex-1 overflow-hidden">
+            <iframe
+              src={selectedDocumentUrl}
+              className="w-full h-full border-0"
+              title="Document Viewer"
+            />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

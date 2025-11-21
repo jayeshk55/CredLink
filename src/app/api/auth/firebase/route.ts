@@ -79,6 +79,15 @@ export async function POST(request: NextRequest) {
     // Find or create user
     let user = await prisma.user.findFirst({ where: { email: email.toLowerCase() } })
 
+    // Check if account exists but is deactivated
+    if (user && user.status === 'inactive') {
+      console.log('❌ Attempted login to deactivated account via Firebase:', email)
+      return NextResponse.json(
+        { error: 'Your account has been deactivated. Please contact support to reactivate your account.' },
+        { status: 403 }
+      )
+    }
+
     if (!user) {
       const username = await generateUniqueUsername(email, name || uid)
       // Generate a strong random password, hash it to satisfy NOT NULL constraint
