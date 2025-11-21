@@ -186,7 +186,7 @@ export default function Homepage() {
       {/* Header removed: page.tsx renders the global header */}
       
       {/* Hero Section */}
-      <section className="section flex items-center px-4 sm:px-6 lg:px-12" style={{ 
+      <section className="section flex items-center px-4 sm:px-6 lg:px-12 hero-section" style={{ 
         background: 'transparent',
         minHeight: '100vh', // Use full viewport height
         paddingTop: '1rem', // Minimal top padding to use available space
@@ -494,8 +494,10 @@ export default function Homepage() {
                                   acceptedConnections.has(profile.id)
                                 }
                                 className={`rounded-sm px-4 py-2 text-sm font-semibold text-white shadow transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                                  acceptedConnections.has(profile.id) || sentRequests.has(profile.id)
+                                  acceptedConnections.has(profile.id)
                                     ? 'bg-green-600 hover:bg-green-800'
+                                    : sentRequests.has(profile.id)
+                                    ? 'bg-amber-500 hover:bg-amber-600'
                                     : 'bg-blue-600 hover:bg-blue-700'
                                 }`}
                                 style={{ minWidth: '90px', textAlign: 'center', marginRight: '12px' }}

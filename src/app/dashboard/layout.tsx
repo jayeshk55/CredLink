@@ -1,8 +1,7 @@
+"use client";
 
- "use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/header";
 import { motion } from "framer-motion";
@@ -14,8 +13,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isAuthenticated, checkAuth, isLoading } = useAuth();
   const [isLgUp, setIsLgUp] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Check auth when dashboard layout mounts
@@ -32,6 +33,25 @@ export default function DashboardLayout({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const mqMobile = window.matchMedia("(max-width: 767px)");
+    const handleMobileChange = () => setIsMobile(mqMobile.matches);
+    handleMobileChange();
+    // @ts-ignore
+    (mqMobile.addEventListener ? mqMobile.addEventListener("change", handleMobileChange) : mqMobile.addListener(handleMobileChange));
+    return () => {
+      // @ts-ignore
+      (mqMobile.removeEventListener ? mqMobile.removeEventListener("change", handleMobileChange) : mqMobile.removeListener(handleMobileChange));
+    };
+  }, []);
+
+  const isCreateOrEditPage = pathname === "/dashboard/create" || pathname === "/dashboard/edit";
+  const mainStyle: React.CSSProperties = isCreateOrEditPage && isMobile
+    ? {}
+    : {
+        padding: "24px",
+        background: "transparent",
+      };
 
   return (
     <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
@@ -56,10 +76,7 @@ export default function DashboardLayout({
         {/* Main Page Area */}
         <main 
           className="flex-1 overflow-y-auto"
-          style={{ 
-            padding: '24px',
-            background: 'transparent'
-          }}
+          style={mainStyle}
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}

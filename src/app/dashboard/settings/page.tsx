@@ -1,26 +1,26 @@
-"use client";
+
+ 
+ "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import "./account-settings.css";
 
 /**
- * Single-file inline-styled Account Settings page
- * - All styles inlined in `S` style object
- * - Responsive via isMobile (window width <= 760)
- * - Hover effects via useHover
+ * Account Settings Page
+ * - All styles moved to account-settings.css
+ * - Duplicate Account Photo section removed
  */
 
 /* ---------- helpers ---------- */
 function useWindowWidth(breakpoint = 760) {
-  // Use consistent initial state for SSR (default to desktop)
   const [width, setWidth] = useState<number>(1200);
   const [isMounted, setIsMounted] = useState(false);
   
   useEffect(() => {
-    // Set mounted flag and initial width on client
     setIsMounted(true);
     setWidth(window.innerWidth);
     
@@ -29,422 +29,8 @@ function useWindowWidth(breakpoint = 760) {
     return () => window.removeEventListener("resize", onResize);
   }, []);
   
-  // Return consistent values during SSR
   return { width, isMobile: isMounted ? width <= breakpoint : false };
 }
-
-function useHover() {
-  const [hovered, setHovered] = useState(false);
-  const onMouseEnter = useCallback(() => setHovered(true), []);
-  const onMouseLeave = useCallback(() => setHovered(false), []);
-  return { hovered, onMouseEnter, onMouseLeave };
-}
-
-/* ---------- design tokens & base styles ---------- */
-const COLORS = {
-  blue600: "#2563eb",
-  blue500: "#1d4ed8",
-  muted: "#64748b",
-  text: "#0f172a",
-  cardShadow: "0 6px 20px rgba(14, 30, 37, 0.06)",
-};
-
-const S: Record<string, React.CSSProperties> = {
-  // page
-  page: {
-    minHeight: "100vh",
-    fontFamily:
-      'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
-    background: "#ffffff",
-    color: COLORS.text,
-  },
-
-  // hero
-  hero: {
-    padding: "36px 20px",
-    background: "transparent",
-    borderBottom: "1px solid rgba(15, 23, 42, 0.03)",
-  },
-  heroInner: {
-    maxWidth: "100%",
-    margin: "0",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 20,
-  },
-  heroInnerMobile: {
-    flexDirection: "column",
-    textAlign: "center",
-  },
-  heroText: { flex: 1 },
-
-  title: {
-    fontSize: "clamp(20px, 3.4vw, 34px)",
-    margin: 0,
-    fontWeight: 700,
-    lineHeight: 1.05,
-  },
-  titleAccent: { color: COLORS.blue600 },
-  lead: { marginTop: 10, color: COLORS.muted },
-
-  heroCta: { display: "flex", gap: 12, alignItems: "center" },
-
-  // buttons
-  primaryBase: {
-    color: "white",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 999,
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "transform .18s ease, box-shadow .18s ease",
-    boxShadow: "0 8px 30px rgba(37,99,235,0.12)",
-    background: `linear-gradient(90deg, ${COLORS.blue600}, ${COLORS.blue500})`,
-  },
-  primaryHover: {
-    transform: "translateY(-3px)",
-  },
-  ghost: {
-    background: "transparent",
-    border: "1px solid rgba(15,23,42,0.06)",
-    padding: "10px 16px",
-    borderRadius: 10,
-    cursor: "pointer",
-  },
-
-  // container
-  container: {
-    maxWidth: 1000,
-    margin: "36px 0",
-    padding: "0 20px 80px",
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: 20,
-  },
-  containerMobile: {
-    padding: "0 12px 40px",
-    gap: 16,
-  },
-  containerMobileOld: {
-    paddingBottom: 40,
-    gap: 14,
-  },
-
-  // card
-  card: {
-    background: "#fff",
-    borderRadius: 12,
-    boxShadow: COLORS.cardShadow,
-    padding: 20,
-    transition: "transform .18s ease",
-  },
-  cardHover: { transform: "translateY(-3px)" },
-
-  // profile card specifics
-  profileCard: { display: "flex", alignItems: "center", gap: 18, padding: 18 },
-  profileRow: { display: "flex", gap: 18, alignItems: "center", width: "100%" },
-  profileRowMobile: { flexDirection: "column", alignItems: "flex-start", gap: 12 },
-
-  avatarBlock: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: 170 },
-  avatarBlockMobile: { width: "100%", flexDirection: "row", alignItems: "center", gap: 12 },
-
-  avatarWrap: { position: "relative", display: "inline-block" },
-  avatarWrapMobile: { marginRight: 8 },
-
-  avatar: {
-    width: 120,
-    height: 120,
-    objectFit: "cover",
-    borderRadius: "50%",
-    border: "4px solid rgba(37,99,235,0.08)",
-    boxShadow: "0 6px 18px rgba(2,6,23,0.06)",
-  },
-  avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "linear-gradient(180deg,#eef6ff,#eaf9ff)",
-    color: COLORS.blue600,
-    fontWeight: 700,
-    fontSize: 36,
-    border: "4px solid rgba(37,99,235,0.06)",
-  },
-
-  uploadLabel: {
-    position: "absolute",
-    right: -6,
-    bottom: -6,
-    background: COLORS.blue600,
-    color: "#fff",
-    borderRadius: 999,
-    padding: "8px 10px",
-    fontSize: 12,
-    cursor: "pointer",
-    boxShadow: "0 6px 18px rgba(37,99,235,0.12)",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-  },
-
-  removePhotoBtn: {
-    background: "transparent",
-    border: "1px solid rgba(15,23,42,0.06)",
-    padding: "6px 10px",
-    borderRadius: 8,
-    cursor: "pointer",
-  },
-
-  // profile info
-  profileInfo: { flex: 1 },
-  name: { margin: 0, fontSize: 20, fontWeight: 700 },
-  email: { color: COLORS.muted, marginTop: 6 },
-  small: { color: COLORS.muted, marginTop: 8, fontSize: 13 },
-
-  // form rows
-  cardTitle: { fontSize: 16, margin: "0 0 12px", fontWeight: 700 },
-  cardTitleDanger: { color: "#b91c1c", margin: "0 0 12px", fontWeight: 700 },
-
-  formRow: {
-    display: "flex",
-    gap: 18,
-    alignItems: "center",
-    padding: "14px 0",
-    borderTop: "1px solid rgba(15,23,42,0.03)",
-  },
-  formRowFirst: { borderTop: "none", paddingTop: 0 },
-  formRowMobile: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 8,
-    padding: "12px 0",
-  },
-
-  formLabel: { width: 170, color: COLORS.muted, fontWeight: 600 },
-  formLabelMobile: { 
-    width: "100%", 
-    marginBottom: 4 
-  },
-
-  formControl: { flex: 1, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" },
-  formControlMobile: {
-    width: "100%",
-    flexDirection: "column",
-    gap: 8,
-  },
-
-  // inputs
-  input: {
-    width: "100%",
-    maxWidth: 520,
-    padding: "10px 12px",
-    borderRadius: 8,
-    border: "1px solid #CBD5E1",
-    background: "#fff",
-    outline: "none",
-    fontSize: 14,
-    boxSizing: "border-box",
-  },
-  inputMobile: {
-    width: "100%",
-    maxWidth: "100%",
-  },
-  inputFocus: {
-    boxShadow: "0 6px 18px rgba(37,99,235,0.06)",
-    borderColor: "rgba(37,99,235,0.16)",
-  },
-  inputDisabled: { color: "#94a3b8", background: "#f8fafc" },
-
-  inputStatic: {
-    width: "100%",
-    maxWidth: 520,
-    padding: "10px 12px",
-    borderRadius: 8,
-    background: "#f8fafc",
-    border: "1px solid rgba(15,23,42,0.06)",
-    color: "#94a3b8",
-  },
-
-  smallPreview: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "1px dashed rgba(15,23,42,0.04)",
-  },
-
-  fileBtn: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 12px",
-    borderRadius: 8,
-    background: "#f8fafc",
-    color: COLORS.text,
-    cursor: "pointer",
-    fontWeight: 600,
-    border: "1px solid rgba(15,23,42,0.08)",
-    transition: "background .12s ease",
-  },
-  fileBtnHover: { background: "#f1f5f9" },
-
-  smallBtn: {
-    background: "transparent",
-    border: "1px solid rgba(15,23,42,0.06)",
-    padding: "8px 10px",
-    borderRadius: 8,
-    cursor: "pointer",
-  },
-
-  // password input container
-  passwordInputContainer: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    maxWidth: 520,
-  },
-  passwordInputContainerMobile: {
-    width: "100%",
-    maxWidth: "100%",
-  },
-  passwordInput: {
-    width: "100%",
-    padding: "10px 40px 10px 12px", // Extra padding on right for eye icon
-    borderRadius: 8,
-    border: "1px solid #CBD5E1",
-    background: "#fff",
-    outline: "none",
-    fontSize: 14,
-    boxSizing: "border-box",
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 12,
-    cursor: "pointer",
-    color: "#64748b",
-    fontSize: 16,
-    zIndex: 1,
-  },
-
-  // toggle (visual only)
-  toggle: { position: "relative", width: 52, height: 28, display: "inline-block" },
-  toggleSlider: {
-    position: "absolute",
-    inset: 0,
-    background: "linear-gradient(90deg,#e6eefb,#f0fbff)",
-    borderRadius: 999,
-    border: "1px solid rgba(15,23,42,0.04)",
-  },
-  toggleKnob: {
-    content: '""',
-    position: "absolute",
-    top: 3,
-    left: 3,
-    width: 22,
-    height: 22,
-    borderRadius: "50%",
-    background: "#fff",
-    boxShadow: "0 2px 6px rgba(2,6,23,0.08)",
-    transition: "transform .18s ease",
-  },
-
-  // danger card
-  dangerCard: { background: "linear-gradient(180deg,#fff4f4,#fffaf6)", border: "1px solid #ffd6d6" },
-  dangerRow: { display: "flex", gap: 12, flexWrap: "wrap" },
-  logout: { background: "#f1f5f9", border: "none", padding: "10px 16px", borderRadius: 8, cursor: "pointer" },
-  delete: {
-    background: "#fff",
-    color: "#ef4444",
-    border: "1px solid #ef4444",
-    padding: "10px 16px",
-    borderRadius: 8,
-    cursor: "pointer",
-    transition: "background .12s ease",
-  },
-  deleteHover: { background: "#fff5f5" },
-
-  // modal
-  modalBackdrop: {
-    position: "fixed",
-    inset: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "rgba(2,6,23,0.5)",
-    zIndex: 60,
-  },
-  modal: {
-    background: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    width: "clamp(300px,46vw,520px)",
-    boxShadow: "0 20px 60px rgba(2,6,23,0.35)",
-  },
-  modalLarge: {
-    background: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    width: "clamp(320px,80vw,720px)",
-    boxShadow: "0 20px 60px rgba(2,6,23,0.35)",
-  },
-  modalActions: { display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 14 },
-
-  // reasons list
-  reasons: { display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10, marginTop: 12, maxHeight: 260, overflow: "auto" },
-  reasonsMobile: { gridTemplateColumns: "1fr" },
-  reasonItem: {
-    display: "flex",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 8,
-    background: "#fafafa",
-    border: "1px solid rgba(15,23,42,0.02)",
-    cursor: "pointer",
-  },
-  reasonActive: { background: "linear-gradient(90deg,#eef6ff,#f0fbff)", borderColor: "rgba(0,123,255,0.08)" },
-
-  // save bar (fixed bottom)
-  saveBar: {
-    position: "fixed",
-    left: 0,
-    right: 0,
-    bottom: 12,
-    display: "flex",
-    justifyContent: "center",
-    pointerEvents: "none", // only inner controls receive pointer
-  },
-  saveButton: {
-    pointerEvents: "auto",
-    background: `linear-gradient(90deg, ${COLORS.blue600}, ${COLORS.blue500})`,
-    color: "#fff",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 999,
-    fontWeight: 600,
-    cursor: "pointer",
-    boxShadow: "0 8px 30px rgba(0,123,255,0.12)",
-  },
-};
-
-/* ---------- constants ---------- */
-const REASONS = [
-  "I have a duplicate account",
-  "I don't find the platform useful",
-  "I'm concerned about privacy or data security",
-  "I receive too many emails or notifications",
-  "I'm switching to another platform",
-  "I'm facing technical issues or bugs",
-  "I created this account by mistake",
-  "Other",
-];
 
 /* ---------- main component ---------- */
 export default function AccountSettingsPage(): React.JSX.Element {
@@ -467,7 +53,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
   const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
   const [tempPhoneNumber, setTempPhoneNumber] = useState<string>("");
-  const [hasPassword, setHasPassword] = useState<boolean>(true); // Track if user has password (not OAuth)
+  const [hasPassword, setHasPassword] = useState<boolean>(true);
 
   // modals / flows
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
@@ -476,13 +62,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
   // responsive
   const { width, isMobile } = useWindowWidth(760);
 
-  // hover hooks for a few interactive elements
-  const primaryHover = useHover();
-  const fileBtnHover = useHover();
-  const deleteHover = useHover();
-  const cardHover = useHover();
-
-  // focus UI states for inputs (so we can show the focus style when active)
+  // focus UI states for inputs
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   // fetch profile on mount
@@ -497,14 +77,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
         setEmail(user.email ?? "");
         setPhoneNumber(user.phone ?? "");
         setAccountPhoto(user.profileImage ?? null);
-        setHasPassword(user.hasPassword ?? true); // Determine if user has password
+        setHasPassword(user.hasPassword ?? true);
       } catch (err) {
-        // keep initial mock data if API fails
         console.error("Failed to fetch user profile:", err);
       }
     };
     fetchUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // photo change: preview + upload
@@ -521,8 +99,8 @@ export default function AccountSettingsPage(): React.JSX.Element {
     try {
       const fd = new FormData();
       fd.append("image", file);
-      fd.append("userId", "currentUserId"); // Add user ID for database update
-      fd.append("fullName", name); // Include current name for database sync
+      fd.append("userId", "currentUserId");
+      fd.append("fullName", name);
       
       const res = await fetch("/api/profile/upload-image", {
         method: "POST",
@@ -532,7 +110,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
       const data = await res.json();
       if (res.ok && data.imageUrl) {
         setAccountPhoto(data.imageUrl);
-        // refresh auth state so header/avatar update if needed
         setTimeout(async () => {
           await checkAuth();
         }, 300);
@@ -546,10 +123,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  /**
-   * SIMPLIFIED: Instantly removes the photo from the UI by setting state to null, 
-   * no backend call or await needed.
-   */
   const handleRemovePhoto = () => {
     setAccountPhoto(null);
     alert('Profile photo removed from UI.');
@@ -561,14 +134,13 @@ export default function AccountSettingsPage(): React.JSX.Element {
     setShowOtpModal(true);
   };
 
-  // OTP verification function (always returns wrong)
+  // OTP verification function
   const handleVerifyOTP = (otpValue: string) => {
     if (otpValue.length !== 6) {
       toast.error("Please enter complete OTP");
       return;
     }
     
-    // Always show wrong OTP message
     setTimeout(() => {
       toast.error("Wrong OTP entered. Please try again.");
     }, 1000);
@@ -587,7 +159,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
       return;
     }
 
-    // Validate phone number format (basic validation)
     const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
     if (!phoneRegex.test(tempPhoneNumber.replace(/\s/g, ''))) {
       toast.error("Please enter a valid phone number");
@@ -595,7 +166,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
 
     try {
-      // Save phone number to backend
       const res = await fetch("/api/profile/update-phone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -606,7 +176,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
       if (res.ok) {
         setPhoneNumber(tempPhoneNumber);
         setIsEditingPhone(false);
-        setIsPhoneVerified(false); // Reset verification status
+        setIsPhoneVerified(false);
         toast.success("Phone number updated successfully");
       } else {
         toast.error("Failed to update phone number");
@@ -617,7 +187,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  // Handle cancel phone editing
   const handleCancelPhoneEdit = () => {
     setTempPhoneNumber("");
     setIsEditingPhone(false);
@@ -625,9 +194,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   const handleDeactivateAccount = async () => {
     try {
-      // Show loading toast
-      const loadingToast = toast.loading('Deactivating your account...');
-
       const response = await fetch('/api/auth/deactivate-account', {
         method: 'POST',
         headers: {
@@ -639,57 +205,21 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
       const data = await response.json();
 
-      // Dismiss loading toast
-      toast.dismiss(loadingToast);
-
       if (!response.ok) {
-        // Handle specific error cases
-        if (response.status === 401) {
-          toast.error('⚠️ Session expired. Please log in again.');
-          setTimeout(() => {
-            window.location.href = '/auth/login';
-          }, 1500);
-          return;
-        }
-        
-        if (response.status === 400 && data.error?.includes('already deactivated')) {
-          toast.error('ℹ️ Your account is already deactivated.');
-          setShowDeactivateConfirm(false);
-          return;
-        }
-        
-        if (response.status === 404) {
-          toast.error('⚠️ User account not found.');
-          setShowDeactivateConfirm(false);
-          return;
-        }
-
-        // Generic error
-        toast.error(data.error || '❌ Failed to deactivate account. Please try again.');
+        toast.error(data.error || 'Failed to deactivate account');
         return;
       }
 
-      // Success
       setShowDeactivateConfirm(false);
       
-      toast.success('✅ Your account has been deactivated successfully. Logging out...', {
-        duration: 3000,
-        icon: '👋',
-      });
+      toast.success("Your account has been deactivated successfully. You will be logged out.");
       
-      // Redirect to home page after a short delay
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Deactivate account error:', error);
-      
-      // Handle network or unexpected errors
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        toast.error('🌐 Network error. Please check your internet connection.');
-      } else {
-        toast.error('❌ Something went wrong. Please try again later.');
-      }
+      toast.error('Failed to deactivate account. Please try again.');
     }
   };
 
@@ -754,49 +284,21 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  /* ---------- small helpers for style merging ---------- */
-  const merge = (...objs: Array<React.CSSProperties | false | null | undefined>) =>
-    Object.assign({}, ...objs.filter(Boolean));
-
   return (
-    <div style={S.page}>
+    <div className="account-settings-page">
       {/* HERO */}
-      <section style={S.hero}>
-        <div style={merge(S.heroInner, isMobile ? S.heroInnerMobile : undefined)}>
-          <div style={S.heroText}>
-            <h1 style={{
-              fontSize: isMobile ? 24 : 28,
-              fontWeight: 700,
-              color: "#111827",
-              margin: 0,
-              lineHeight: 1.05
-            }}>
-              Account <span style={S.titleAccent}>Settings</span>
+      <section className="hero-section">
+        <div className={`hero-inner ${isMobile ? 'mobile' : ''}`}>
+          <div className="hero-text">
+            <h1 className={`hero-title ${isMobile ? 'mobile' : 'desktop'}`}>
+              Account <span className="hero-title-accent">Settings</span>
             </h1>
-            <p style={{
-              fontSize: 16,
-              color: "#4B5563",
-              marginTop: 8
-            }}>Update your profile, security settings and preferences.</p>
+            <p className="hero-lead">Update your profile, security settings and preferences.</p>
           </div>
 
           {/* Save Changes Button - Top Right */}
           <button
-            style={{
-              background: `linear-gradient(90deg, ${COLORS.blue600}, ${COLORS.blue500})`,
-              color: '#fff',
-              border: 'none',
-              padding: isMobile ? '10px 16px' : '12px 24px',
-              borderRadius: 8,
-              fontWeight: 600,
-              fontSize: isMobile ? 14 : 16,
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(37,99,235,0.25)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              alignSelf: 'center'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            className={`btn-primary ${isMobile ? 'mobile' : 'desktop'}`}
             onClick={() => alert('All changes saved')}
             suppressHydrationWarning
           >
@@ -806,24 +308,19 @@ export default function AccountSettingsPage(): React.JSX.Element {
       </section>
 
       {/* MAIN */}
-      <main style={merge(S.container, isMobile ? S.containerMobile : undefined)}>
+      <main className={`settings-container ${isMobile ? 'mobile' : ''}`}>
         {/* Profile overview card */}
-        <section
-          aria-labelledby="profile-heading"
-          style={merge(S.card, S.profileCard, cardHover.hovered ? S.cardHover : undefined)}
-          onMouseEnter={cardHover.onMouseEnter}
-          onMouseLeave={cardHover.onMouseLeave}
-        >
-          <div style={merge(S.profileRow, isMobile ? S.profileRowMobile : undefined)}>
-            <div style={merge(S.avatarBlock, isMobile ? S.avatarBlockMobile : undefined)}>
-              <div style={merge(S.avatarWrap, isMobile ? S.avatarWrapMobile : undefined)}>
+        <section aria-labelledby="profile-heading" className="settings-card profile-card">
+          <div className={`profile-row ${isMobile ? 'mobile' : ''}`}>
+            <div className={`avatar-block ${isMobile ? 'mobile' : ''}`}>
+              <div className={`avatar-wrap ${isMobile ? 'mobile' : ''}`}>
                 {accountPhoto ? (
-                  <img src={accountPhoto} alt="profile" style={S.avatar} />
+                  <img src={accountPhoto} alt="profile" className="avatar-img" />
                 ) : (
-                  <div style={S.avatarPlaceholder}>{name?.charAt(0)?.toUpperCase() ?? "U"}</div>
+                  <div className="avatar-placeholder">{name?.charAt(0)?.toUpperCase() ?? "U"}</div>
                 )}
 
-                <label style={S.uploadLabel}>
+                <label className="upload-label">
                   <input
                     aria-label="Upload profile photo"
                     type="file"
@@ -836,113 +333,56 @@ export default function AccountSettingsPage(): React.JSX.Element {
               </div>
 
               {accountPhoto && (
-                <button type="button" style={S.removePhotoBtn} onClick={handleRemovePhoto}>
+                <button type="button" className="remove-photo-btn" onClick={handleRemovePhoto}>
                   Remove
                 </button>
               )}
             </div>
 
-            <div style={S.profileInfo}>
-              <h2 style={S.name}>{name}</h2>
-              <div style={S.email}>{email}</div>
-              
+            <div className="profile-info">
+              <h2 className="profile-name">{name}</h2>
+              <div className="profile-email">{email}</div>
             </div>
           </div>
         </section>
 
         {/* Form card */}
-        <section style={S.card} aria-labelledby="settings-heading">
-          <h3 id="settings-heading" style={{
-            fontSize: 16,
-            margin: "0 0 12px",
-            fontWeight: 700,
-            color: "#111827"
-          }}>
+        <section className="settings-card" aria-labelledby="settings-heading">
+          <h3 id="settings-heading" className="card-title">
             Personal Information
           </h3>
 
           {/* Name row */}
-          <div style={merge(S.formRow, S.formRowFirst, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Name</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
+          <div className={`form-row form-row-first ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Name</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               <input
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                onChange={(e) => setName(e.target.value)}
                 onFocus={() => setFocusedInput("name")}
                 onBlur={() => { setFocusedInput(null); updateNameInDatabase(name); }}
-                style={merge(
-                  S.input,
-                  S.inputMobile,
-                  focusedInput === "name" ? S.inputFocus : undefined
-                )}
+                className={`form-input ${isMobile ? 'mobile' : ''}`}
                 aria-label="Name"
                 suppressHydrationWarning
               />
             </div>
           </div>
 
-          {/* Account Photo row */}
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Account Photo</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <div style={S.smallPreview}>
-                {accountPhoto ? (
-                  <img src={accountPhoto} alt="small preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                ) : (
-                  <div style={{ color: COLORS.muted, fontSize: 12 }}>No photo</div>
-                )}
-              </div>
-
-              <label
-                style={merge(S.fileBtn, fileBtnHover.hovered ? S.fileBtnHover : undefined)}
-                onMouseEnter={fileBtnHover.onMouseEnter}
-                onMouseLeave={fileBtnHover.onMouseLeave}
-              >
-                + Add Photo
-                <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
-              </label>
-            </div>
-          </div>
-
           {/* Email row */}
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Email</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <div style={S.inputStatic}>{email || "your@email.com"}</div>
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Email</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <div className="input-static">{email || "your@email.com"}</div>
             </div>
           </div>
 
           {/* Phone Number row */}
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Phone Number</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Phone Number</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 
-                {/* Phone number display or input */}
                 {isEditingPhone ? (
-                  // Phone number input mode
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <input
                       type="tel"
@@ -951,135 +391,49 @@ export default function AccountSettingsPage(): React.JSX.Element {
                       placeholder="Enter phone number (e.g., +1234567890)"
                       onFocus={() => setFocusedInput("phone")}
                       onBlur={() => setFocusedInput(null)}
-                      style={merge(
-                        S.input,
-                        S.inputMobile,
-                        focusedInput === "phone" ? S.inputFocus : undefined
-                      )}
+                      className={`form-input ${isMobile ? 'mobile' : ''}`}
                     />
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button
-                        onClick={handleSavePhone}
-                        style={{
-                          ...S.primaryBase,
-                          background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-                          fontSize: "12px",
-                          padding: "6px 12px"
-                        }}
-                      >
+                    <div className="phone-edit-actions">
+                      <button onClick={handleSavePhone} className="phone-save-btn">
                         Save
                       </button>
-                      <button
-                        onClick={handleCancelPhoneEdit}
-                        style={{
-                          ...S.primaryBase,
-                          background: "#6B7280",
-                          fontSize: "12px",
-                          padding: "6px 12px"
-                        }}
-                      >
+                      <button onClick={handleCancelPhoneEdit} className="phone-cancel-btn">
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
-                  // Phone number display mode
                   <>
                     {phoneNumber ? (
-                      // When phone number exists
-                      <div style={{
-                        ...S.inputStatic,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px"
-                      }}>
+                      <div className="input-static" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <span>{phoneNumber}</span>
                         {isPhoneVerified ? (
-                          <div style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            background: "#D1FAE5",
-                            color: "#065F46",
-                            padding: "2px 8px",
-                            borderRadius: "12px",
-                            fontSize: "12px",
-                            fontWeight: 600
-                          }}>
+                          <div className="phone-status-verified">
                             <FaCheckCircle style={{ fontSize: "12px" }} />
                             Verified
                           </div>
                         ) : (
                           <>
-                            <div style={{
-                              background: "#FEF3C7",
-                              color: "#92400E",
-                              padding: "2px 8px",
-                              borderRadius: "12px",
-                              fontSize: "12px",
-                              fontWeight: 600
-                            }}>
+                            <div className="phone-status-unverified">
                               Not Verified
                             </div>
-                            <button
-                              onClick={handleEditPhone}
-                              style={{
-                                background: "none",
-                                border: "1px solid #D1D5DB",
-                                color: "#6B7280",
-                                fontSize: "12px",
-                                padding: "4px 8px",
-                                borderRadius: "6px",
-                                cursor: "pointer",
-                                fontWeight: 500,
-                                marginLeft: "auto"
-                              }}
-                            >
+                            <button onClick={handleEditPhone} className="phone-edit-btn">
                               Edit
                             </button>
                           </>
                         )}
                       </div>
                     ) : (
-                      // When no phone number
-                      <div style={{
-                        ...S.inputStatic,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between"
-                      }}>
+                      <div className="input-static" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span>Not provided</span>
-                        <button
-                          onClick={handleEditPhone}
-                          style={{
-                            background: "none",
-                            border: "1px solid #D1D5DB",
-                            color: "#6B7280",
-                            fontSize: "12px",
-                            padding: "4px 8px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontWeight: 500
-                          }}
-                        >
+                        <button onClick={handleEditPhone} className="phone-add-btn">
                           Add Phone
                         </button>
                       </div>
                     )}
                     
-                    {/* Send OTP button */}
                     {phoneNumber && !isPhoneVerified && (
-                      <button
-                        onClick={handleSendOTP}
-                        style={{
-                          ...S.primaryBase,
-                          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                          fontSize: "12px",
-                          padding: "8px 16px",
-                          alignSelf: "flex-start",
-                          minWidth: "120px"
-                        }}
-                      >
+                      <button onClick={handleSendOTP} className="send-otp-btn">
                         Send OTP
                       </button>
                     )}
@@ -1089,18 +443,13 @@ export default function AccountSettingsPage(): React.JSX.Element {
             </div>
           </div>
 
-          {/* Password row - Only show if user has password (not OAuth) */}
+          {/* Password row */}
           {hasPassword && (
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Password</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Password</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               {/* Current Password */}
-              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
                 <input
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
@@ -1108,22 +457,16 @@ export default function AccountSettingsPage(): React.JSX.Element {
                   placeholder="Current password"
                   onFocus={() => setFocusedInput("currentPassword")}
                   onBlur={() => setFocusedInput(null)}
-                  style={merge(
-                    S.passwordInput,
-                    focusedInput === "currentPassword" ? S.inputFocus : undefined
-                  )}
+                  className="password-input"
                   aria-label="Current password"
                 />
-                <div
-                  style={S.eyeIcon}
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                >
+                <div className="eye-icon" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
                   {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
               </div>
 
               {/* New Password */}
-              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
                 <input
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -1131,22 +474,16 @@ export default function AccountSettingsPage(): React.JSX.Element {
                   placeholder="New password"
                   onFocus={() => setFocusedInput("newPassword")}
                   onBlur={() => setFocusedInput(null)}
-                  style={merge(
-                    S.passwordInput,
-                    focusedInput === "newPassword" ? S.inputFocus : undefined
-                  )}
+                  className="password-input"
                   aria-label="New password"
                 />
-                <div
-                  style={S.eyeIcon}
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                >
+                <div className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
                   {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
               </div>
 
               {/* Confirm Password */}
-              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
                 <input
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1154,28 +491,17 @@ export default function AccountSettingsPage(): React.JSX.Element {
                   placeholder="Confirm new password"
                   onFocus={() => setFocusedInput("confirmPassword")}
                   onBlur={() => setFocusedInput(null)}
-                  style={merge(
-                    S.passwordInput,
-                    focusedInput === "confirmPassword" ? S.inputFocus : undefined
-                  )}
+                  className="password-input"
                   aria-label="Confirm new password"
                 />
-                <div
-                  style={S.eyeIcon}
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
+                <div className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
               </div>
 
               {/* Change Password Button */}
-              <div style={{ display: "flex", justifyContent: "center", paddingRight: "1rem", marginTop: "8px" }}>
-                <button 
-                  className="change-password" 
-                  style={S.smallBtn} 
-                  onClick={changePassword}
-                  suppressHydrationWarning
-                >
+              <div className="change-password-container">
+                <button className="btn-small" onClick={changePassword} suppressHydrationWarning>
                   Change Password
                 </button>
               </div>
@@ -1183,28 +509,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
           </div>
           )}
 
-          {/* OAuth User Info - Show if user logged in with Google */}
+          {/* OAuth User Info */}
           {!hasPassword && (
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Authentication</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "10px 16px",
-                background: "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)",
-                border: "1px solid #93C5FD",
-                borderRadius: "8px",
-                color: "#1E40AF",
-                fontSize: "14px",
-                fontWeight: 500
-              }}>
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Authentication</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <div className="oauth-badge">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -1217,19 +527,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
           </div>
           )}
 
-          {/* Delete row */}
-          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge({
-              width: 170,
-              color: "#4B5563",
-              fontWeight: 600,
-              fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Deactivate</label>
-            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
+          {/* Deactivate row */}
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Deactivate</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               <button
-                style={merge(S.delete, deleteHover.hovered ? S.deleteHover : undefined)}
-                onMouseEnter={deleteHover.onMouseEnter}
-                onMouseLeave={deleteHover.onMouseLeave}
+                className="btn-delete"
                 onClick={() => setShowDeactivateConfirm(true)}
                 suppressHydrationWarning
               >
@@ -1242,92 +545,17 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
       {/* Deactivate Confirmation Modal */}
       {showDeactivateConfirm && (
-        <div style={S.modalBackdrop} onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setShowDeactivateConfirm(false);
-          }
-        }}>
-          <div style={S.modal}>
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              marginBottom: "20px"
-            }}>
-              <div style={{
-                fontSize: "48px",
-                marginBottom: "12px"
-              }}>⚠️</div>
-              <h4 style={{ 
-                color: "#ef4444", 
-                marginBottom: "8px",
-                fontSize: "20px",
-                fontWeight: 700,
-                textAlign: "center"
-              }}>
-                Deactivate Account?
-              </h4>
-            </div>
-            
-            <div style={{
-              background: "#FEF2F2",
-              border: "1px solid #FEE2E2",
-              borderRadius: "8px",
-              padding: "12px 16px",
-              marginBottom: "16px"
-            }}>
-              <p style={{ 
-                color: "#991B1B", 
-                marginBottom: "12px",
-                fontSize: "14px",
-                lineHeight: "1.5"
-              }}>
-                <strong>What happens when you deactivate:</strong>
-              </p>
-              <ul style={{
-                color: "#7F1D1D",
-                fontSize: "13px",
-                margin: 0,
-                paddingLeft: "20px",
-                lineHeight: "1.6"
-              }}>
-                <li>Your profile will no longer be accessible</li>
-                <li>You won't be able to log in</li>
-                <li>Your data will be preserved</li>
-                <li>You can contact support to reactivate</li>
-              </ul>
-            </div>
-            
-            <p style={{ 
-              color: "#4B5563", 
-              marginBottom: "24px",
-              fontSize: "14px",
-              textAlign: "center"
-            }}>
-              Are you sure you want to continue?
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h4 style={{ color: "#ef4444", marginBottom: "16px" }}>Deactivate Account</h4>
+            <p style={{ color: "#4B5563", marginBottom: "24px" }}>
+              Are you sure you want to deactivate your account? Your data will be preserved but you won't be able to log in.
             </p>
-            
-            <div style={S.modalActions}>
-              <button 
-                style={{
-                  ...S.ghost,
-                  padding: "10px 20px",
-                  fontWeight: 600,
-                  flex: 1
-                }}
-                onClick={() => setShowDeactivateConfirm(false)}
-              >
+            <div className="modal-actions">
+              <button className="btn-ghost" onClick={() => setShowDeactivateConfirm(false)}>
                 Cancel
               </button>
-              <button 
-                style={{
-                  ...S.delete, 
-                  fontWeight: 600,
-                  padding: "10px 20px",
-                  flex: 1
-                }} 
-                onClick={handleDeactivateAccount}
-              >
+              <button className="btn-delete" onClick={handleDeactivateAccount}>
                 Yes, Deactivate
               </button>
             </div>
@@ -1397,111 +625,32 @@ function OTPModal({ phoneNumber, onClose, onVerify }: {
   };
 
   return (
-    <div style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-      padding: "20px"
-    }}>
-      <div style={{
-        background: "white",
-        borderRadius: "16px",
-        padding: "32px",
-        width: "100%",
-        maxWidth: "400px",
-        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
-      }}>
-        {/* Header */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "24px"
-        }}>
-          <h3 style={{
-            fontSize: "20px",
-            fontWeight: 700,
-            color: "#1F2937",
-            margin: 0
-          }}>
-            Verify Phone Number
-          </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none",
-              border: "none",
-              fontSize: "20px",
-              color: "#6B7280",
-              cursor: "pointer",
-              padding: "4px"
-            }}
-          >
-            ×
-          </button>
+    <div className="otp-modal-backdrop">
+      <div className="otp-modal">
+        <div className="otp-header">
+          <h3 className="otp-title">Verify Phone Number</h3>
+          <button onClick={onClose} className="otp-close-btn">×</button>
         </div>
 
-        {/* Content */}
-        <div style={{ textAlign: "center" }}>
-          <div style={{
-            fontSize: "48px",
-            marginBottom: "16px"
-          }}>
-            📱
-          </div>
+        <div className="otp-content">
+          <div className="otp-icon">📱</div>
           
-          <p style={{
-            color: "#6B7280",
-            fontSize: "14px",
-            margin: "0 0 8px 0"
-          }}>
-            We've sent a 6-digit code to
-          </p>
-          
-          <p style={{
-            color: "#1F2937",
-            fontSize: "16px",
-            fontWeight: 600,
-            margin: "0 0 24px 0"
-          }}>
-            {phoneNumber}
-          </p>
+          <p className="otp-text">We've sent a 6-digit code to</p>
+          <p className="otp-phone">{phoneNumber}</p>
 
           {/* OTP Inputs */}
-          <div style={{
-            display: "flex",
-            gap: "8px",
-            justifyContent: "center",
-            marginBottom: "24px"
-          }}>
+          <div className="otp-inputs">
             {otp.map((digit, index) => (
               <input
                 key={index}
-                ref={(el) => {
-                  inputRefs.current[index] = el;
-                }}
+                ref={(el) => { inputRefs.current[index] = el; }}
                 type="text"
                 inputMode="numeric"
                 maxLength={1}
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  border: digit ? "2px solid #2563EB" : "2px solid #E5E7EB",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: "#1F2937",
-                  outline: "none",
-                  background: digit ? "#EFF6FF" : "white"
-                }}
+                className={`otp-input ${digit ? 'filled' : ''}`}
               />
             ))}
           </div>
@@ -1510,39 +659,15 @@ function OTPModal({ phoneNumber, onClose, onVerify }: {
           <button
             onClick={handleSubmit}
             disabled={isVerifying || otp.join("").length !== 6}
-            style={{
-              width: "100%",
-              background: (isVerifying || otp.join("").length !== 6) 
-                ? "#9CA3AF" 
-                : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "12px",
-              padding: "12px",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: (isVerifying || otp.join("").length !== 6) ? "not-allowed" : "pointer",
-              marginBottom: "16px"
-            }}
+            className="otp-verify-btn"
           >
             {isVerifying ? "Verifying..." : "Verify OTP"}
           </button>
 
           {/* Resend */}
-          <div style={{ fontSize: "14px", color: "#6B7280" }}>
+          <div className="otp-resend-text">
             Didn't receive the code?{" "}
-            <button
-              onClick={handleResend}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#2563EB",
-                fontSize: "14px",
-                fontWeight: 600,
-                cursor: "pointer",
-                textDecoration: "underline"
-              }}
-            >
+            <button onClick={handleResend} className="otp-resend-btn">
               Resend OTP
             </button>
           </div>
@@ -1550,4 +675,4 @@ function OTPModal({ phoneNumber, onClose, onVerify }: {
       </div>
     </div>
   );
-}
+} 

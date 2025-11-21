@@ -390,9 +390,18 @@
 .contactInfo {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  flex: 1;
+  gap: 0.4rem;
+  flex: 0 0 auto;
   min-width: 0;
+}
+
+.contactDetails {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
 /* Avatar properly sized, aligned left */
@@ -411,11 +420,6 @@
   box-shadow: 0 4px 12px rgba(30, 103, 244, 0.2);
 }
 
-.contactDetails {
-  flex: 1;
-  min-width: 0;
-}
-
 /* Text wraps gracefully, no overflow */
 .contactName {
   font-size: 1.1rem;
@@ -425,6 +429,7 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   line-height: 1.4;
+  text-align: left !important;
 }
 
 /* Card source wraps properly */
@@ -516,7 +521,7 @@
 /* Mobile fixes - 16-20px side padding, centered layout, full-width cards */
 @media (max-width: 768px) {
   .container {
-    padding: 1.25rem 1.125rem;
+    padding: 1.25rem 0.5rem;
   }
 
   .header {
@@ -564,33 +569,62 @@
     font-size: 16px;
   }
 
-  /* Mobile - buttons stack vertically, full-width */
+  /* Mobile - buttons in a single row */
   .contactActions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 0.625rem;
+    align-items: stretch;
+    justify-content: center;
   }
 
   .actionButton {
     width: 100%;
+    flex: 0 1 auto;
     justify-content: center;
   }
+
+  .phoneButton {
+    justify-self: center;
+    width: auto;
+    min-width: 60%;
+  }
+
+	/* Slightly wider message card left/right on mobile */
+	.messageButton {
+		width: calc(100% + 0.75rem);
+		margin: 0 -0.375rem;
+	}
 
   /* Mobile - reduce avatar size */
   .avatar {
     width: 3rem;
     height: 3rem;
     font-size: 1.2rem;
+    margin: 0 auto;
   }
 
   /* Mobile - header flexible layout */
   .contactHeader {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .contactInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .contactDetails {
+    text-align: center;
   }
 
   .contactMeta {
-    align-self: flex-start;
+    align-self: center;
+    margin-top: 0.25rem;
   }
 
   .contactCard {
@@ -604,10 +638,12 @@
 
   .contactName {
     font-size: 1rem;
+    text-align: center;
   }
 
   .contactCardText {
     font-size: 0.8rem;
+    grid-column: 1 / -1;
   }
 
   .resultsHeader {
@@ -623,7 +659,7 @@
 /* Extra small screens - further reduce sizes */
 @media (max-width: 480px) {
   .container {
-    padding: 1rem 1.125rem;
+    padding: 1rem 0.5rem;
   }
 
   .title {

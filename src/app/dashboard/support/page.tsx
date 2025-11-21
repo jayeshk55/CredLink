@@ -31,10 +31,11 @@ export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [formData, setFormData] = useState({ name: "", email: "", topic: "", message: "" });
+
   // Format steps like "1) Do this 2) Do that" into separate lines
-const formatAnswer = (text: string) => {
-  return text.replace(/(\d\))/g, "\n$1").trim();
-};
+  const formatAnswer = (text: string) => {
+    return text.replace(/(\d\))/g, "\n$1").trim();
+  };
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -44,7 +45,6 @@ const formatAnswer = (text: string) => {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  
 
   const contactOptions = useMemo<ContactOption[]>(() => [
     {
@@ -85,7 +85,7 @@ const formatAnswer = (text: string) => {
       a: "You can get started for free with MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
     },
     {
-      q: "How does MyKard help grow my professional network?",
+      q: "How does MyKard help grow my professional\u00A0network?",
       a: "MyKard helps you connect instantly through shareable QR or link — whether at events, meetings, or online.You can discover professionals, entrepreneurs, and creators nearby or in your industry, and stay connected effortlessly.",
     },
    
@@ -161,12 +161,41 @@ const formatAnswer = (text: string) => {
   }, []);
 
   return (
-    <section style={S.container}>
-      <div style={S.wrapper}>
+    <section style={S.container} className="support-container">
+      {/* Decorative animated blobs & grid */}
+      <div style={S.blobWrap} aria-hidden>
+        <div style={S.blob1}></div>
+        <div style={S.blob2}></div>
+        <div style={S.blob3}></div>
+      </div>
+
+      {/* internal style tag for animations and media queries (still keeping main design inline) */}
+      <style>{`
+        @keyframes floaty1 { 0%{transform: translateY(0) translateX(0)} 50%{transform: translateY(-12px) translateX(6px)} 100%{transform: translateY(0) translateX(0)} }
+        @keyframes floaty2 { 0%{transform: translateY(0) translateX(0)} 50%{transform: translateY(-18px) translateX(-8px)} 100%{transform: translateY(0) translateX(0)} }
+        @keyframes rotateSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes pulseGlow { 0%{box-shadow:0 0 0 0 rgba(29,78,216,0.4)} 70%{box-shadow:0 0 0 12px rgba(29,78,216,0)} 100%{box-shadow:0 0 0 0 rgba(29,78,216,0)} }
+        @media (max-width: 640px){
+          .support-container{ padding: 2.4rem 0 !important }
+          .support-wrapper{ padding: 1.2rem 0 !important }
+          .support-title{ font-size: 1.4rem !important }
+          .cards-grid{ grid-template-columns: 1fr !important }
+          .support-form-footer{
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .support-form-footer p{
+            text-align: center !important;
+          }
+        }
+      `}</style>
+
+      <div style={S.wrapper} className="support-wrapper">
         {/* ===== HERO ===== */}
         <header style={S.header}>
           <div style={S.heroBadge}>We're here to help</div>
-          <h1 style={S.title}>MyKard Support & Help Centre</h1>
+          <h1 style={S.title} className="support-title">MyKard Support & Help Centre</h1>
           <p style={S.subtitle}>
             Whether you’re building a digital identity, managing team memberships, or monitoring
             engagement analytics, the MyKard support team is ready around the clock to keep you moving forward.
@@ -174,17 +203,17 @@ const formatAnswer = (text: string) => {
         </header>
 
         {/* ===== CONTACT CARDS ===== */}
-        <div style={S.contactGrid}>
+        <div style={S.contactGrid} className="cards-grid">
           {contactOptions.map((opt) => {
             const Icon = opt.icon;
             return (
               <div key={opt.title} style={S.card}>
-                <div style={S.iconCircle}>
+                <div style={{ ...S.iconCircle, boxShadow: '0 6px 20px rgba(37,99,235,0.14)', background: 'linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2))' }}>
                   <Icon size={32} color={opt.accentColor} />
                 </div>
                 <h3 style={S.cardTitle}>{opt.title}</h3>
                 <p style={S.cardDesc}>{opt.description}</p>
-                <a href={opt.action.href} style={{ ...S.button, background: "#1d4ed8" }}>
+                <a href={opt.action.href} style={{ ...S.cta, border: '1px solid rgba(29,78,216,0.12)' }}>
                   {opt.action.label}
                 </a>
               </div>
@@ -201,7 +230,7 @@ const formatAnswer = (text: string) => {
 
           <div style={S.faqList}>
             {faqs.map((faq, i) => (
-              <div key={i} style={S.faqCard}>
+              <div key={i} style={{ ...S.faqCard, transition: 'transform 0.28s ease, box-shadow 0.28s ease' }}>
                 <button style={S.faqButton} onClick={() => handleFaqToggle(i)}>
                   <span style={S.faqQ}>
                     <HelpCircle size={isMobile ? 18 : 20} style={{ color: '#2563eb', marginRight: 8, flexShrink: 0 }} />
@@ -209,16 +238,15 @@ const formatAnswer = (text: string) => {
                   </span>
                   <span style={{ fontSize: 24, color: '#2563eb', transform: activeFaq === i ? 'rotate(45deg)' : 'none', transition: '0.2s' }}>+</span>
                 </button>
-             {activeFaq === i && (
-  <p style={S.faqA}>
-    {formatAnswer(faq.a).split("\n").map((line, i) => (
-      <div key={i} style={{ marginBottom: 6 }}>
-        {line}
-      </div>
-    ))}
-  </p>
-)}
-
+                {activeFaq === i && (
+                  <div style={S.faqA}>
+                    {formatAnswer(faq.a).split("\n").map((line, idx) => (
+                      <p key={idx} style={{ marginBottom: 8 }}>
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -262,21 +290,21 @@ const formatAnswer = (text: string) => {
                 required
                 value={formData.message}
                 onChange={handleFormChange}
-                style={{ ...S.input, minHeight: 140, resize: "vertical" }}
+                style={{ ...S.input, minHeight: 140, resize: "vertical", background: 'rgba(255,255,255,0.6)' }}
                 placeholder="Describe the issue, include relevant account links, and any deadlines."
               />
             </div>
 
-            <div style={S.formFooter}>
+            <div style={S.formFooter} className="support-form-footer">
               <p style={S.consentText}>By submitting, you consent to MyKard contacting you at the email provided.</p>
-              <button type="submit" disabled={isSubmitting} style={S.submitBtn}>
-                {isSubmitting ? "Sending..." : "Send Request"}
+              <button type="submit" disabled={isSubmitting} style={{ ...S.submitBtn, ...(isSubmitting ? S.submitBtnDisabled : {} ) }}>
+                <span style={{ marginRight: 10 }}>{isSubmitting ? "Sending..." : "Send Request"}</span>
+                <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 999, background: '#fff', opacity: 0.08, boxShadow: '0 0 10px rgba(255,255,255,0.6)', animation: 'pulseGlow 1.8s infinite' }} />
               </button>
             </div>
           </form>
         </div>
 
-        
         {/* ===== STATUS ===== */}
         {submitStatus === "success" && <div style={{ ...S.toast, background: "#10B981" }}>✅ Support request sent successfully!</div>}
         {submitStatus === "error" && <div style={{ ...S.toast, background: "#EF4444" }}>❌ Failed to send request. Please try again.</div>}
@@ -304,61 +332,115 @@ const formatAnswer = (text: string) => {
 const S: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(145deg, #f8faff 0%, #eef3ff 100%)",
-    fontFamily: "Poppins, sans-serif",
+    background: "linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%)",
+    fontFamily: "Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
     padding: "3rem 1rem",
-    color: "#111827",
+    color: "#0f172a",
+    position: 'relative',
+    overflow: 'hidden'
   },
-  wrapper: { maxWidth: 1000, margin: "0 auto", display: "flex", flexDirection: "column", gap: "3rem" },
+  blobWrap: {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 0,
+    pointerEvents: 'none',
+  },
+  blob1: {
+    position: 'absolute',
+    width: 420,
+    height: 420,
+    background: 'radial-gradient(circle at 30% 30%, rgba(37,99,235,0.18), rgba(37,99,235,0.06) 40%, transparent 60%)',
+    top: -80,
+    right: -120,
+    borderRadius: '50%',
+    filter: 'blur(40px)',
+    transform: 'translateZ(0)',
+    animation: 'floaty1 7s ease-in-out infinite',
+  },
+  blob2: {
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    background: 'radial-gradient(circle at 70% 70%, rgba(34,197,94,0.12), rgba(99,102,241,0.04) 40%, transparent 60%)',
+    bottom: -80,
+    left: -80,
+    borderRadius: '50%',
+    filter: 'blur(36px)',
+    transform: 'translateZ(0) rotate(0deg)',
+    animation: 'floaty2 9s ease-in-out infinite',
+  },
+  blob3: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    background: 'conic-gradient(from 120deg, rgba(255,255,255,0.06), rgba(29,78,216,0.06))',
+    top: '30%',
+    left: '40%',
+    borderRadius: '48%',
+    filter: 'blur(28px)',
+    transform: 'translateZ(0)',
+    animation: 'rotateSlow 40s linear infinite',
+  },
+  wrapper: { maxWidth: 1000, margin: "0 auto", display: "flex", flexDirection: "column", gap: "2.5rem", position: 'relative', zIndex: 2 },
   header: { textAlign: "center" },
-  heroBadge: { background: "white", display: "inline-block", padding: "0.4rem 1rem", borderRadius: 20, color: "#2563eb", fontWeight: 600, fontSize: 14, boxShadow: "0 2px 6px rgba(0,0,0,0.05)" },
-  title: { fontSize: "2.3rem", fontWeight: 700, marginTop: 12 },
-  subtitle: { color: "#6b7280", marginTop: 12, maxWidth: 700, marginInline: "auto", lineHeight: 1.6 },
-  contactGrid: { display: "grid", gridTemplateColumns: "minmax(280px, 420px)", justifyContent: "center", gap: "1.5rem" },
-  card: { background: "white", borderRadius: 18, padding: "1.8rem", boxShadow: "0 10px 20px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", alignItems: "center", transition: "0.3s" },
-  iconCircle: { background: "#f9fafb", borderRadius: "50%", width: 70, height: 70, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 },
-  cardTitle: { fontSize: "1.2rem", fontWeight: 600 },
-  cardDesc: { color: "#6b7280", margin: "0.5rem 0 1rem", textAlign: "center" },
-  button: { 
-    background: "#1d4ed8", 
-    color: "#fff", 
-    padding: "0.8rem 1.6rem", 
-    border: "none", 
-    borderRadius: 10, 
-    fontWeight: 600, 
-    cursor: "pointer", 
-    transition: "0.3s" 
+  heroBadge: { background: "rgba(255,255,255,0.6)", display: "inline-block", padding: "0.4rem 1rem", borderRadius: 20, color: "#2563eb", fontWeight: 700, fontSize: 13, boxShadow: "0 6px 18px rgba(37,99,235,0.08)", backdropFilter: 'blur(6px)' },
+  title: { fontSize: "2rem", fontWeight: 800, marginTop: 12, letterSpacing: '-0.02em', background: 'linear-gradient(90deg,#0f172a,#1d4ed8)', WebkitBackgroundClip: 'text' as any, color: 'transparent' },
+  subtitle: { color: "#475569", marginTop: 12, maxWidth: 760, marginInline: "auto", lineHeight: 1.6 },
+  contactGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.2rem", justifyContent: "center" },
+  card: { background: "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(250,250,255,0.55))", borderRadius: 16, padding: "1.6rem", boxShadow: "0 12px 40px rgba(2,6,23,0.06)", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8, transition: 'transform 0.28s cubic-bezier(.2,.9,.3,1), box-shadow 0.28s ease', cursor: 'default' },
+  iconCircle: { background: 'linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35))', borderRadius: '50%', width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8, border: '1px solid rgba(29,78,216,0.06)' },
+  cardTitle: { fontSize: "1.05rem", fontWeight: 700 },
+  cardDesc: { color: "#6b7280", margin: "0.2rem 0 1rem", textAlign: "center", lineHeight: 1.5 },
+  cta: { 
+    background: 'linear-gradient(90deg,#1d4ed8,#2563eb)',
+    color: '#fff',
+    padding: '0.6rem 1rem',
+    borderRadius: 10,
+    fontWeight: 700,
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    transform: 'translateZ(0)',
+    boxShadow: '0 8px 30px rgba(37,99,235,0.18)',
+    transition: 'transform 0.22s ease, box-shadow 0.22s ease',
   },
   faqSection: { textAlign: "center" },
-  sectionTitle: { fontSize: "1.6rem", fontWeight: 600 },
+  sectionTitle: { fontSize: "1.3rem", fontWeight: 700 },
   sectionSubtitle: { color: "#6b7280", marginTop: 8, lineHeight: 1.5 },
-  faqList: { marginTop: 24, display: "flex", flexDirection: "column", gap: 16 },
-  faqCard: { background: "white", borderRadius: 14, padding: "1.2rem 1.5rem", boxShadow: "0 6px 15px rgba(0,0,0,0.05)", textAlign: "left" },
-  faqButton: { background: "none", border: "none", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 16, fontWeight: 500, cursor: "pointer", minHeight: 56, textAlign: "left" },
-  faqQ: { display: "flex", alignItems: "center", color: "#111827", flex: 1, textAlign: "left" },
-  faqA: { color: "#6b7280", marginTop: 10, fontSize: 14, lineHeight: 1.6 },
-  formSection: { background: "white", borderRadius: 20, padding: "2rem", boxShadow: "0 10px 20px rgba(0,0,0,0.05)" },
-  form: { display: "flex", flexDirection: "column", gap: 20 },
-  formRow: { display: "flex", gap: 20, flexWrap: "wrap" },
-  formGroup: { flex: 1, display: "flex", flexDirection: "column", gap: 6 },
-  label: { fontSize: 14, fontWeight: 500 },
-  input: { padding: "0.8rem 1rem", borderRadius: 10, border: "1px solid #cbd5e1", fontSize: 14, outline: "none" },
-  formFooter: { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, borderTop: "1px solid #e5e7eb", paddingTop: 16 },
+  faqList: { marginTop: 18, display: "flex", flexDirection: "column", gap: 12 },
+  faqCard: { background: "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,255,0.8))", borderRadius: 12, padding: "1rem 1.2rem", boxShadow: "0 6px 22px rgba(2,6,23,0.04)" },
+  faqButton: { background: "none", border: "none", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 15, fontWeight: 600, cursor: "pointer", minHeight: 56, textAlign: "left" },
+  faqQ: { display: "flex", alignItems: "center", color: "#0f172a", gap: 10, flex: 1, textAlign: "left" },
+  faqA: { color: "#475569", marginTop: 10, fontSize: 14, lineHeight: 1.6 },
+  formSection: { background: "linear-gradient(180deg, rgba(255,255,255,0.76), rgba(245,247,255,0.6))", borderRadius: 16, padding: "1.6rem", boxShadow: "0 18px 50px rgba(2,6,23,0.06)" },
+  form: { display: "flex", flexDirection: "column", gap: 16 },
+  formRow: { display: "flex", gap: 16, flexWrap: "wrap" },
+  formGroup: { flex: 1, display: "flex", flexDirection: "column", gap: 8 },
+  label: { fontSize: 13, fontWeight: 700, color: '#0f172a' },
+  input: { padding: "0.8rem 1rem", borderRadius: 12, border: "1px solid rgba(2,6,23,0.06)", fontSize: 14, outline: "none", background: 'rgba(255,255,255,0.9)' },
+  formFooter: { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, borderTop: "1px solid rgba(2,6,23,0.04)", paddingTop: 14 },
   consentText: { fontSize: 13, color: "#6b7280" },
   submitBtn: { 
-    background: "#1d4ed8", 
-    color: "white", 
-    padding: "0.8rem 1.8rem", 
-    border: "none", 
-    borderRadius: 10, 
-    fontWeight: 600, 
-    cursor: "pointer" 
+    background: "linear-gradient(90deg,#1d4ed8,#2563eb)",
+    color: "white",
+    padding: "0.7rem 1.4rem",
+    border: "none",
+    borderRadius: 12,
+    fontWeight: 700,
+    cursor: "pointer",
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    boxShadow: '0 12px 30px rgba(37,99,235,0.18)',
+    transform: 'translateZ(0)'
   },
+  submitBtnDisabled: { opacity: 0.7, cursor: 'not-allowed', transform: 'scale(0.995)' },
   ctaCard: { background: "white", borderRadius: 20, padding: "2rem", textAlign: "center", boxShadow: "0 10px 20px rgba(0,0,0,0.05)" },
-  toast: { position: "fixed", top: 20, right: 20, color: "white", padding: "0.8rem 1.4rem", borderRadius: 8, fontWeight: 500, boxShadow: "0 6px 15px rgba(0,0,0,0.2)" },
-  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 },
-  modalCard: { background: "white", padding: "2rem", borderRadius: 16, maxWidth: 400, width: "90%", boxShadow: "0 15px 30px rgba(0,0,0,0.2)" },
-  modalTitle: { fontSize: "1.4rem", fontWeight: 600, marginBottom: 10 },
-  modalText: { color: "#6b7280", lineHeight: 1.5 },
-  modalActions: { marginTop: 20, textAlign: "right" },
+  toast: { position: "fixed", top: 20, right: 20, color: "white", padding: "0.8rem 1.4rem", borderRadius: 8, fontWeight: 600, boxShadow: "0 6px 20px rgba(2,6,23,0.2)", zIndex: 9999 },
+  modalOverlay: { position: "fixed", inset: 0, background: "rgba(2,6,23,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 },
+  modalCard: { background: "linear-gradient(180deg, #ffffff, #f8fbff)", padding: "1.6rem", borderRadius: 12, maxWidth: 420, width: "92%", boxShadow: "0 20px 60px rgba(2,6,23,0.18)" },
+  modalTitle: { fontSize: "1.1rem", fontWeight: 800, marginBottom: 8 },
+  modalText: { color: "#475569", lineHeight: 1.6 },
+  modalActions: { marginTop: 12, textAlign: "right" },
 };

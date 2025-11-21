@@ -102,7 +102,7 @@ export default function ContactsPage() {
         <div className={styles.headerContent}>
           <div className={styles.titleSection}>
             <h1 className={styles.title}>
-              <Users className={styles.titleIcon} />
+              {/* <Users className={styles.titleIcon} /> */}
               My Contacts
             </h1>
             <p className={styles.subtitle}>
@@ -193,14 +193,6 @@ export default function ContactsPage() {
                         </div>
                         <div className={styles.contactDetails}>
                           <h3 className={styles.contactName}>{contact.name}</h3>
-                          <p className={styles.contactCard}>
-                            Contacted via <span className={styles.cardName}>
-                              {contact.card.cardName || contact.card.fullName}
-                              {contact.card.cardName && contact.card.fullName !== contact.card.cardName && (
-                                <span className={styles.cardType}> ({contact.card.fullName})</span>
-                              )}
-                            </span>
-                          </p>
                         </div>
                       </div>
                       <div className={styles.contactMeta}>
@@ -214,32 +206,37 @@ export default function ContactsPage() {
                     <div className={styles.contactActions}>
                       <button
                         onClick={() => handleEmailClick(contact.email)}
-                        className={styles.actionButton}
+                        className={`${styles.actionButton} ${styles.messageButton}`}
                         title="Send email"
                       >
                         <Mail size={16} />
                         {contact.email}
                       </button>
-                      
+
                       <button
                         onClick={() => handlePhoneClick(contact.phone)}
-                        className={styles.actionButton}
+                        className={`${styles.actionButton} ${styles.phoneButton}`}
                         title="Call phone"
                       >
                         <Phone size={16} />
                         {contact.phone}
                       </button>
 
-                      {contact.sourceUrl && (
-                        <button
-                          onClick={() => handleSourceClick(contact.sourceUrl!)}
-                          className={styles.actionButton}
-                          title="View source page"
-                        >
-                          <ExternalLink size={16} />
-                          Source
-                        </button>
-                      )}
+                      <p
+                        className={styles.contactCardText}
+                        onClick={() => {
+                          if (contact.sourceUrl) {
+                            handleSourceClick(contact.sourceUrl);
+                          }
+                        }}
+                      >
+                        Contacted via <span className={styles.cardName}>
+                          {contact.card.cardName || contact.card.fullName}
+                          {contact.card.cardName && contact.card.fullName !== contact.card.cardName && (
+                            <span className={styles.cardType}> ({contact.card.fullName})</span>
+                          )}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 ))}

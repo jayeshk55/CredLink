@@ -2631,7 +2631,7 @@ const EditPage = () => {
   }
 
   return (
-    <div style={{ 
+    <div className="create-wrap" style={{ 
       display: 'flex', 
       flexDirection: 'column',
       minHeight: '100vh', 
@@ -2657,6 +2657,13 @@ const EditPage = () => {
             flex: 1 !important;
             min-width: 0 !important;
           }
+        }
+      `}</style>
+
+      <style>{`
+        .create-wrap { padding: 10px; }
+        @media (max-width: 720px) {
+          .create-wrap { padding: 6px 8px !important; }
         }
       `}</style>
 

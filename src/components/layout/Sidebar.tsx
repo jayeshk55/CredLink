@@ -50,6 +50,7 @@ const Sidebar = () => {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         if (!token) return;
+
         const res = await fetch('/api/message/receive', {
           method: 'GET',
           headers: {
@@ -58,9 +59,72 @@ const Sidebar = () => {
           },
         });
         if (!res.ok) return;
+
         const data = await res.json();
-        const unread = (data.messages || []).filter((m: any) => m && (m.read === false || m.read === undefined)).length;
-        setUnreadCount(unread);
+        const inboxMessages = data.messages || [];
+        const sentMessages = data.sentMessages || [];
+
+        const inboxBySender = new Map<string, any[]>();
+        (inboxMessages as any[]).forEach((m: any) => {
+          if (!m || !m.senderId) return;
+          const arr = inboxBySender.get(m.senderId) || [];
+          arr.push(m);
+          inboxBySender.set(m.senderId, arr);
+        });
+
+        const sentByReceiver = new Map<string, any[]>();
+        (sentMessages as any[]).forEach((m: any) => {
+          if (!m || !m.receiverId) return;
+          const arr = sentByReceiver.get(m.receiverId) || [];
+          arr.push(m);
+          sentByReceiver.set(m.receiverId, arr);
+        });
+
+        let readPointers: Record<string, string> = {};
+        try {
+          const stored = localStorage.getItem('dashboard-message-read-pointers');
+          if (stored) readPointers = JSON.parse(stored);
+        } catch {
+          readPointers = {};
+        }
+
+        const allPartyIds = new Set<string>([
+          ...Array.from(inboxBySender.keys()),
+          ...Array.from(sentByReceiver.keys()),
+        ]);
+
+        let totalUnread = 0;
+
+        for (const partyId of allPartyIds) {
+          const inboxForParty = inboxBySender.get(partyId) || [];
+          const sentForParty = sentByReceiver.get(partyId) || [];
+
+          const combined = [
+            ...inboxForParty.map((m: any) => ({
+              date: m.createdAt || m.date || new Date().toISOString(),
+              direction: 'in' as const,
+            })),
+            ...sentForParty.map((m: any) => ({
+              date: m.createdAt || m.date || new Date().toISOString(),
+              direction: 'out' as const,
+            })),
+          ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+          if (!combined.length) continue;
+
+          const readPointer = readPointers[partyId];
+          const lastReadAt = readPointer ? new Date(readPointer).getTime() : 0;
+
+          const incomingCount = combined
+            .filter(item => item.direction === 'in' && new Date(item.date).getTime() > lastReadAt)
+            .length;
+
+          if (incomingCount > 0) {
+            totalUnread += incomingCount;
+          }
+        }
+
+        setUnreadCount(totalUnread);
       } catch (e) {
         // ignore
       }

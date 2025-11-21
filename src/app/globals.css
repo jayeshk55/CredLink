@@ -998,6 +998,11 @@ p, .body-text {
     padding-bottom: 2rem !important;
   }
   
+  /* Extra top space for hero so it clears the fixed mobile header */
+  .hero-section {
+    padding-top: 5.5rem !important;
+  }
+  
   .section.py-12 {
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
