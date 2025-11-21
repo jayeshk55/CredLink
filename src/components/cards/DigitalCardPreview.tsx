@@ -29,6 +29,7 @@ export interface DigitalCardProps {
   themeColor2?: string;
   fontFamily?: string;
   cardType?: string;
+  documentUrl?: string;
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
@@ -53,6 +54,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   themeColor1 = "#3b82f6",
   themeColor2 = "#2563eb",
   cardType = "",
+  documentUrl,
 }) => {
   // Construct full name from firstName, middleName, lastName
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || name || 'Your Name';
@@ -236,7 +238,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {about}
         </p>
 
-        {/* Pills - Exact copy from edit page */}
+        {/* Pills - Exact copy from edit page, plus Docs when documentUrl exists */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
             { text: "Services" },
@@ -244,12 +246,21 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             { text: "Skills" },
             { text: "Experience" },
             { text: "Review" },
+            ...(documentUrl ? [{ text: "Docs" }] as { text: string }[] : []),
           ].map((b) => (
             <button
               key={b.text}
-              onClick={() => {
-                if (b.text === 'Portfolio') { openPortfolio(); }
-                else { setActivePanel(b.text as Section); }
+              onClick={(e) => {
+                e.stopPropagation();
+                if (b.text === 'Portfolio') {
+                  openPortfolio();
+                } else if (b.text === 'Docs' && documentUrl) {
+                  if (typeof window !== 'undefined') {
+                    window.open(documentUrl, '_blank', 'noopener');
+                  }
+                } else {
+                  setActivePanel(b.text as Section);
+                }
               }}
               style={{
                 padding: "8px 14px",

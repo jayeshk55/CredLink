@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
 import { prisma } from "@/lib/prisma";
-import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 import { adminStorageBucket } from "@/lib/firebase-admin";
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
@@ -203,7 +203,7 @@ export async function PATCH(
     // Handle profile image upload
     const profileImageFile = formData.get('profileImage') as File;
     if (profileImageFile && profileImageFile.size > 0) {
-      // Delete old image if exists
+      // Delete old image if exists (only relevant for legacy Cloudinary URLs)
       if (existingCard.profileImage) {
         try {
           const publicId = existingCard.profileImage.split('/').slice(-2).join('/').split('.')[0];
@@ -212,20 +212,36 @@ export async function PATCH(
           console.error('Error deleting old profile image:', err);
         }
       }
-      
-      // Upload new image
-      const buffer = Buffer.from(await profileImageFile.arrayBuffer());
-      const uploadResult: any = await uploadToCloudinary(buffer, {
-        folder: 'credlink/cards/profiles',
-        public_id: `${decoded.userId}_profile_${Date.now()}`,
+
+      const arrayBuffer = await profileImageFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const originalName = (profileImageFile as any).name || 'profile.jpg';
+      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
+      const timestamp = Date.now();
+      const filePath = `cards/profile-images/${decoded.userId}/${timestamp}-${safeName}`;
+
+      const fileRef = adminStorageBucket.file(filePath);
+
+      await fileRef.save(buffer, {
+        resumable: false,
+        metadata: {
+          contentType: profileImageFile.type || 'application/octet-stream',
+        },
       });
-      updateData.profileImage = uploadResult.secure_url;
+
+      const [signedUrl] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '2100-01-01',
+      });
+
+      updateData.profileImage = signedUrl;
     }
 
     // Handle banner image upload
     const bannerImageFile = formData.get('bannerImage') as File;
     if (bannerImageFile && bannerImageFile.size > 0) {
-      // Delete old image if exists
+      // Delete old image if exists (only relevant for legacy Cloudinary URLs)
       if ((existingCard as any).bannerImage) {
         try {
           const publicId = (existingCard as any).bannerImage.split('/').slice(-2).join('/').split('.')[0];
@@ -234,20 +250,36 @@ export async function PATCH(
           console.error('Error deleting old banner image:', err);
         }
       }
-      
-      // Upload new image
-      const buffer = Buffer.from(await bannerImageFile.arrayBuffer());
-      const uploadResult: any = await uploadToCloudinary(buffer, {
-        folder: 'credlink/cards/banners',
-        public_id: `${decoded.userId}_banner_${Date.now()}`,
+
+      const arrayBuffer = await bannerImageFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const originalName = (bannerImageFile as any).name || 'banner.jpg';
+      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
+      const timestamp = Date.now();
+      const filePath = `cards/banner-images/${decoded.userId}/${timestamp}-${safeName}`;
+
+      const fileRef = adminStorageBucket.file(filePath);
+
+      await fileRef.save(buffer, {
+        resumable: false,
+        metadata: {
+          contentType: bannerImageFile.type || 'application/octet-stream',
+        },
       });
-      updateData.bannerImage = uploadResult.secure_url;
+
+      const [signedUrl] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '2100-01-01',
+      });
+
+      updateData.bannerImage = signedUrl;
     }
 
     // Handle cover image upload
     const coverImageFile = formData.get('coverImage') as File;
     if (coverImageFile && coverImageFile.size > 0) {
-      // Delete old image if exists
+      // Delete old image if exists (only relevant for legacy Cloudinary URLs)
       if (existingCard.coverImage) {
         try {
           const publicId = existingCard.coverImage.split('/').slice(-2).join('/').split('.')[0];
@@ -256,14 +288,30 @@ export async function PATCH(
           console.error('Error deleting old cover image:', err);
         }
       }
-      
-      // Upload new image
-      const buffer = Buffer.from(await coverImageFile.arrayBuffer());
-      const uploadResult: any = await uploadToCloudinary(buffer, {
-        folder: 'credlink/cards/covers',
-        public_id: `${decoded.userId}_cover_${Date.now()}`,
+
+      const arrayBuffer = await coverImageFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const originalName = (coverImageFile as any).name || 'cover.jpg';
+      const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
+      const timestamp = Date.now();
+      const filePath = `cards/cover-images/${decoded.userId}/${timestamp}-${safeName}`;
+
+      const fileRef = adminStorageBucket.file(filePath);
+
+      await fileRef.save(buffer, {
+        resumable: false,
+        metadata: {
+          contentType: coverImageFile.type || 'application/octet-stream',
+        },
       });
-      updateData.coverImage = uploadResult.secure_url;
+
+      const [signedUrl] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: '2100-01-01',
+      });
+
+      updateData.coverImage = signedUrl;
     }
 
     // Update card

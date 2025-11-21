@@ -62,6 +62,7 @@ interface Card {
   cover?: string;
   coverImage?: string;
   bannerImage?: string;
+  documentUrl?: string;
   email?: string;
   phone?: string;
   linkedin?: string;
@@ -106,6 +107,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
   phone: card.phone || '',
   linkedin: card.linkedinUrl || card.linkedin || '',
   website: card.websiteUrl || card.website || '',
+  documentUrl: (card as any).documentUrl || '',
   themeColor1: card.selectedColor || '#3b82f6',
   themeColor2: card.selectedColor2 || '#2563eb',
    fontFamily: card.selectedFont || 'system-ui, sans-serif',

@@ -37,6 +37,7 @@ interface Card {
   cover?: string;
   coverImage?: string;
   bannerImage?: string;
+  documentUrl?: string;
   email?: string;
   phone?: string;
   linkedin?: string;
@@ -57,7 +58,7 @@ const renderCardPreview = (card: Card) => {
     firstName: card.firstName || '',
     middleName: card.middleName || '',
     lastName: card.lastName || '',
-     cardName: card.cardName || card.name || '',
+    cardName: card.cardName || card.name || '',
     title: card.title || '',
     company: card.company || '',
     location: card.location || '',
@@ -77,6 +78,7 @@ const renderCardPreview = (card: Card) => {
     themeColor2: card.selectedColor2 || '#2563eb',
     fontFamily: card.selectedFont || 'system-ui, sans-serif',
     cardType: card.cardType || '',
+    documentUrl: card.documentUrl || '',
   };
 
   const selectedDesign = card.selectedDesign || 'Classic';
