@@ -479,6 +479,8 @@ export default function MessagesPage() {
       lineHeight: "1.6",
       boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
       maxWidth: "80%",
+      wordBreak: "break-word",
+      overflowWrap: "break-word",
     },
     bubbleOut: {
       background: colors.primaryGradient,
@@ -489,6 +491,8 @@ export default function MessagesPage() {
       lineHeight: "1.6",
       boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
       maxWidth: "80%",
+      wordBreak: "break-word",
+      overflowWrap: "break-word",
     },
     composer: {
       padding: "20px",

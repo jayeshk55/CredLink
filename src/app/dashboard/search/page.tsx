@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, Suspense, useRef } from "react";
-import { Search, ChevronDown } from "lucide-react";
+import React, { useMemo, useState, useEffect, Suspense } from "react";
+import { Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Modal } from "@/components/ui/modal";
 
@@ -36,30 +36,11 @@ function SearchPageContent() {
 
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [connectionName, setConnectionName] = useState("");
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
   const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
-
-  // custom dropdown state (responsive)
-  const [catOpen, setCatOpen] = useState(false);
-  const catRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    // close on outside click / ESC
-    const handleClick = (e: MouseEvent) => {
-      if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCatOpen(false); };
-    document.addEventListener("mousedown", handleClick);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -145,19 +126,10 @@ function SearchPageContent() {
     } finally { setConnectingUserId(null); }
   };
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    profiles.forEach((p) => p.category && set.add(p.category));
-    return Array.from(set);
-  }, [profiles]);
-
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
     const raw = query.trim().toLowerCase();
-    if (!raw) {
-      if (category) return profiles.filter(p => p.category === category).slice(0, 50);
-      return [];
-    }
+    if (!raw) return [];
     let keywordsPart = raw;
     let locationPart = "";
     const inIdx = raw.lastIndexOf(" in ");
@@ -178,12 +150,9 @@ function SearchPageContent() {
       const city = (p.city || "").toLowerCase();
       const keywordsMatch = keywords.length === 0 || keywords.every(k => hay.includes(k));
       const locationMatch = !locationPart || city.includes(locationPart);
-      if (category && p.category !== category) return false;
       return keywordsMatch && locationMatch;
     }).slice(0, 50);
-  }, [query, category, profiles]);
-
-  const chooseCategory = (c: string) => { setCategory(c); setCatOpen(false); };
+  }, [query, profiles]);
 
   return (
     // Allow dropdown to extend outside; top-level container uses visible overflow
@@ -212,15 +181,6 @@ function SearchPageContent() {
 
         .icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.85; }
 
-        /* custom dropdown */
-        .cat { position:relative; z-index: 9999; min-width:140px; width: 180px; max-width: 100%; }
-        .cat-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.04); background:#fff; font-size:14px; color:#0F172A; cursor:pointer; box-shadow: 0 6px 18px rgba(16,24,40,0.03); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cat-panel { position: absolute; top: 100%; left: 0; right: 0; width: 100%; background: #fff; border-radius: 10px; box-shadow: 0 14px 40px rgba(2,6,23,0.12); border: 1px solid rgba(0,0,0,0.06); overflow: auto; max-height: 60vh; z-index: 99999; }
-        .cat-item { padding:12px 14px; cursor:pointer; font-size:15px; border-bottom:1px solid rgba(0,0,0,0.03); color:#0F172A; }
-        .cat-item:last-child { border-bottom:none; }
-        .cat-item:hover { background: linear-gradient(90deg, rgba(99,102,241,0.06), rgba(34,211,238,0.03)); }
-
-
         .meta { margin-top:12px; color:#64748B; font-size:13px; }
 
         /* cards grid */
@@ -238,25 +198,7 @@ function SearchPageContent() {
           .wrap { padding: 6px 8px; }
           .title { font-size:24px; }
           .row { flex-direction: column; align-items: stretch; gap:12px; }
-          .cat { width: 100%; }
-          .cat-btn { width: 100%; }
           .left input { padding: 12px 16px 12px 44px; font-size:15px; }
-          .cat {
-            width: 100%;
-            margin-top: 8px;
-          }
-          .cat-panel {
-            position: fixed;
-            top: auto;
-            bottom: 18px;
-            left: 8px;
-            right: 8px;
-            width: auto;
-            max-width: none;
-            border-radius: 12px;
-            z-index: 99999;
-            max-height: 50vh;
-          }
           .grid { grid-template-columns: 1fr; }
           .card { align-items:flex-start; gap:10px; }
           .avatar { width:56px; height:56px; font-size:20px; }
@@ -265,7 +207,6 @@ function SearchPageContent() {
         /* medium screens */
         @media (max-width: 980px) and (min-width: 721px) {
           .grid { grid-template-columns: repeat(2, 1fr); }
-          .cat { width: 220px; }
         }
 
         /* utility spinner keyframes */
@@ -299,37 +240,10 @@ function SearchPageContent() {
               />
             </div>
 
-            <div className="cat" ref={catRef}>
-              <button
-                type="button"
-                aria-haspopup="listbox"
-                aria-expanded={catOpen}
-                className="cat-btn"
-                onClick={() => setCatOpen(s => !s)}
-              >
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "inline-block" }}>
-                  {category || "All Categories"}
-                </span>
-                <ChevronDown style={{ width: 16, height: 16, color: "#94A3B8" }} />
-              </button>
-
-              {catOpen && (
-                <div role="listbox" className="cat-panel" aria-label="Categories">
-                  <div className="cat-item" role="option" aria-selected={category === ""} onClick={() => chooseCategory("")}>All Categories</div>
-                  {categories.map(c => (
-                    <div key={c} className="cat-item" role="option" aria-selected={category === c} onClick={() => chooseCategory(c)}>{c}</div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-        
-            
-
           </div>
 
           <div className="meta">
-            {hasQuery ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}` : "Search to see results or choose a category"}
+            {hasQuery ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}` : "Search to see results"}
           </div>
         </div>
 
@@ -372,7 +286,7 @@ function SearchPageContent() {
 
           {!loading && hasQuery && filtered.length === 0 && (
             <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 22, color: "#64748B" }}>
-              No results found. Try different keywords or categories.
+              No results found. Try different keywords.
             </div>
           )}
         </div>
