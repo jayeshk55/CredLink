@@ -58,6 +58,10 @@ export default function AccountSettingsPage(): React.JSX.Element {
   // modals / flows
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState<boolean>(false);
+  const [showPasswordSuccessModal, setShowPasswordSuccessModal] = useState<boolean>(false);
+  const [showDeactivateSuccessModal, setShowDeactivateSuccessModal] = useState<boolean>(false);
+  const [deactivateErrorMessage, setDeactivateErrorMessage] = useState<string>('');
+  const [showDeactivateErrorModal, setShowDeactivateErrorModal] = useState<boolean>(false);
 
   // responsive
   const { width, isMobile } = useWindowWidth(760);
@@ -206,20 +210,23 @@ export default function AccountSettingsPage(): React.JSX.Element {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || 'Failed to deactivate account');
+        setDeactivateErrorMessage(data.error || 'Failed to deactivate account');
+        setShowDeactivateErrorModal(true);
+        setShowDeactivateConfirm(false);
         return;
       }
 
       setShowDeactivateConfirm(false);
-      
-      toast.success("Your account has been deactivated successfully. You will be logged out.");
+      setShowDeactivateSuccessModal(true);
       
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
     } catch (error) {
       console.error('Deactivate account error:', error);
-      toast.error('Failed to deactivate account. Please try again.');
+      setDeactivateErrorMessage('Failed to deactivate account. Please try again.');
+      setShowDeactivateErrorModal(true);
+      setShowDeactivateConfirm(false);
     }
   };
 
@@ -268,11 +275,11 @@ export default function AccountSettingsPage(): React.JSX.Element {
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
-        toast.success('Password updated successfully!');
+        setShowPasswordSuccessModal(true);
       } else if (res.status === 400) {
         toast.error('Invalid input or password mismatch');
       } else if (res.status === 401) {
-        toast.error('Unauthorized request');
+        toast.error('Current password is incorrect');
       } else if (res.status === 500) {
         toast.error('Something went wrong, please try again later');
       } else {
@@ -557,6 +564,80 @@ export default function AccountSettingsPage(): React.JSX.Element {
               </button>
               <button className="btn-delete" onClick={handleDeactivateAccount}>
                 Yes, Deactivate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Success Modal */}
+      {showPasswordSuccessModal && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '400px', padding: '30px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>✅</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '10px', color: '#10b981' }}>
+                Password Updated Successfully!
+              </h3>
+              <p style={{ color: '#6b7280', marginBottom: '30px' }}>
+                Your password has been changed successfully. You can now use your new password to login.
+              </p>
+              <button 
+                className="btn-primary" 
+                onClick={() => setShowPasswordSuccessModal(false)}
+                style={{ width: '100%', padding: '12px' }}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deactivate Success Modal */}
+      {showDeactivateSuccessModal && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '400px', padding: '30px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>👋</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '10px' }}>
+                Account Deactivated
+              </h3>
+              <p style={{ color: '#6b7280', marginBottom: '30px' }}>
+                Your account has been deactivated successfully. You will be redirected to the home page shortly.
+              </p>
+              <div style={{ 
+                background: '#f3f4f6', 
+                padding: '12px', 
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                Redirecting in 2 seconds...
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deactivate Error Modal */}
+      {showDeactivateErrorModal && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: '400px', padding: '30px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚠️</div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '10px', color: '#ef4444' }}>
+                Deactivation Failed
+              </h3>
+              <p style={{ color: '#6b7280', marginBottom: '30px' }}>
+                {deactivateErrorMessage}
+              </p>
+              <button 
+                className="btn-primary" 
+                onClick={() => setShowDeactivateErrorModal(false)}
+                style={{ width: '100%', padding: '12px' }}
+              >
+                Close
               </button>
             </div>
           </div>
