@@ -8,7 +8,7 @@
     "dev:https": "next dev --experimental-https",
     "dev:tunnel": "next dev --experimental-https --port 3000",
     "dev:local-prod": "next dev --experimental-https --hostname 0.0.0.0 --port 3000",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "cleanup": "npx tsx cleanup-ttl.ts",
