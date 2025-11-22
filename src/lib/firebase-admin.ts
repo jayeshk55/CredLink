@@ -52,7 +52,13 @@ function initFirebaseAdmin() {
   }
 }
 
-initFirebaseAdmin()
+// Initialize Firebase Admin SDK once per runtime
+function getFirebaseAdmin() {
+  if (!admin.apps.length) {
+    initFirebaseAdmin()
+  }
+  return admin
+}
 
-export const adminAuth = admin.auth()
-export const adminStorageBucket = admin.storage().bucket()
+export const adminAuth = () => getFirebaseAdmin().auth()
+export const adminStorageBucket = () => getFirebaseAdmin().storage().bucket()

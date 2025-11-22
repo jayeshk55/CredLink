@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     const filePath = `cards/documents/${decoded.userId}/${timestamp}-${pdfFileName}`;
 
     // Upload to Firebase Storage
-    const fileRef = adminStorageBucket.file(filePath);
+    const fileRef = adminStorageBucket().file(filePath);
 
     await fileRef.save(finalBuffer, {
       resumable: false,

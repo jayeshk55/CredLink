@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const filePath = `users/profile-images/${decoded.userId}/${timestamp}-${safeName}`
 
-    const fileRef = adminStorageBucket.file(filePath)
+    const fileRef = adminStorageBucket().file(filePath)
 
     await fileRef.save(buffer, {
       resumable: false,

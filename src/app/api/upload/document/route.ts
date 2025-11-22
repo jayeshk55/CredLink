@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const safeName = (originalName || 'document').replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
     const filePath = `uploads/documents/${timestamp}-${safeName}`;
 
-    const fileRef = adminStorageBucket.file(filePath);
+    const fileRef = adminStorageBucket().file(filePath);
 
     await fileRef.save(buffer, {
       resumable: false,
