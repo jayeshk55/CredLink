@@ -110,7 +110,7 @@ export default function UsersPage() {
         setLoading(true);
         const res = await fetch("/api/users");
         const data = await res.json();
-        console.log(data);
+      //  console.log(data);
         setUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error);
