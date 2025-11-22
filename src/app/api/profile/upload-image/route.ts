@@ -104,7 +104,11 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const filePath = `users/profile-images/${decoded.userId}/${timestamp}-${safeName}`
 
-    const fileRef = adminStorageBucket.file(filePath)
+    const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath)
 
     await fileRef.save(buffer, {
       resumable: false,

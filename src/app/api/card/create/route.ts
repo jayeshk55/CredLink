@@ -75,7 +75,11 @@ export async function POST(req: NextRequest) {
       const timestamp = Date.now();
       const filePath = `cards/profile-images/${decoded.userId}/${timestamp}-${safeName}`;
 
-      const fileRef = adminStorageBucket.file(filePath);
+      const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath);
 
       await fileRef.save(buffer, {
         resumable: false,
@@ -106,7 +110,11 @@ export async function POST(req: NextRequest) {
       const timestamp = Date.now();
       const filePath = `cards/banner-images/${decoded.userId}/${timestamp}-${safeName}`;
 
-      const fileRef = adminStorageBucket.file(filePath);
+      const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath);
 
       await fileRef.save(buffer, {
         resumable: false,
@@ -134,7 +142,11 @@ export async function POST(req: NextRequest) {
       const timestamp = Date.now();
       const filePath = `cards/cover-images/${decoded.userId}/${timestamp}-${safeName}`;
 
-      const fileRef = adminStorageBucket.file(filePath);
+      const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath);
 
       await fileRef.save(buffer, {
         resumable: false,

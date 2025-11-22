@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
     const safeName = (originalName || 'document').replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
     const filePath = `uploads/documents/${timestamp}-${safeName}`;
 
-    const fileRef = adminStorageBucket.file(filePath);
+    const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath);
 
     await fileRef.save(buffer, {
       resumable: false,

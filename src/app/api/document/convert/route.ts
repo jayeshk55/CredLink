@@ -158,7 +158,11 @@ export async function POST(req: NextRequest) {
     const filePath = `cards/documents/${decoded.userId}/${timestamp}-${pdfFileName}`;
 
     // Upload to Firebase Storage
-    const fileRef = adminStorageBucket.file(filePath);
+    const bucket = adminStorageBucket();
+    if (!bucket) {
+      return NextResponse.json({ error: 'Firebase Storage not available during build' }, { status: 503 });
+    }
+    const fileRef = bucket.file(filePath);
 
     await fileRef.save(finalBuffer, {
       resumable: false,
