@@ -69,7 +69,7 @@ export default function ProfilePage() {
     }
   };
 
-  const user = userProfile || session?.user || zustandUser;
+  const user = userProfile || zustandUser;
 
   const displayUser = user
     ? {
