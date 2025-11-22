@@ -7,63 +7,69 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { token, password } = body
 
-    if (!token || !password) {
-      return NextResponse.json(
-        { error: 'Token and password are required' },
-        { status: 400 }
-      )
-    }
+    // TODO: Add PasswordResetToken model to Prisma schema
+    return NextResponse.json(
+      { error: 'Password reset feature is temporarily disabled - PasswordResetToken model missing from schema' },
+      { status: 503 }
+    )
 
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      )
-    }
+    // if (!token || !password) {
+    //   return NextResponse.json(
+    //     { error: 'Token and password are required' },
+    //     { status: 400 }
+    //   )
+    // }
 
-    // Find the reset token
-    const resetToken = await prisma.passwordResetToken.findFirst({
-      where: {
-        token: token,
-        used: false,
-        expiresAt: {
-          gt: new Date() // Token must not be expired
-        }
-      },
-      include: {
-        user: true
-      }
-    })
+    // if (password.length < 8) {
+    //   return NextResponse.json(
+    //     { error: 'Password must be at least 8 characters long' },
+    //     { status: 400 }
+    //   )
+    // }
 
-    if (!resetToken) {
-      return NextResponse.json(
-        { error: 'Invalid or expired reset token' },
-        { status: 400 }
-      )
-    }
+    // // Find the reset token
+    // const resetToken = await prisma.passwordResetToken.findFirst({
+    //   where: {
+    //     token: token,
+    //     used: false,
+    //     expiresAt: {
+    //       gt: new Date() // Token must not be expired
+    //     }
+    //   },
+    //   include: {
+    //     user: true
+    //   }
+    // })
 
-    // Hash the new password
-    const saltRounds = 12
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    // if (!resetToken) {
+    //   return NextResponse.json(
+    //     { error: 'Invalid or expired reset token' },
+    //     { status: 400 }
+    //   )
+    // }
 
-    // Update user's password and mark token as used
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: resetToken.userId },
-        data: { password: hashedPassword }
-      }),
-      prisma.passwordResetToken.update({
-        where: { id: resetToken.id },
-        data: { used: true }
-      })
-    ])
+    // // Hash the new password
+    // const saltRounds = 12
+    // const hashedPassword = await bcrypt.hash(password, saltRounds)
 
-    console.log('✅ Password reset successful for user:', resetToken.user.email)
+    // // Update user's password and mark token as used
+    // await prisma.$transaction([
+    //   prisma.user.update({
+    //     where: { id: resetToken.userId },
+    //     data: { password: hashedPassword }
+    //   }),
+    //   prisma.passwordResetToken.update({
+    //     where: { id: resetToken.id },
+    //     data: { used: true }
+    //   })
+    // ])
 
-    return NextResponse.json({
-      success: true,
-      message: 'Password has been reset successfully'
-    })
+    // console.log('✅ Password reset successful for user:', resetToken.user.email)
+
+    // return NextResponse.json({
+    //   success: true,
+    //   message: 'Password has been reset successfully'
+    // })
 
   } catch (error) {
     console.error('Password reset error:', error)
@@ -77,49 +83,55 @@ export async function POST(request: NextRequest) {
 // GET endpoint to validate reset token
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const token = searchParams.get('token')
+    // TODO: Add PasswordResetToken model to Prisma schema
+    return NextResponse.json(
+      { error: 'Password reset feature is temporarily disabled - PasswordResetToken model missing from schema' },
+      { status: 503 }
+    )
 
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Token is required' },
-        { status: 400 }
-      )
-    }
+    // const { searchParams } = new URL(request.url)
+    // const token = searchParams.get('token')
 
-    // Check if token exists and is valid
-    const resetToken = await prisma.passwordResetToken.findFirst({
-      where: {
-        token: token,
-        used: false,
-        expiresAt: {
-          gt: new Date() // Token must not be expired
-        }
-      },
-      include: {
-        user: {
-          select: {
-            email: true,
-            fullName: true
-          }
-        }
-      }
-    })
+    // if (!token) {
+    //   return NextResponse.json(
+    //     { error: 'Token is required' },
+    //     { status: 400 }
+    //   )
+    // }
 
-    if (!resetToken) {
-      return NextResponse.json(
-        { error: 'Invalid or expired reset token' },
-        { status: 400 }
-      )
-    }
+    // // Check if token exists and is valid
+    // const resetToken = await prisma.passwordResetToken.findFirst({
+    //   where: {
+    //     token: token,
+    //     used: false,
+    //     expiresAt: {
+    //       gt: new Date() // Token must not be expired
+    //     }
+    //   },
+    //   include: {
+    //     user: {
+    //       select: {
+    //         email: true,
+    //         fullName: true
+    //       }
+    //     }
+    //   }
+    // })
 
-    return NextResponse.json({
-      valid: true,
-      user: {
-        email: resetToken.user.email,
-        fullName: resetToken.user.fullName
-      }
-    })
+    // if (!resetToken) {
+    //   return NextResponse.json(
+    //     { error: 'Invalid or expired reset token' },
+    //     { status: 400 }
+    //   )
+    // }
+
+    // return NextResponse.json({
+    //   valid: true,
+    //   user: {
+    //     email: resetToken.user.email,
+    //     fullName: resetToken.user.fullName
+    //   }
+    // })
 
   } catch (error) {
     console.error('Token validation error:', error)

@@ -1,33 +1,5 @@
 /* CardDetail.module.css */
 
-:root {
-  /* Primary Theme Color (Blue from the image) */
-  --color-primary: #1e62f5;
-  --color-primary-light: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-fade: rgba(37, 99, 235, 0.1);
-  --color-primary-soft: #eff6ff; /* bg-blue-50 equivalent */
-  --color-primary-border: #bfdbfe; /* border-blue-200 equivalent */
-
-  /* General Colors */
-  --color-text-dark: #1f2937; /* Gray 900 */
-  --color-text-medium: #4b5563; /* Gray 600 */
-  --color-text-light: #6b7280; /* Gray 500 */
-  --color-background: #f9fafb; /* Gray 50 */
-  --color-white: #ffffff;
-  --color-border: #e5e7eb; /* Gray 200 */
-
-  /* Specific Colors */
-  --color-success: #10b981; /* Green 500 */
-  --color-danger: #ef4444; /* Red 500 */
-  --color-danger-bg: #fef2f2; /* Red 50 */
-  --color-danger-border: #fecaca; /* Red 200 */
-  --color-danger-text: #b91c1c; /* Red 800 */
-  --color-red-600: #dc2626;
-
-  --color-purple-600: #9333ea;
-}
-
 /* --- Layout and Structure --- */
 .pageContainer {
   background-color: var(--color-background);

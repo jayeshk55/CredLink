@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
       size: file.size
     });
 
-    // Check file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    // Check file size (max 1MB)
+    const maxSize = 1 * 1024 * 1024; // 1MB
     if (file.size > maxSize) {
-      return NextResponse.json({ error: "File size must be less than 10MB" }, { status: 400 });
+      return NextResponse.json({ error: "File size must be less than 1MB" }, { status: 400 });
     }
 
     const originalName = (file as any).name || null;

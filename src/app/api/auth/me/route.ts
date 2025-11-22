@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../[...nextauth]/route'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 
@@ -19,12 +18,6 @@ function decodeJwtPayload(token: string): any | null {
 
 export async function GET() {
   try {
-    // Try NextAuth session first
-    const session = await getServerSession(authOptions)
-    if (session?.user) {
-      return NextResponse.json({ user: session.user }, { status: 200 })
-    }
-
     // Fallback to custom JWT cookie `user_token`
     const cookieStore = await cookies()
     const userToken = cookieStore.get('user_token')?.value
