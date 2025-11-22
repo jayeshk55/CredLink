@@ -54,11 +54,25 @@ function initFirebaseAdmin() {
 
 // Initialize Firebase Admin SDK once per runtime
 function getFirebaseAdmin() {
-  if (!admin.apps.length) {
+  // Only initialize Firebase if we're not in build time
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test' && !admin.apps.length) {
     initFirebaseAdmin()
   }
   return admin
 }
 
-export const adminAuth = () => getFirebaseAdmin().auth()
-export const adminStorageBucket = () => getFirebaseAdmin().storage().bucket()
+export const adminAuth = () => {
+  // Only use Firebase Auth if not in build time
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
+    return getFirebaseAdmin().auth()
+  }
+  return null
+}
+
+export const adminStorageBucket = () => {
+  // Only use Firebase Storage if not in build time
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
+    return getFirebaseAdmin().storage().bucket()
+  }
+  return null
+}
