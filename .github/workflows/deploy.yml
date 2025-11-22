@@ -40,7 +40,7 @@ jobs:
           FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
           NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
           CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
-        run: TURBOPACK=0 npm run build
+        run: NEXT_TURBOPACK=0 npm run build
 
   build-and-deploy:
     needs: test
