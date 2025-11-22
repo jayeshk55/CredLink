@@ -2600,6 +2600,24 @@ const EditPage = () => {
                       <strong>Selected:</strong> {resumeFile.name} ({(resumeFile.size / 1024).toFixed(2)} KB)
                     </div>
                   )}
+                  {resumeFile && (
+                    <button
+                      type="button"
+                      onClick={() => setResumeFile(null)}
+                      style={{
+                        marginTop: '8px',
+                        background: '#fff',
+                        border: '1px solid #dc2626',
+                        color: '#dc2626',
+                        borderRadius: '6px',
+                        padding: '6px 10px',
+                        fontSize: '12px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Remove Document
+                    </button>
+                  )}
                 </div>
               </div>
 
