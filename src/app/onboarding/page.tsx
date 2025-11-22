@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { set } from "zod";
 
 /* -------------------------------------------------
    COLORS & STYLES
@@ -282,6 +283,7 @@ const OnboardingPage: React.FC = () => {
   const router = useRouter();
   const [showPartyPopup, setShowPartyPopup] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const[isEnabled,setIsEnabled]=useState(true);
   const [formData, setFormData] = useState({
     photo: "",
     photoFile: null as File | null,
@@ -379,6 +381,7 @@ const OnboardingPage: React.FC = () => {
       // Final step - Create card
       try {
         // Create FormData for card creation
+        
         const cardFormData = new FormData();
         
         // Required fields from signup
@@ -386,7 +389,7 @@ const OnboardingPage: React.FC = () => {
         cardFormData.append('fullName', formData.name || '');
         cardFormData.append('phone', formData.phone || '');
         cardFormData.append('email', formData.email || '');
-        cardFormData.append('name', formData.name || '');
+        cardFormData.append('firstName', formData.name || '');
         // Optional fields
         if (formData.title) cardFormData.append('title', formData.title);
         if (formData.company) cardFormData.append('company', formData.company);
@@ -424,6 +427,11 @@ const OnboardingPage: React.FC = () => {
         }
         
         // Create card using card creation API
+        if(!isEnabled){
+          return;
+        }
+        setIsEnabled(false);
+        
         const response = await fetch('/api/card/create', {
           method: 'POST',
           credentials: 'include',
@@ -434,12 +442,14 @@ const OnboardingPage: React.FC = () => {
         console.log('Card creation response:', data);
         
         if (!response.ok) {
+          setIsEnabled(true); // Re-enable button on error
           throw new Error(data.error || 'Failed to create card');
         }
         
         setShowPartyPopup(true);
       } catch(error: any) {
         console.error('Error creating card:', error);
+        setIsEnabled(true); // Re-enable button on error
         alert(error.message || 'Failed to create card. Please try again.');
       }
     }
@@ -945,7 +955,8 @@ const OnboardingPage: React.FC = () => {
                 disabled={
                   (step === 1 && !formData.name.trim()) ||
                   (step === 2 && !formData.phone.trim()) ||
-                  (step === 3 && !formData.email.trim())
+                  (step === 3 && !formData.email.trim()) ||
+                  (step === 10 && !isEnabled)
                 }
                 style={{
                   flex: step >= 4 && step <= 9 ? 1 : 'auto',
@@ -954,7 +965,8 @@ const OnboardingPage: React.FC = () => {
                   background: (
                     (step === 1 && !formData.name.trim()) ||
                     (step === 2 && !formData.phone.trim()) ||
-                    (step === 3 && !formData.email.trim())
+                    (step === 3 && !formData.email.trim()) ||
+                    (step === 10 && !isEnabled)
                   )
                     ? '#D1D5DB'
                     : `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
@@ -966,20 +978,22 @@ const OnboardingPage: React.FC = () => {
                   cursor: (
                     (step === 1 && !formData.name.trim()) ||
                     (step === 2 && !formData.phone.trim()) ||
-                    (step === 3 && !formData.email.trim())
+                    (step === 3 && !formData.email.trim()) ||
+                    (step === 10 && !isEnabled)
                   )
                     ? 'not-allowed'
                     : 'pointer',
                   opacity: (
                     (step === 1 && !formData.name.trim()) ||
                     (step === 2 && !formData.phone.trim()) ||
-                    (step === 3 && !formData.email.trim())
+                    (step === 3 && !formData.email.trim()) ||
+                    (step === 10 && !isEnabled)
                   )
                     ? 0.6
                     : 1,
                 }}
               >
-                {step < 10 ? 'Continue' : 'Create Card'}
+                {step === 10 && !isEnabled ? 'Creating...' : (step < 10 ? 'Continue' : 'Create Card')}
               </button>
             </div>
 
