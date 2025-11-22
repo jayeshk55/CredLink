@@ -501,6 +501,31 @@ const OnboardingPage: React.FC = () => {
     zIndex: 10,
   };
 
+  const heroTitleStyle: React.CSSProperties = {
+    fontSize: isLargeScreen ? "32px" : "clamp(20px, 6vw, 32px)",
+    fontWeight: "700",
+    color: "#1F2937",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: isLargeScreen ? "flex-end" : "center",
+    justifyContent: "center",
+    gap: isLargeScreen ? "5px" : "6px",
+    whiteSpace: "nowrap",
+    lineHeight: "1",
+    marginBottom: "20px",
+    textAlign: "center",
+    maxWidth: "100%",
+    overflow: "hidden",
+  };
+
+  const heroLogoStyle: React.CSSProperties = {
+    height: isLargeScreen ? undefined : "clamp(52px, 14vw, 96px)",
+    maxHeight: isLargeScreen ? "100px" : undefined,
+    objectFit: "contain",
+    marginBottom: "0",
+    maxWidth: isLargeScreen ? "180px" : "50vw",
+  };
+
   const inputStyle = (id: string) => ({
     width: '100%',
     border: 'none',
@@ -580,39 +605,22 @@ const OnboardingPage: React.FC = () => {
           }}
         >
           <div style={{ maxWidth: '448px', textAlign: 'center', marginBottom: 0 }}>
-  <h1
-  style={{
-    fontSize: "40px",
-    fontWeight: "700",
-    color: "#1F2937",
-    display: "flex",
-    alignItems: "flex-end",   
-    justifyContent: "center",
-    gap: "5px",
-    whiteSpace: "nowrap",
-    lineHeight: "1",
-    marginBottom: "20px",      
-  }}
->
-  Welcome to
-  <img
-    src="/assets/mykard.png"
-    alt="MyKard Logo"
-    style={{
-      height: "150px",        
-      objectFit: "contain",
-      marginBottom: "-50px", 
-    }}
-  />
-</h1>
-           <p
-    style={{
-      color: colors.textLight,
-      margin: "0 0 32px",            
-    }}
-  >
-    Build connections in your own unique way.
-  </p>
+            <h1 style={heroTitleStyle}>
+              <span>Welcome to</span>
+              <img
+                src="/assets/headerlogo.png"
+                alt="MyKard Logo"
+                style={heroLogoStyle}
+              />
+            </h1>
+            <p
+              style={{
+                color: colors.textLight,
+                margin: "0 0 32px",
+              }}
+            >
+              Build connections in your own unique way.
+            </p>
             <button
               onClick={() => setStep(1)}
               style={{
