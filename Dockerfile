@@ -20,7 +20,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the application (without sensitive environment variables)
-RUN npm run build
+RUN npm run build -- --no-turbo
 
 # Production image, copy all the files and run next
 FROM base AS runner
