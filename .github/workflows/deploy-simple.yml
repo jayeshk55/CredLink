@@ -24,7 +24,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t mykard-app .
-          docker tag mykard-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
+          docker tag mykard-app:latest 461346075647.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -39,7 +39,7 @@ jobs:
 
       - name: Push to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
+          docker push 461346075647.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
 
       - name: Deploy to ECS
         run: |
