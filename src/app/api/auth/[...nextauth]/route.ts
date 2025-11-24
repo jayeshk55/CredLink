@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs"
 import { randomUUID } from "crypto"
 import { prisma } from "@/lib/prisma"
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",

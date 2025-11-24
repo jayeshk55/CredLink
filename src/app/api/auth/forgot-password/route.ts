@@ -34,32 +34,34 @@ export async function POST(request: NextRequest) {
       // Set expiration to 1 hour from now
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
+      // TODO: Add PasswordResetToken model to Prisma schema
       // Clean up any existing unused tokens for this user
-      await prisma.passwordResetToken.deleteMany({
-        where: {
-          userId: user.id,
-          used: false
-        }
-      })
+      // await prisma.passwordResetToken.deleteMany({
+      //   where: {
+      //     userId: user.id,
+      //     used: false
+      //   }
+      // })
 
       // Create new reset token
-      await prisma.passwordResetToken.create({
-        data: {
-          token: resetToken,
-          userId: user.id,
-          expiresAt,
-          used: false
-        }
-      })
+      // await prisma.passwordResetToken.create({
+      //   data: {
+      //     token: resetToken,
+      //     userId: user.id,
+      //     expiresAt,
+      //     used: false
+      //   }
+      // })
 
       // Send password reset email
       try {
-        await sendPasswordResetEmail(
-          user.email,
-          resetToken,
-          user.fullName
-        )
-        console.log('✅ Password reset email sent to:', user.email)
+        // Temporarily disabled until PasswordResetToken model is added
+        // await sendPasswordResetEmail(
+        //   user.email,
+        //   resetToken,
+        //   user.fullName
+        // )
+        console.log('⚠️ Password reset email disabled - PasswordResetToken model missing')
       } catch (emailError) {
         console.error('❌ Failed to send password reset email:', emailError)
         // Don't expose email sending errors to the client
