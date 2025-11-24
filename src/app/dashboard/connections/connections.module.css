@@ -1700,8 +1700,11 @@
 
 .quickActionsOrbit {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
+  max-width: 100%;
+  margin-top: auto;
+  margin-bottom: 8px;
 }
 
 .quickActionsRow {
@@ -1744,18 +1747,18 @@
 }
 
 .quickActionTop {
-  top: 0;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .quickActionLeft {
-  bottom: 16px;
+  bottom: 28px;
   left: 0;
 }
 
 .quickActionRight {
-  bottom: 16px;
+  bottom: 28px;
   right: 0;
 }
 
