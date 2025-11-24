@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { prisma } from '@/lib/prisma'
 
 // Simple JWT decode function (without verification for now)
 function decodeJWT(token: string) {
@@ -27,7 +28,7 @@ export async function GET() {
       )
     }
 
-    // Decode JWT token to get user info
+    // Decode JWT token to get user id
     const decoded = decodeJWT(token)
     
     if (!decoded || !decoded.userId) {
@@ -37,16 +38,35 @@ export async function GET() {
       )
     }
 
-    // Return actual user data from the token
+    // Fetch latest user data from database so fields like profileImage are always fresh
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        username: true,
+        profileImage: true,
+      },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
     return NextResponse.json({ 
       user: {
-        id: decoded.userId,
-        email: decoded.email,
-        fullName: decoded.fullName,
-        phone: decoded.phone || null,
-        username: decoded.username || null,
-        profileImage: decoded.profileImage || null
-      }
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        phone: user.phone || null,
+        username: user.username || null,
+        profileImage: user.profileImage || null,
+      },
     })
   } catch (error) {
     console.error('Get current user error:', error)
