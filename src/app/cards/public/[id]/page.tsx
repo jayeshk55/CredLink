@@ -25,6 +25,10 @@ interface Card {
   skills?: string;
   portfolio?: string;
   experience?: string;
+
+  services?: string;
+review?: string;
+
   photo?: string;
   profileImage?: string;
   cover?: string;
@@ -60,29 +64,31 @@ interface ConnectionFormData {
 
 // ----------------- Card Preview Component -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
-  const renderCardPreview = () => {
-    const commonProps = {
-      name: card.fullName || card.name || '',
-      title: card.title || '',
-      company: card.company || '',
-      location: card.location || '',
-      about: card.bio || card.about || card.description || '',
-      skills: card.skills || '',
-      portfolio: card.portfolio || '',
-      experience: card.experience || '',
-      photo: card.profileImage || card.photo || '',
-      cover: card.coverImage || card.bannerImage || card.cover || '',
-      email: card.email || '',
-      phone: card.phone || '',
-      linkedin: card.linkedinUrl || card.linkedin || '',
-      website: card.websiteUrl || card.website || '',
-      themeColor1: card.selectedColor || '#3b82f6',
-      themeColor2: card.selectedColor2 || '#2563eb',
-     // cardType: card.cardType || '',
-    };
 
-    const design = card.selectedDesign || 'Classic';
-    
+  const commonProps = {
+    name: card.fullName || card.name || '',
+    title: card.title || '',
+    company: card.company || '',
+    location: card.location || '',
+    about: card.bio || card.about || card.description || '',
+    skills: card.skills || '',
+    portfolio: card.portfolio || '',
+    experience: card.experience || '',
+    services: card.services || '',
+    review: card.review || '',
+    photo: card.profileImage || card.photo || '',
+    cover: card.coverImage || card.bannerImage || card.cover || '',
+    email: card.email || '',
+    phone: card.phone || '',
+    linkedin: card.linkedinUrl || card.linkedin || '',
+    website: card.websiteUrl || card.website || '',
+    themeColor1: card.selectedColor || '#3b82f6',
+    themeColor2: card.selectedColor2 || '#2563eb',
+  };
+
+  const design = card.selectedDesign || 'Classic';
+
+  const renderCardPreview = () => {
     switch (design) {
       case 'Flat':
         return <FlatCardPreview {...commonProps} />;

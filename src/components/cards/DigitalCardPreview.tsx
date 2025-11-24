@@ -7,8 +7,8 @@ export interface DigitalCardProps {
   firstName?: string;
   middleName?: string;
   lastName?: string;
-  cardName?: string; // Card identifier - shows in top-right badge
-  name?: string; // Deprecated - kept for backwards compatibility
+  cardName?: string; 
+  name?: string; 
   title: string;
   company?: string;
   location: string;
@@ -24,7 +24,7 @@ export interface DigitalCardProps {
   phone?: string;
   linkedin?: string;
   website?: string;
-  design?: string; // Classic, Flat, Modern, Sleek
+  design?: string;
   themeColor1?: string;
   themeColor2?: string;
   fontFamily?: string;
@@ -39,7 +39,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   middleName = "",
   lastName = "",
   cardName = "",
-  name = "", // Deprecated
+  name = "",
   title = "",
   company = "",
   location = "",
@@ -47,6 +47,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   skills = "SEO, Content Creation, Analytics, Social Media",
   portfolio = "[Link] Latest Campaigns",
   experience = "Lead SEO Specialist (2021-Present)",
+  services = "",
+  review = "",
   photo = "",
   cover = "",
   email = "",
@@ -58,9 +60,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   cardType = "",
   documentUrl,
 }) => {
-  // Construct full name from firstName, middleName, lastName
+
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || name || 'Your Name';
   const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : (name ? name.charAt(0).toUpperCase() : "J");
+
   const parsedCompany = (() => {
     const atIndex = experience.indexOf('@');
     if (atIndex !== -1) {
@@ -70,10 +73,12 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
     }
     return '';
   })();
+
   const companyFinal = company && company.trim().length > 0 ? company : parsedCompany;
 
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
+
   const openPortfolio = () => {
     const val = (portfolio || '').trim();
     if (!val) { setActivePanel('Portfolio'); return; }
@@ -94,8 +99,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         position: "relative",
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
       }}>
-      {/* Card Name Badge - Top Right */}
-     {/* Card Name + Card Type (Unified Badge Row) */}
+
+{/* Card Name + Type */}
 {(cardName || cardType) && (
   <div
     style={{
@@ -107,7 +112,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       zIndex: 20,
     }}
   >
-    {/* Card Name */}
     {cardName && (
       <div
         style={{
@@ -124,7 +128,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
     )}
 
-    {/* Card Type */}
     {cardType && (
       <div
         style={{
@@ -142,7 +145,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
     )}
   </div>
 )}
-     
+
       {/* Header */}
       <div style={{
         padding: "22px",
@@ -183,6 +186,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           </div>
 
           <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{fullName}</h3>
+
           {(title || companyFinal) && (
             <div style={{ display: "flex", gap: "12px", alignItems: "center", color: "#ffffff", opacity: 0.95 }}>
               {title && <span style={{ fontSize: "14px", fontWeight: 700 }}>{title}</span>}
@@ -190,14 +194,22 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               {companyFinal && <span style={{ fontSize: "14px", fontWeight: 700 }}>{companyFinal}</span>}
             </div>
           )}
+
           {location && <p style={{ margin: "10px 0 0", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
 
-          {/* Social Row - Only show icons when data exists */}
           {(email || phone || linkedin || website) && (
-            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
-              {/* Mail - Only show if email exists */}
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
               {email && (
-                <a href={`mailto:${email}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                <a href={`mailto:${email}`} style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none"
+                }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16v16H4z" opacity="0"/>
                     <path d="M4 8l8 5 8-5"/>
@@ -205,24 +217,53 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                   </svg>
                 </a>
               )}
-              {/* Phone - Only show if phone exists */}
+
               {phone && (
-                <a href={`tel:${phone}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <a href={`tel:${phone}`} style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none"
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                     <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
                   </svg>
                 </a>
               )}
-              {/* LinkedIn - Only show if linkedin exists */}
+
               {linkedin && (
-                <a href={linkedin} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none"
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                    <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
+                  </svg>
                 </a>
               )}
-              {/* Globe - Only show if website exists */}
+
               {website && (
-                <a href={website} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <a href={website} target="_blank" rel="noopener noreferrer" style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none"
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="2" y1="12" x2="22" y2="12"/>
                     <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
@@ -234,13 +275,12 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {/* Body - Exact copy from edit page */}
+      {/* Body */}
       <div style={{ padding: "20px 20px 16px", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
 
-        {/* Pills - Exact copy from edit page, plus Docs when documentUrl exists */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
             { text: "Services" },
@@ -248,7 +288,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             { text: "Skills" },
             { text: "Experience" },
             { text: "Review" },
-            ...(documentUrl ? [{ text: "Docs" }] as { text: string }[] : []),
+            ...(documentUrl ? [{ text: "Docs" }] : []),
           ].map((b) => (
             <button
               key={b.text}
@@ -257,9 +297,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 if (b.text === 'Portfolio') {
                   openPortfolio();
                 } else if (b.text === 'Docs' && documentUrl) {
-                  if (onDocumentClick) {
-                    onDocumentClick(documentUrl);
-                  }
+                  onDocumentClick?.(documentUrl);
                 } else {
                   setActivePanel(b.text as Section);
                 }
@@ -281,6 +319,95 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* MODAL INSERTED HERE */}
+      {activePanel && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+            padding: "20px",
+          }}
+          onClick={() => setActivePanel(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "420px",
+              maxHeight: "80vh",
+              overflow: "auto",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+            }}
+          >
+            <div
+              style={{
+                padding: "16px",
+                borderBottom: "1px solid #eee",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <h3 style={{ margin: 0, color: "#111827", fontWeight: 700 }}>
+                {activePanel}
+              </h3>
+              <button
+                onClick={() => setActivePanel(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  color: "#6B7280",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ padding: "16px" }}>
+              {(() => {
+                const panels: Record<string, string> = {
+                  Services: services,
+                  Skills: skills,
+                  Portfolio: portfolio,
+                  Experience: experience,
+                  Review: review,
+                };
+
+                return (
+                  panels[activePanel]
+                    ?.split(",")
+                    .map((item, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: "#f9fafb",
+                          padding: "10px 12px",
+                          marginBottom: "10px",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          color: "#111827",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                        }}
+                      >
+                        {item.trim()}
+                      </div>
+                    ))
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       </div>
     </div>
