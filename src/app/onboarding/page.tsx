@@ -395,8 +395,13 @@ const OnboardingPage: React.FC = () => {
         if (formData.company) cardFormData.append('company', formData.company);
         if (formData.location) cardFormData.append('location', formData.location);
         if (formData.about) cardFormData.append('bio', formData.about);
-        
-        // Combine skills, portfolio, and experience into description
+
+        // Add standalone skills and portfolio so they are stored in dedicated DB columns
+        if (formData.skills) cardFormData.append('skills', formData.skills);
+        if (formData.portfolio) cardFormData.append('portfolio', formData.portfolio);
+        if (formData.experience) cardFormData.append('experience', formData.experience);
+
+        // Also keep a consolidated description for backward compatibility / previews
         const descriptionParts = [];
         if (formData.skills) descriptionParts.push(`Skills: ${formData.skills}`);
         if (formData.portfolio) descriptionParts.push(`Portfolio: ${formData.portfolio}`);
