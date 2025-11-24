@@ -71,12 +71,14 @@
 }
 
 .input {
-  padding: 10px 12px;
+  padding: 10px 40px 10px 12px; /* extra right padding for eye icon */
   border-radius: 8px;
   border: 1.5px solid #cbd5e1;
   font-size: 15px;
   transition: 0.2s;
   background: #fff;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -149,19 +151,188 @@
 
 /* ====== Responsive Design ====== */
 @media (max-width: 1024px) {
-  .container { padding: 24px; }
-  .grid { grid-template-columns: 1fr; }
+  .container { 
+    padding: 24px; 
+  }
+  .grid { 
+    /* Stack cards vertically in DOM order (Profile, then Change Password) */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .wrapper {
+    max-width: 100%;
+    padding: 0 8px;
+  }
 }
 
 @media (max-width: 768px) {
-  .container { padding: 16px; }
-  .header { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .header h1 { font-size: 22px; }
-  .card { padding: 22px; }
-  .input { font-size: 14px; }
-  .buttonRow { flex-direction: column; }
+  .container { 
+    padding: 12px; 
+  }
+  
+  /* Force stacked layout for profile + change password on mobile */
+  .grid {
+    display: block !important;
+  }
+  
+  .card {
+    width: 100%;
+  }
+  
+  .header { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 12px;
+    text-align: left;
+  }
+  
+  .headerIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .header h1 { 
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  
+  .header p {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  
+  .title {
+    font-size: 20px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+  }
+  
+  .card { 
+    padding: 20px; 
+    border-radius: 8px;
+  }
+  
+  .sectionTitle {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .card h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .input { 
+    font-size: 16px; /* Larger for better mobile UX */
+    padding: 12px 40px 12px 12px; /* keep room for eye icon */
+  }
+  
+  .label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  
+  .passwordField {
+    margin-bottom: 4px;
+  }
+  
+  .eyeBtn {
+    right: 12px;
+    padding: 4px;
+  }
+  
+  .actions {
+    margin-top: 24px;
+  }
+  
+  .primaryBtn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    justify-content: center;
+  }
+  
+  .buttonRow { 
+    flex-direction: column; 
+    gap: 12px;
+  }
+  
   .saveBtn,
-  .cancelBtn { width: 100%; }
+  .cancelBtn { 
+    width: 100%; 
+    padding: 14px;
+    font-size: 16px;
+  }
+  
+  .profileInfo {
+    gap: 16px;
+  }
+  
+  .infoItem {
+    font-size: 14px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+  }
+  
+  .permissions {
+    margin-top: 24px;
+  }
+  
+  .permissions h3 {
+    font-size: 14px;
+  }
+  
+  .permissions ul {
+    gap: 10px;
+  }
+  
+  .permissions li {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+  
+  .dot {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+  
+  .header h1 {
+    font-size: 18px;
+  }
+  
+  .sectionTitle {
+    font-size: 16px;
+  }
+  
+  .input {
+    padding: 10px 40px 10px 10px;
+    font-size: 16px;
+  }
+  
+  .primaryBtn {
+    padding: 12px;
+    font-size: 15px;
+  }
+  
+  .infoItem {
+    padding: 10px;
+    font-size: 13px;
+  }
 }
 
 /* ====== Additional Styles ====== */
@@ -199,6 +370,14 @@
   gap: 32px;
   align-items: stretch;
   margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 }
 
 .profileInfo {
@@ -253,6 +432,7 @@
 
 .passwordField {
   position: relative;
+  width: 100%;
 }
 
 .eyeBtn {

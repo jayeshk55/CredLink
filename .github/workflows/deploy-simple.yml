@@ -24,14 +24,14 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t mykard-app .
-          docker tag mykard-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/mykard:latest
+          docker tag mykard-app:latest 461346075647.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ap-south-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -39,7 +39,7 @@ jobs:
 
       - name: Push to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/mykard:latest
+          docker push 461346075647.dkr.ecr.ap-south-1.amazonaws.com/mykard-app:latest
 
       - name: Deploy to ECS
         run: |

@@ -4,6 +4,8 @@ import { verify } from 'jsonwebtoken';
 import { prisma } from "@/lib/prisma";
 import { deleteFromCloudinary } from "@/lib/cloudinary";
 import { adminStorageBucket } from "@/lib/firebase-admin";
+import mammoth from 'mammoth';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
 const MAX_DOCUMENT_SIZE_BYTES = 1024 * 1024; // 1MB
@@ -44,22 +46,24 @@ export async function PATCH(
     const updateData: any = {};
     
     // Personal Information - Extract name fields
-    const firstName = formData.get('firstName') as string;
-    if (firstName !== null) updateData.firstName = firstName || undefined;
-    
-    const middleName = formData.get('middleName') as string;
-    if (middleName !== null) updateData.middleName = middleName || undefined;
-    
-    const lastName = formData.get('lastName') as string;
-    if (lastName !== null) updateData.lastName = lastName || undefined;
-    
+   const firstName = formData.get('firstName') as string | null;
+if (firstName !== null) updateData.firstName = firstName ?? "";
+
+const middleName = formData.get('middleName') as string | null;
+updateData.middleName = middleName ?? "";
+
+
+const lastName = formData.get('lastName') as string | null;
+updateData.lastName = lastName ?? "";
+
     // Construct fullName from firstName/middleName/lastName
     if (firstName !== null || middleName !== null || lastName !== null) {
-      const names = [
-        firstName || existingCard.firstName || '',
-        middleName || existingCard.middleName || '',
-        lastName || existingCard.lastName || ''
-      ];
+    const names = [
+  firstName ?? "",
+  middleName ?? "",
+  lastName ?? ""
+];
+
       updateData.fullName = names.filter(Boolean).join(' ').trim() || 'Unnamed';
     }
     
@@ -177,29 +181,82 @@ export async function PATCH(
       }
 
       try {
-        // Use the document conversion API for DOC/DOCX conversion
-        const convertFormData = new FormData();
-        convertFormData.append('file', documentFile);
-        
-        // Make internal API call to convert document
-        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-        const convertResponse = await fetch(`${baseUrl}/api/document/convert`, {
-          method: 'POST',
-          body: convertFormData,
-          headers: {
-            'Cookie': `user_token=${token}`
-          }
-        });
-
-        if (!convertResponse.ok) {
-          const errorData = await convertResponse.json();
-          throw new Error(errorData.error || 'Failed to process document');
+        const bucket = adminStorageBucket();
+        if (!bucket) {
+          return NextResponse.json({ error: 'Storage not available' }, { status: 503 });
         }
 
-        const convertResult = await convertResponse.json();
-        updateData.documentUrl = convertResult.url;
+        const originalName = (documentFile as any).name || 'document';
+        const safeName = originalName.replace(/[^a-z0-9.]+/gi, '-').toLowerCase();
+        const ext = safeName.split('.').pop() || '';
+        const timestamp = Date.now();
+        const targetPdfName = `${timestamp}-${safeName.replace(/\.(docx|doc|pdf)$/i, '')}.pdf`;
+        const filePath = `cards/documents/${decoded.userId}/${targetPdfName}`;
+        let pdfBuffer: Buffer;
+
+        if (/(docx|doc)$/i.test(ext)) {
+          console.log('[card/update] Converting DOC/DOCX to PDF inline');
+          const arrayBuffer = await documentFile.arrayBuffer();
+          const docBuffer = Buffer.from(arrayBuffer);
+          const mammothResult = await mammoth.extractRawText({ buffer: docBuffer });
+          const text = mammothResult.value || 'Empty document';
+
+          const pdfDoc = await PDFDocument.create();
+          const page = pdfDoc.addPage();
+          const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+          const fontSize = 12;
+          const lineHeight = fontSize * 1.25;
+          const margin = 50;
+          const maxWidth = page.getWidth() - margin * 2;
+
+          const words = text.replace(/\r/g, '').split(/\s+/);
+          let line = '';
+          let y = page.getHeight() - margin - fontSize;
+
+          const lines: string[] = [];
+          for (const w of words) {
+            const testLine = line ? line + ' ' + w : w;
+            const width = font.widthOfTextAtSize(testLine, fontSize);
+            if (width > maxWidth) {
+              if (line) lines.push(line);
+              line = w;
+            } else {
+              line = testLine;
+            }
+          }
+          if (line) lines.push(line);
+
+          for (const l of lines) {
+            if (y < margin) {
+              const newPage = pdfDoc.addPage();
+              y = newPage.getHeight() - margin - fontSize;
+              page.drawText(''); // keep reference
+            }
+            page.drawText(l, { x: margin, y, size: fontSize, font });
+            y -= lineHeight;
+          }
+
+            pdfBuffer = Buffer.from(await pdfDoc.save());
+        } else if (/pdf/i.test(ext)) {
+          console.log('[card/update] Using existing PDF (upload only)');
+          const arrayBuffer = await documentFile.arrayBuffer();
+          pdfBuffer = Buffer.from(arrayBuffer);
+        } else {
+          return NextResponse.json(
+            { error: 'Unsupported document type. Use PDF, DOC, or DOCX.' },
+            { status: 400 }
+          );
+        }
+
+        const fileRef = bucket.file(filePath);
+        await fileRef.save(pdfBuffer, {
+          resumable: false,
+          metadata: { contentType: 'application/pdf' }
+        });
+        const [signedUrl] = await fileRef.getSignedUrl({ action: 'read', expires: '2100-01-01' });
+        updateData.documentUrl = signedUrl;
       } catch (error: any) {
-        console.error('Error converting document:', error);
+        console.error('[card/update] Inline document conversion failed:', error);
         return NextResponse.json(
           { error: error.message || 'Failed to process document' },
           { status: 500 }

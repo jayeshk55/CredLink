@@ -114,10 +114,12 @@ export default function DashboardContactPage() {
     }
 
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch('/api/message/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -136,6 +138,12 @@ export default function DashboardContactPage() {
 
       toast.success('Message sent');
       handleCloseMessageModal();
+      
+      // Trigger message refresh across the app
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('message-sent'));
+        window.dispatchEvent(new Event('messages-updated'));
+      }
     } catch (e: any) {
       console.error('Send message error:', e);
       toast.error(e?.message || 'Failed to send message');

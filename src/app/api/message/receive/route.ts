@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Fetch messages sent *to* the user (incoming)
-        const messages = await (prisma as any).message.findMany({
+        const incomingMessages = await (prisma as any).message.findMany({
             where: {
                 receiverId: userId,
             },
@@ -22,13 +22,26 @@ export async function GET(req: NextRequest) {
             },
         });
 
-        // Get unique sender IDs (people who contacted this user)
-        const senderIds = Array.from(new Set(messages.map((msg: any) => msg.senderId)));
+        // Fetch all messages sent *by* this user (outgoing)
+        const allSentMessages = await (prisma as any).message.findMany({
+            where: {
+                senderId: userId,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
 
-        // Fetch sender details
+        // Combine all unique conversation partners (both senders and receivers)
+        const allPartnerIds = new Set([
+            ...incomingMessages.map((msg: any) => msg.senderId),
+            ...allSentMessages.map((msg: any) => msg.receiverId)
+        ]);
+
+        // Fetch details for all conversation partners
         const senders = await (prisma as any).user.findMany({
             where: {
-                id: { in: senderIds },
+                id: { in: Array.from(allPartnerIds) },
             },
             select: {
                 id: true,
@@ -37,16 +50,14 @@ export async function GET(req: NextRequest) {
             },
         });
 
-        // Fetch messages sent *by* this user to those same senders
-        const sentMessages = await (prisma as any).message.findMany({
-            where: {
-                senderId: userId,
-                receiverId: { in: senderIds },
-            },
-            orderBy: {
-                createdAt: "asc",
-            },
-        });
+        // For the frontend, we need to structure the data properly
+        // Messages sent TO the user (incoming)
+        const messages = incomingMessages;
+        
+        // Messages sent BY the user to these partners (outgoing)
+        const sentMessages = allSentMessages.filter((msg: any) => 
+            allPartnerIds.has(msg.receiverId)
+        );
 
         return NextResponse.json({ 
             ok: true, 

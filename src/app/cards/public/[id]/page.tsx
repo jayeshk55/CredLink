@@ -78,7 +78,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       website: card.websiteUrl || card.website || '',
       themeColor1: card.selectedColor || '#3b82f6',
       themeColor2: card.selectedColor2 || '#2563eb',
-      cardType: card.cardType || '',
+     // cardType: card.cardType || '',
     };
 
     const design = card.selectedDesign || 'Classic';

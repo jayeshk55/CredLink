@@ -68,6 +68,22 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // Trigger real-time update for receiver
+        try {
+            // This would be handled by a WebSocket or SSE service
+            // For now, we'll use a simple approach with event dispatching
+            if (typeof global !== 'undefined' && global.dispatchEvent) {
+                global.dispatchEvent(new CustomEvent('new-message', {
+                    detail: {
+                        receiverId: String(resolvedReceiverId),
+                        message: newMessage
+                    }
+                }));
+            }
+        } catch (eventError) {
+            console.error('Error dispatching message event:', eventError);
+        }
+
         return NextResponse.json({ ok: true, message: newMessage }, { status: 201 });
     } catch (err: any) {
             console.error("Failed to create message:", err);
@@ -89,4 +105,3 @@ export async function POST(req: NextRequest) {
 }
 
 // Helpful for direct browser hits; make it clear this endpoint expects POST
- 
