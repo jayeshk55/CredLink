@@ -210,3 +210,19 @@
 .sidebar.closed {
   transform: translateX(-100%);
 }
+
+@media (min-width: 1024px) {
+  /* On desktop, sidebar is always visible; ignore closed transform */
+  .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar.closed {
+    transform: translateX(0);
+  }
+
+  /* Hide floating mobile toggle button on desktop */
+  .mobileToggle {
+    display: none;
+  }
+}
