@@ -68,6 +68,42 @@ export default function MessagesPage() {
 
   useEffect(() => {
     fetchMessages();
+
+    // Mark message-related notifications as cleared for this user
+    const clearMessageNotifications = async () => {
+      try {
+        const res = await fetch('/api/notifications', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data?.notifications) ? data.notifications : [];
+        const messageIds = list
+          .filter((n: any) => n && n.title === 'Message received')
+          .map((n: any) => n.id as string);
+
+        if (typeof window === 'undefined' || messageIds.length === 0) return;
+
+        let existing: string[] = [];
+        try {
+          const stored = window.localStorage.getItem('dashboard-cleared-notifications');
+          if (stored) existing = JSON.parse(stored);
+        } catch {
+          existing = [];
+        }
+        const setExisting = new Set(existing || []);
+        messageIds.forEach((id: string) => setExisting.add(id));
+        const next = Array.from(setExisting);
+        window.localStorage.setItem('dashboard-cleared-notifications', JSON.stringify(next));
+        window.dispatchEvent(new Event('notifications-updated'));
+      } catch {
+        // ignore
+      }
+    };
+
+    clearMessageNotifications();
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
   }, []);
 
   // Listen for message updates from other parts of the app

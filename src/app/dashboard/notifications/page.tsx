@@ -13,17 +13,20 @@ type NotificationItem = {
 export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const [clearedIds, setClearedIds] = useState<string[]>([]);
   const [sort, setSort] = useState<"latest" | "oldest">("latest");
 
   const displayed = useMemo(() => {
-    const arr = [...items];
+    const clearedSet = new Set(clearedIds || []);
+    const arr = items.filter((n) => !clearedSet.has(n.id));
+
     arr.sort((a, b) => {
       const da = new Date(a.createdAt).getTime();
       const db = new Date(b.createdAt).getTime();
       return sort === "latest" ? db - da : da - db;
     });
     return arr;
-  }, [items, sort]);
+  }, [items, sort, clearedIds]);
 
   // Dummy notifications for development/testing
   const dummy: NotificationItem[] = [
@@ -51,6 +54,17 @@ export default function NotificationsPage() {
   ];
 
   useEffect(() => {
+    let initialCleared: string[] = [];
+    try {
+      if (typeof window !== "undefined") {
+        const stored = window.localStorage.getItem("dashboard-cleared-notifications");
+        if (stored) initialCleared = JSON.parse(stored);
+      }
+    } catch {
+      initialCleared = [];
+    }
+    setClearedIds(initialCleared);
+
     const load = async () => {
       try {
         const res = await fetch("/api/notifications", { credentials: "include" });
@@ -70,6 +84,32 @@ export default function NotificationsPage() {
     load();
   }, []);
 
+  const persistCleared = (next: string[]) => {
+    setClearedIds(next);
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("dashboard-cleared-notifications", JSON.stringify(next));
+        window.dispatchEvent(new Event("notifications-updated"));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleClearOne = (id: string) => {
+    if (clearedIds.includes(id)) return;
+    const next = [...clearedIds, id];
+    persistCleared(next);
+  };
+
+  const handleClearAll = () => {
+    const allIds = items.map((n) => n.id);
+    const setExisting = new Set(clearedIds || []);
+    allIds.forEach((id) => setExisting.add(id));
+    const next = Array.from(setExisting);
+    persistCleared(next);
+  };
+
   return (
     <div style={{ padding: 24 }}>
       <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827", marginBottom: 8 }}>
@@ -79,7 +119,22 @@ export default function NotificationsPage() {
         Stay up to date with your account activity
       </p>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <button
+          type="button"
+          onClick={handleClearAll}
+          style={{
+            padding: "8px 12px",
+            fontSize: 13,
+            borderRadius: 9999,
+            border: "1px solid #e5e7eb",
+            background: "#f9fafb",
+            color: "#6b7280",
+            cursor: "pointer",
+          }}
+        >
+          Clear all
+        </button>
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as "latest" | "oldest")}
@@ -136,6 +191,23 @@ export default function NotificationsPage() {
                 </span>
               </div>
               <div style={{ fontSize: 14, color: "#374151" }}>{n.message}</div>
+              <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => handleClearOne(n.id)}
+                  style={{
+                    fontSize: 12,
+                    padding: "4px 10px",
+                    borderRadius: 9999,
+                    border: "1px solid #e5e7eb",
+                    background: "#f9fafb",
+                    color: "#6b7280",
+                    cursor: "pointer",
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
             </li>
           ))}
         </ul>
