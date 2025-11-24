@@ -64,27 +64,34 @@ interface ConnectionFormData {
 
 // ----------------- Card Preview Component -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
+const commonProps = {
+  firstName: card.fullName ? card.fullName.split(" ")[0] : "",
+  middleName: card.fullName?.split(" ").length === 3 ? card.fullName.split(" ")[1] : "",
+  lastName: card.fullName ? card.fullName.split(" ").slice(-1).join("") : "",
 
-  const commonProps = {
-    name: card.fullName || card.name || '',
-    title: card.title || '',
-    company: card.company || '',
-    location: card.location || '',
-    about: card.bio || card.about || card.description || '',
-    skills: card.skills || '',
-    portfolio: card.portfolio || '',
-    experience: card.experience || '',
-    services: card.services || '',
-    review: card.review || '',
-    photo: card.profileImage || card.photo || '',
-    cover: card.coverImage || card.bannerImage || card.cover || '',
-    email: card.email || '',
-    phone: card.phone || '',
-    linkedin: card.linkedinUrl || card.linkedin || '',
-    website: card.websiteUrl || card.website || '',
-    themeColor1: card.selectedColor || '#3b82f6',
-    themeColor2: card.selectedColor2 || '#2563eb',
-  };
+  title: card.title || "",
+  company: card.company || "",
+  location: card.location || "",
+  about: card.bio || card.about || card.description || "",
+
+  skills: card.skills || "",
+  portfolio: card.portfolio || "",
+  experience: card.experience || "",
+  services: card.services || "",
+  review: card.review || "",
+
+  photo: card.profileImage || card.photo || "",
+  cover: card.coverImage || card.bannerImage || card.cover || "",
+
+  email: card.email || "",
+  phone: card.phone || "",
+  linkedin: card.linkedinUrl || card.linkedin || "",
+  website: card.websiteUrl || card.website || "",
+
+  themeColor1: card.selectedColor || "#3b82f6",
+  themeColor2: card.selectedColor2 || "#2563eb",
+};
+
 
   const design = card.selectedDesign || 'Classic';
 

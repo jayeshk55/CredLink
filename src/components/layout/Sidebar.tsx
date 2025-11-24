@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Menu,
   X,
+  Bell,
 } from "lucide-react";
 import "./sidebar.css"; // 
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +30,7 @@ const Sidebar = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [pendingConnections, setPendingConnections] = useState(0);
   const [contactsCount, setContactsCount] = useState(0);
+  const [notificationsCount, setNotificationsCount] = useState(0);
 
   useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -128,6 +130,55 @@ const Sidebar = () => {
     fetchUnread();
   }, []);
 
+  // Fetch notifications count for Notifications badge
+  useEffect(() => {
+    let intervalId: any;
+
+    const computeCount = (list: any[]) => {
+      let cleared: string[] = [];
+      try {
+        if (typeof window !== 'undefined') {
+          const stored = window.localStorage.getItem('dashboard-cleared-notifications');
+          if (stored) cleared = JSON.parse(stored);
+        }
+      } catch {
+        cleared = [];
+      }
+      const clearedSet = new Set(cleared || []);
+      return list.filter((n: any) => !clearedSet.has(n.id)).length;
+    };
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/notifications', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data?.notifications) ? data.notifications : [];
+        setNotificationsCount(computeCount(list));
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    fetchNotifications();
+    intervalId = setInterval(fetchNotifications, 20000);
+
+    const onUpdated = () => {
+      fetchNotifications();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('notifications-updated', onUpdated as any);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('notifications-updated', onUpdated as any);
+      }
+    };
+  }, []);
+
   // Fetch pending connection requests count for badge
   useEffect(() => {
     let intervalId: any;
@@ -201,6 +252,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> },
+    { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
     { name: "Contacts", path: "/dashboard/contacts", icon: <Users /> },
@@ -273,6 +325,9 @@ const Sidebar = () => {
               >
                 <span className="navIcon">{item.icon}</span>
                 <span>{item.name}</span>
+                {item.name === "Notifications" && notificationsCount > 0 && pathname !== "/dashboard/notifications" && (
+                  <span className="navBadge">{notificationsCount}</span>
+                )}
                 {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
                   <span className="navBadge">{unreadCount}</span>
                 )}

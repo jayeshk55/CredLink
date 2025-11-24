@@ -393,6 +393,19 @@ export default function DashboardContactPage() {
         setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
         setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
         toast.success(`Connection with ${request.name} approved!`);
+        try {
+          if (typeof window !== 'undefined') {
+            let existing: string[] = [];
+            const stored = window.localStorage.getItem('dashboard-cleared-notifications');
+            if (stored) existing = JSON.parse(stored);
+            const setExisting = new Set(existing || []);
+            setExisting.add(`conn-${contactId}`);
+            window.localStorage.setItem('dashboard-cleared-notifications', JSON.stringify(Array.from(setExisting)));
+            window.dispatchEvent(new Event('notifications-updated'));
+          }
+        } catch {
+          // ignore
+        }
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('connections-updated'));
         }
@@ -432,6 +445,19 @@ export default function DashboardContactPage() {
       
       if (request) {
         toast.success(`Connection request from ${request.name} rejected`);
+        try {
+          if (typeof window !== 'undefined') {
+            let existing: string[] = [];
+            const stored = window.localStorage.getItem('dashboard-cleared-notifications');
+            if (stored) existing = JSON.parse(stored);
+            const setExisting = new Set(existing || []);
+            setExisting.add(`conn-${contactId}`);
+            window.localStorage.setItem('dashboard-cleared-notifications', JSON.stringify(Array.from(setExisting)));
+            window.dispatchEvent(new Event('notifications-updated'));
+          }
+        } catch {
+          // ignore
+        }
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('connections-updated'));
         }
