@@ -1,27 +1,5 @@
 /* PublicCard.module.css */
 
-:root {
-  /* Primary Theme Color (Blue from the existing design) */
-  --color-primary: #1e62f5;
-  --color-primary-light: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-fade: rgba(37, 99, 235, 0.1);
-  --color-primary-soft: #eff6ff;
-  --color-primary-border: #bfdbfe;
-
-  /* General Colors */
-  --color-text-dark: #1f2937;
-  --color-text-medium: #4b5563;
-  --color-text-light: #6b7280;
-  --color-background: #f9fafb;
-  --color-white: #ffffff;
-  --color-border: #e5e7eb;
-
-  /* Success Colors */
-  --color-success: #10b981;
-  --color-success-bg: #ecfdf5;
-  --color-success-border: #a7f3d0;
-}
 
 /* --- Layout and Structure --- */
 .pageContainer {
