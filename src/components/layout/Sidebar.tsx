@@ -24,7 +24,6 @@ const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useAuth();
-  const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
@@ -34,10 +33,6 @@ const Sidebar = () => {
   useEffect(() => {
     // Set mounted flag to ensure client-side only updates
     setIsMounted(true);
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -220,7 +215,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Menu Button (only when sidebar is closed) */}
-      {isMounted && isMobile && !isOpen && (
+      {isMounted && !isOpen && (
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
           className={"mobileToggle mobileToggleClosed"}
@@ -233,7 +228,7 @@ const Sidebar = () => {
 
       {/* Overlay (for mobile) */}
       <AnimatePresence>
-        {isMobile && isOpen && (
+        {isOpen && (
           <motion.div
             className="mobileOverlay"
             initial={{ opacity: 0 }}
@@ -246,10 +241,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <motion.aside
-        className={`sidebar ${isMobile ? (isOpen ? "open" : "closed") : ""}`}
-        initial={{ x: isMobile ? -300 : 0 }}
-        animate={{ x: isMobile ? (isOpen ? 0 : -300) : 0 }}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
+        className={`sidebar ${isOpen ? "open" : "closed"}`}
       >
         {/* Header */}
         <div className="sidebarHeader">
@@ -276,7 +268,7 @@ const Sidebar = () => {
                 key={item.name}
                 className={`navItem ${isActive ? "activeNav" : ""}`}
                 onClick={() => {
-                  if (isMobile) setIsOpen(false);
+                  setIsOpen(false);
                 }}
               >
                 <span className="navIcon">{item.icon}</span>
@@ -305,7 +297,7 @@ const Sidebar = () => {
                 key={item.name}
                 className={`footerLink ${isActive ? "activeNav" : ""}`}
                 onClick={() => {
-                  if (isMobile) setIsOpen(false);
+                  setIsOpen(false);
                 }}
               >
                 <span className="navIcon">{item.icon}</span>
