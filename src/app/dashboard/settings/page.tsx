@@ -38,8 +38,38 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   // profile state
   const [accountPhoto, setAccountPhoto] = useState<string | null>(null);
-  const [name, setName] = useState<string>("Yaasnick");
-  const [email, setEmail] = useState<string>("yaasnick01@gmail.com");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        
+        const userData = await response.json();
+        setName(userData.name || userData.email.split('@')[0]);
+        setEmail(userData.email || '');
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Fallback to empty strings if there's an error
+        setName('');
+        setEmail('');
+      }
+    };
+    
+    fetchUserData();
+  }, []);
+
   const [password, setPassword] = useState<string>("**********");
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
