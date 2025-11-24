@@ -677,31 +677,8 @@ const handleDelete = async () => {
                     </div>
                   ))}
                 </div>
-
-                <div className={styles.analyticsCard}>
-                  <h4>Engagement Trends</h4>
-                  <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '8px', padding: '20px 0' }}>
-                    {lineData.datasets[0].data.map((value, index) => (
-                      <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${(value / 100) * 100}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 }}
-                          style={{
-                            width: '100%',
-                            backgroundColor: '#2563eb',
-                            borderRadius: '4px 4px 0 0',
-                            minHeight: '10px'
-                          }}
-                        />
-                        <span style={{ fontSize: '12px', color: '#6b7280' }}>{lineData.labels[index]}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </motion.div>
             )}
-
 
             {/* Full Settings Section */}
             {activeTab === "settings" && (
