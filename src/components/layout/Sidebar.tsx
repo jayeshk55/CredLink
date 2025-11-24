@@ -29,6 +29,7 @@ const Sidebar = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [pendingConnections, setPendingConnections] = useState(0);
   const [contactsCount, setContactsCount] = useState(0);
+  const [lastSeenContactsCount, setLastSeenContactsCount] = useState(0);
 
   useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -178,13 +179,25 @@ const Sidebar = () => {
     fetchContacts();
     intervalId = setInterval(fetchContacts, 20000);
     const onUpdated = () => fetchContacts();
+    const readLastSeen = () => {
+      try {
+        const stored = typeof window !== 'undefined' ? localStorage.getItem('contacts-last-seen-count') : null;
+        if (stored !== null) setLastSeenContactsCount(parseInt(stored || '0', 10) || 0);
+      } catch (_) {
+        // ignore
+      }
+    };
     if (typeof window !== 'undefined') {
       window.addEventListener('contacts-updated', onUpdated as any);
+      window.addEventListener('contacts-seen', readLastSeen as any);
+      // initial read of last seen
+      readLastSeen();
     }
     return () => {
       clearInterval(intervalId);
       if (typeof window !== 'undefined') {
         window.removeEventListener('contacts-updated', onUpdated as any);
+        window.removeEventListener('contacts-seen', readLastSeen as any);
       }
     };
   }, []);
@@ -279,9 +292,12 @@ const Sidebar = () => {
                 {item.name === "Connections" && pendingConnections > 0 && pathname !== "/dashboard/connections" && (
                   <span className="navBadge">{pendingConnections}</span>
                 )}
-                {item.name === "Contacts" && contactsCount > 0 && pathname !== "/dashboard/contacts" && (
-                  <span className="navBadge">{contactsCount}</span>
-                )}
+                {(() => {
+                  const unseen = Math.max(0, contactsCount - lastSeenContactsCount);
+                  return item.name === "Contacts" && unseen > 0 && pathname !== "/dashboard/contacts" ? (
+                    <span className="navBadge">{unseen}</span>
+                  ) : null;
+                })()}
               </Link>
             );
           })}
