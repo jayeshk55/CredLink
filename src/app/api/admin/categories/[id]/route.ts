@@ -130,7 +130,7 @@ export async function PUT(
         description: description?.trim() || null,
         icon: icon || existingCategory.icon,
         color: color || existingCategory.color,
-        tags: tagsArray,
+        tags: JSON.stringify(tagsArray),
         isActive: isActive !== undefined ? isActive : existingCategory.isActive,
         updatedAt: new Date()
       }

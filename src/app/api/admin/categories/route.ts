@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         description: description?.trim() || null,
         icon: icon || 'Briefcase',
         color: color || '#3B82F6',
-        tags: tagsArray,
+        tags: JSON.stringify(tagsArray),
         isActive: isActive !== undefined ? isActive : true,
         userCount: 0
       }
