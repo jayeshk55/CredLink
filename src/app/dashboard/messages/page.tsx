@@ -910,27 +910,56 @@ export default function MessagesPage() {
 
             {/* Conversation */}
             <div ref={conversationRef} style={styles.chatBody} onScroll={handleConversationScroll}>
-              <div style={{ textAlign: "center", margin: "10px 0" }}>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "#94A3B8", backgroundColor: "#F1F5F9", padding: "4px 12px", borderRadius: "20px" }}>
-                  {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(activeMessage.date))}
-                </span>
-              </div>
+              {(() => {
+                const threadItems = (activeMessage.thread && activeMessage.thread.length > 0
+                  ? activeMessage.thread
+                  : [
+                      { text: activeMessage.message, date: activeMessage.date, direction: 'in' as const },
+                    ]);
 
-              {(activeMessage.thread && activeMessage.thread.length > 0 ? activeMessage.thread : [
-                { text: activeMessage.message, date: activeMessage.date, direction: 'in' as const }
-              ]).map((item, idx) => {
-                const isIncoming = item.direction === 'in';
-                return (
-                  <div key={idx} style={{ display: "flex", width: "100%", justifyContent: isIncoming ? "flex-start" : "flex-end" }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: isIncoming ? "flex-start" : "flex-end", width: "100%" }}>
-                      <div style={isIncoming ? styles.bubbleIn : styles.bubbleOut}>{item.text}</div>
-                      <span style={{ fontSize: "10px", marginTop: "6px", color: "#94A3B8", fontWeight: 500 }}>
-                        {isIncoming ? activeMessage.name.split(' ')[0] : 'You'} • {formatDate(item.date).split(',')[1].trim()}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                let lastDateKey: string | null = null;
+
+                return threadItems.map((item, idx) => {
+                  const isIncoming = item.direction === 'in';
+                  const itemDate = new Date(item.date);
+                  const dateKey = itemDate.toDateString();
+                  const showDateHeader = dateKey !== lastDateKey;
+                  lastDateKey = dateKey;
+
+                  return (
+                    <React.Fragment key={item.id || idx}>
+                      {showDateHeader && (
+                        <div style={{ textAlign: "center", margin: "10px 0" }}>
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: 700,
+                              color: "#94A3B8",
+                              backgroundColor: "#F1F5F9",
+                              padding: "4px 12px",
+                              borderRadius: "20px",
+                            }}
+                          >
+                            {new Intl.DateTimeFormat(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            }).format(itemDate)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div style={{ display: "flex", width: "100%", justifyContent: isIncoming ? "flex-start" : "flex-end" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: isIncoming ? "flex-start" : "flex-end", width: "100%" }}>
+                          <div style={isIncoming ? styles.bubbleIn : styles.bubbleOut}>{item.text}</div>
+                          <span style={{ fontSize: "10px", marginTop: "6px", color: "#94A3B8", fontWeight: 500 }}>
+                            {isIncoming ? activeMessage.name.split(' ')[0] : 'You'} • {formatDate(item.date).split(',')[1].trim()}
+                          </span>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  );
+                });
+              })()}
             </div>
 
             {/* Composer */}

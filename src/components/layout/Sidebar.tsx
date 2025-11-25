@@ -14,7 +14,6 @@ import {
   HelpCircle,
   Menu,
   X,
-  Bell,
 } from "lucide-react";
 import "./sidebar.css"; // 
 import { motion, AnimatePresence } from "framer-motion";

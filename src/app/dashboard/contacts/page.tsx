@@ -53,7 +53,17 @@ export default function ContactsPage() {
         }
 
         const data = await response.json();
-        setContacts(data.contacts || []);
+        const list = data.contacts || [];
+        setContacts(list);
+        // mark as seen on visit
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('contacts-last-seen-count', String(list.length || 0));
+            window.dispatchEvent(new Event('contacts-seen'));
+          }
+        } catch (_) {
+          // ignore
+        }
         if (typeof window !== 'undefined') {
           try {
             window.localStorage.setItem('dashboard-contacts-last-opened', new Date().toISOString());
