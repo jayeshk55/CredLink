@@ -32,6 +32,8 @@ const Sidebar = () => {
   const [contactsCount, setContactsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
   const notificationsPrevCountRef = useRef<number>(-1);
+  const messagesPrevCountRef = useRef<number>(-1);
+  const connectionsPrevCountRef = useRef<number>(-1);
 
     useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -133,6 +135,20 @@ const Sidebar = () => {
         }
 
         setUnreadCount(totalUnread);
+
+        // Show toast on first load or when unread count increases
+        const prev = messagesPrevCountRef.current;
+        const isFirst = prev === -1;
+
+        if ((isFirst && totalUnread > 0) || (!isFirst && totalUnread > prev)) {
+          toast(
+            totalUnread === 1
+              ? 'You have 1 unread message'
+              : `You have ${totalUnread} unread messages`
+          );
+        }
+
+        messagesPrevCountRef.current = totalUnread;
       } catch (e) {
         // ignore
       }
@@ -188,27 +204,6 @@ const Sidebar = () => {
         const list = Array.isArray(data?.notifications) ? data.notifications : [];
         const unreadTotal = computeCount(list);
         setNotificationsCount(unreadTotal);
-
-        // Show toast on first load or when unread count increases, if user isn't
-        // already on a page where they'd naturally see the notifications.
-        const prev = notificationsPrevCountRef.current;
-        const isFirst = prev === -1;
-        const currentPath =
-          typeof window !== 'undefined' ? window.location.pathname : pathname;
-        const isNotificationsPage = currentPath === '/dashboard/notifications';
-        const isMessagesPage = currentPath === '/dashboard/messages';
-        const isConnectionsPage = currentPath === '/dashboard/connections';
-
-        if (!isNotificationsPage && !isMessagesPage && !isConnectionsPage) {
-          if ((isFirst && unreadTotal > 0) || (!isFirst && unreadTotal > prev)) {
-            toast(
-              unreadTotal === 1
-                ? 'You have 1 new notification'
-                : `You have ${unreadTotal} new notifications`
-            );
-          }
-        }
-
         notificationsPrevCountRef.current = unreadTotal;
       } catch (_) {
         // ignore
@@ -261,7 +256,22 @@ const Sidebar = () => {
         if (!res.ok) return;
         const data = await res.json();
         const requests = Array.isArray(data.requests) ? data.requests : [];
-        setPendingConnections(computePending(requests));
+        const pendingTotal = computePending(requests);
+        setPendingConnections(pendingTotal);
+
+        // Toast on first load or when pending count increases
+        const prev = connectionsPrevCountRef.current;
+        const isFirst = prev === -1;
+
+        if ((isFirst && pendingTotal > 0) || (!isFirst && pendingTotal > prev)) {
+          toast(
+            pendingTotal === 1
+              ? 'You have 1 pending connection request'
+              : `You have ${pendingTotal} pending connection requests`
+          );
+        }
+
+        connectionsPrevCountRef.current = pendingTotal;
       } catch (_) {
         // ignore
       }
