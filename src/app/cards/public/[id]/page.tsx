@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { X, Users, Mail, Phone } from "lucide-react";
+import { X, Users } from "lucide-react";
 import DigitalCardPreview from "@/components/cards/DigitalCardPreview";
 import FlatCardPreview from "@/components/cards/FlatCardPreview";
 import ModernCardPreview from "@/components/cards/ModernCardPreview";
@@ -25,21 +25,23 @@ interface Card {
   skills?: string;
   portfolio?: string;
   experience?: string;
-
   services?: string;
-review?: string;
+  review?: string;
 
   photo?: string;
   profileImage?: string;
   cover?: string;
   coverImage?: string;
   bannerImage?: string;
+
   email?: string;
   phone?: string;
   linkedin?: string;
   linkedinUrl?: string;
   website?: string;
   websiteUrl?: string;
+
+  documentUrl?: string;
   selectedDesign?: string;
   selectedColor?: string;
   selectedColor2?: string;
@@ -47,6 +49,7 @@ review?: string;
   cardType?: string;
   views?: number;
   boost?: "Active" | "Inactive";
+
   user?: {
     id: string;
     fullName: string;
@@ -63,47 +66,55 @@ interface ConnectionFormData {
 }
 
 // ----------------- Card Preview Component -----------------
-const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
-const commonProps = {
-  firstName: card.fullName ? card.fullName.split(" ")[0] : "",
-  middleName: card.fullName?.split(" ").length === 3 ? card.fullName.split(" ")[1] : "",
-  lastName: card.fullName ? card.fullName.split(" ").slice(-1).join("") : "",
+const CardPreview: React.FC<{
+  card: Card;
+  onDocumentClick: (url: string) => void;
+}> = ({ card, onDocumentClick }) => {
+  const commonProps = {
+    firstName: card.fullName ? card.fullName.split(" ")[0] : "",
+    middleName:
+      card.fullName?.split(" ").length === 3
+        ? card.fullName.split(" ")[1]
+        : "",
+    lastName: card.fullName ? card.fullName.split(" ").slice(-1).join("") : "",
 
-  title: card.title || "",
-  company: card.company || "",
-  location: card.location || "",
-  about: card.bio || card.about || card.description || "",
+    title: card.title || "",
+    company: card.company || "",
+    location: card.location || "",
+    about: card.bio || card.about || card.description || "",
 
-  skills: card.skills || "",
-  portfolio: card.portfolio || "",
-  experience: card.experience || "",
-  services: card.services || "",
-  review: card.review || "",
+    skills: card.skills || "",
+    portfolio: card.portfolio || "",
+    experience: card.experience || "",
+    services: card.services || "",
+    review: card.review || "",
 
-  photo: card.profileImage || card.photo || "",
-  cover: card.coverImage || card.bannerImage || card.cover || "",
+    photo: card.profileImage || card.photo || "",
+    cover: card.coverImage || card.bannerImage || card.cover || "",
 
-  email: card.email || "",
-  phone: card.phone || "",
-  linkedin: card.linkedinUrl || card.linkedin || "",
-  website: card.websiteUrl || card.website || "",
+    email: card.email || "",
+    phone: card.phone || "",
+    linkedin: card.linkedinUrl || card.linkedin || "",
+    website: card.websiteUrl || card.website || "",
 
-  themeColor1: card.selectedColor || "#3b82f6",
-  themeColor2: card.selectedColor2 || "#2563eb",
-};
+    themeColor1: card.selectedColor || "#3b82f6",
+    themeColor2: card.selectedColor2 || "#2563eb",
 
+    documentUrl: card.documentUrl || "",
+    onDocumentClick,
+  };
 
-  const design = card.selectedDesign || 'Classic';
+  const design = card.selectedDesign || "Classic";
 
   const renderCardPreview = () => {
     switch (design) {
-      case 'Flat':
+      case "Flat":
         return <FlatCardPreview {...commonProps} />;
-      case 'Modern':
+      case "Modern":
         return <ModernCardPreview {...commonProps} />;
-      case 'Sleek':
+      case "Sleek":
         return <SleekCardPreview {...commonProps} />;
-      case 'Classic':
+      case "Classic":
       default:
         return <DigitalCardPreview {...commonProps} design={design} />;
     }
@@ -115,7 +126,7 @@ const commonProps = {
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
       className={styles.cardPreviewArea}
-      style={{ maxWidth: '360px' }}
+      style={{ maxWidth: "360px" }}
     >
       {renderCardPreview()}
     </motion.div>
@@ -130,80 +141,67 @@ const ConnectionModal: React.FC<{
   isSubmitting: boolean;
 }> = ({ isOpen, onClose, onSubmit, isSubmitting }) => {
   const [formData, setFormData] = useState<ConnectionFormData>({
-    name: '',
-    phone: '',
-    email: ''
+    name: "",
+    phone: "",
+    email: "",
   });
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
     };
-    
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation
+
     if (!formData.name.trim()) {
-      toast.error('Please enter your name');
+      toast.error("Please enter your name");
       return;
     }
     if (!formData.email.trim()) {
-      toast.error('Please enter your email');
+      toast.error("Please enter your email");
       return;
     }
     if (!formData.phone.trim()) {
-      toast.error('Please enter your phone number');
+      toast.error("Please enter your phone number");
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
 
     onSubmit(formData);
   };
 
-  const resetForm = () => {
-    setFormData({ name: '', phone: '', email: '' });
-  };
-
-  useEffect(() => {
-    if (!isOpen) {
-      resetForm();
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
-  // Different animations for mobile vs desktop
-  const modalVariants = isMobile 
+  const variants = isMobile
     ? {
         initial: { opacity: 0, y: "100%" },
         animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: "100%" }
+        exit: { opacity: 0, y: "100%" },
       }
     : {
         initial: { opacity: 0, scale: 0.9, y: 20 },
         animate: { opacity: 1, scale: 1, y: 0 },
-        exit: { opacity: 0, scale: 0.9, y: 20 }
+        exit: { opacity: 0, scale: 0.9, y: 20 },
       };
 
   return (
@@ -216,14 +214,14 @@ const ConnectionModal: React.FC<{
         onClick={onClose}
       >
         <motion.div
-          initial={modalVariants.initial}
-          animate={modalVariants.animate}
-          exit={modalVariants.exit}
-          transition={{ 
-            type: isMobile ? "tween" : "spring", 
-            stiffness: 300, 
+          initial={variants.initial}
+          animate={variants.animate}
+          exit={variants.exit}
+          transition={{
+            type: isMobile ? "tween" : "spring",
+            stiffness: 300,
             damping: 30,
-            duration: isMobile ? 0.3 : undefined
+            duration: isMobile ? 0.3 : undefined,
           }}
           className={styles.modalContent}
           onClick={(e) => e.stopPropagation()}
@@ -245,53 +243,38 @@ const ConnectionModal: React.FC<{
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-              <label htmlFor="name" className={styles.formLabel}>
-                Full Name *
-              </label>
+              <label className={styles.formLabel}>Full Name *</label>
               <input
                 type="text"
-                id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Enter your full name"
                 className={styles.formInput}
                 disabled={isSubmitting}
-                required
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.formLabel}>
-                Email Address *
-              </label>
+              <label className={styles.formLabel}>Email *</label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter your email address"
                 className={styles.formInput}
                 disabled={isSubmitting}
-                required
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="phone" className={styles.formLabel}>
-                Phone Number *
-              </label>
+              <label className={styles.formLabel}>Phone *</label>
               <input
                 type="tel"
-                id="phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder="Enter your phone number"
                 className={styles.formInput}
                 disabled={isSubmitting}
-                required
               />
             </div>
 
@@ -304,12 +287,13 @@ const ConnectionModal: React.FC<{
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
                 className={styles.submitButton}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Connecting...' : 'Connect'}
+                {isSubmitting ? "Connecting..." : "Connect"}
               </button>
             </div>
           </form>
@@ -323,146 +307,85 @@ const ConnectionModal: React.FC<{
 const PublicCardPage = () => {
   const params = useParams();
   const cardId = params.id as string;
+
   const [card, setCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // DOCUMENT VIEWER STATE
+  const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchCard = async () => {
       try {
         setIsLoading(true);
-        console.log('🔍 Fetching public card with ID:', cardId);
-        
-        // For now, we'll use the same API endpoint as the private card
-        // In a real implementation, you might want a separate public API endpoint
-        const response = await fetch(`/api/card/${cardId}`);
-        
-        if (!response.ok) {
-          throw new Error('Card not found');
-        }
 
+        const response = await fetch(`/api/card/${cardId}`);
         const data = await response.json();
-        
-        if (data.success && data.card) {
-          console.log('✅ Fetched public card:', data.card);
-          
-          // Check if card is active (not paused)
-          if (data.card.cardActive === false) {
-            toast.error('This card has been deactivated by the owner', {
-              duration: 5000,
-              icon: '🚫',
-            });
-            setCard(null);
-            setIsLoading(false);
-            return;
-          }
-          
-          setCard(data.card);
-          
-          // Increment view count for public access
-          try {
-            await fetch(`/api/card/${cardId}/view`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-          } catch (viewError) {
-            console.warn('Failed to increment view count:', viewError);
-          }
+
+        if (!response.ok || !data.success) throw new Error("Card not found");
+
+        if (data.card.cardActive === false) {
+          toast.error("This card has been deactivated by the owner");
+          setCard(null);
         } else {
-          throw new Error('Card not found');
+          setCard(data.card);
         }
-      } catch (error: any) {
-        console.error('❌ Error fetching public card:', error);
+      } catch (e) {
         setCard(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (cardId) {
-      fetchCard();
-    }
+    if (cardId) fetchCard();
   }, [cardId]);
-
-  const handleConnectClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    if (!isSubmitting) {
-      setIsModalOpen(false);
-    }
-  };
 
   const handleFormSubmit = async (formData: ConnectionFormData) => {
     setIsSubmitting(true);
-    
     try {
-      console.log('📝 Submitting connection request:', {
-        cardId,
-        ...formData
-      });
-
-      const response = await fetch(`/api/cards/${cardId}/connect`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch(`/api/cards/${cardId}/connect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          sourceUrl: typeof window !== 'undefined' ? window.location.href : null,
+          sourceUrl: window.location.href,
         }),
       });
 
-      const result = await response.json();
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit connection request');
-      }
-
-      toast.success(result.message || 'Thank you for connecting!', {
-        duration: 4000,
-        position: 'top-center',
-      });
-      
+      toast.success("Thank you for connecting!");
       setIsModalOpen(false);
-    } catch (error: any) {
-      console.error('❌ Error submitting connection request:', error);
-      
-      // Handle specific error cases
-      if (error.message.includes('already submitted')) {
-        toast.error('You have already submitted a connection request for this card.');
-      } else if (error.message.includes('Invalid input')) {
-        toast.error('Please check your input and try again.');
-      } else {
-        toast.error(error.message || 'Failed to submit connection request. Please try again.');
-      }
+    } catch (e: any) {
+      toast.error(e.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className={styles.pageContainer}>
         <div className={styles.loading}>
-          <div className={styles.spinner}></div>
+          <div className={styles.spinner} />
           <p className={styles.loadingText}>Loading card...</p>
         </div>
       </div>
     );
-  }
 
-  if (!card) {
+  if (!card)
     return (
       <div className={styles.pageContainer}>
         <div className={styles.errorContainer}>
           <h1 className={styles.errorTitle}>Card Unavailable</h1>
           <p className={styles.errorMessage}>
-            This card has been deactivated by the owner or does not exist.
+            This card has been deactivated or does not exist.
           </p>
           <a href="/" className={styles.errorButton}>
             Go to Homepage
@@ -470,42 +393,74 @@ const PublicCardPage = () => {
         </div>
       </div>
     );
-  }
 
   return (
-    <div className={styles.pageContainer}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={styles.contentWrapper}
-      >
-        {/* Card Preview */}
-        <CardPreview card={card} />
-
-        {/* Connect Button */}
-        <motion.button
+    <>
+      <div className={styles.pageContainer}>
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          onClick={handleConnectClick}
-          className={styles.connectButton}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.5 }}
+          className={styles.contentWrapper}
         >
-          <Users size={20} />
-          Let's Connect
-        </motion.button>
-      </motion.div>
+          {/* Card Preview */}
+          <CardPreview
+            card={card}
+            onDocumentClick={(url) => setSelectedDocumentUrl(url)}
+          />
 
-      {/* Connection Modal */}
-      <ConnectionModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSubmit={handleFormSubmit}
-        isSubmitting={isSubmitting}
-      />
-    </div>
+          {/* Connect Button */}
+          <motion.button
+            onClick={() => setIsModalOpen(true)}
+            className={styles.connectButton}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Users size={20} />
+            Let's Connect
+          </motion.button>
+        </motion.div>
+
+        {/* Modal */}
+        <ConnectionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          isSubmitting={isSubmitting}
+          onSubmit={handleFormSubmit}
+        />
+      </div>
+
+      {/* ---------------- DOCUMENT VIEWER ---------------- */}
+      {selectedDocumentUrl && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="fixed top-0 right-0 w-full md:w-1/2 h-full bg-white shadow-2xl z-50 flex flex-col"
+        >
+          <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Document Viewer
+            </h3>
+            <button
+              onClick={() => setSelectedDocumentUrl(null)}
+              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              ✖
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <iframe
+              src={selectedDocumentUrl || ""}
+              className="w-full h-full border-0"
+              title="Document Viewer"
+            />
+          </div>
+        </motion.div>
+      )}
+    </>
   );
 };
 
