@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
 import styles from "./cardType.module.css";
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 const FlatCardPreview: React.FC<DigitalCardProps> = ({
   firstName = "",
@@ -31,8 +32,11 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
   documentUrl,
   onDocumentClick,
 }) => {
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
   const fullName =
-    [firstName, middleName, lastName].filter(Boolean).join(" ") ||
+    [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(" ") ||
     "Your Name";
 
   const firstLetter = fullName.charAt(0).toUpperCase();

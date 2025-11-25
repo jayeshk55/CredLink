@@ -25,3 +25,13 @@ export function truncateText(text: string, length: number): string {
   if (text.length <= length) return text
   return text.substring(0, length) + "..."
 }
+
+export function capitalizeFirstLetter(text: string): string {
+  if (!text) return text
+  // Capitalize first letter of each word (split by space)
+  return text
+    .split(' ')
+    .map(word => word.trim() ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
+    .filter(Boolean)
+    .join(' ')
+}

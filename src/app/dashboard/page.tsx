@@ -11,6 +11,7 @@ import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/Digital
 import FlatCardPreview from '@/components/cards/FlatCardPreview';
 import ModernCardPreview from "@/components/cards/ModernCardPreview";
 import SleekCardPreview from "@/components/cards/SleekCardPreview";
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -60,13 +61,17 @@ const Dashboard = () => {
  const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null);
 
  // Card Preview Renderer (Exact Copy from Edit Page)
-  const renderCardPreview = (card: Card) => {
+ const renderCardPreview = (card: Card) => {
+  // Split fullName with capitalization
+  const capitalizedFullName = capitalizeFirstLetter(card.fullName || '');
+  const nameParts = capitalizedFullName.split(' ');
+  
   // Use EXACT same prop mapping as edit page
   const commonProps = {
-    firstName: card.firstName || '',
-    middleName: card.middleName || '',
-    lastName: card.lastName || '',
-    cardName: card.cardName || card.name || '',
+    firstName: nameParts[0] || '',
+    middleName: nameParts.length === 3 ? nameParts[1] : '',
+    lastName: nameParts.length >= 2 ? nameParts.slice(-1).join('') : '',
+    cardName: capitalizeFirstLetter(card.cardName || card.name || ''),
     title: card.title || '',
     company: card.company || '',
     location: card.location || '',

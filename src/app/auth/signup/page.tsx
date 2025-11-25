@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
-import { auth, GoogleAuthProvider, signInWithPopup } from "@/lib/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from "@/lib/firebase"
 import "../../globals.css"
 import styles from "./signup.module.css"
 
@@ -162,12 +161,18 @@ export default function SignupPage() {
     try {
       // Create user in Firebase Auth
       if (!auth) {
-        throw new Error('Authentication is not configured. Please set Firebase env vars.')
+        throw new Error('Authentication is not configured. Please check your Firebase environment variables.')
       }
+
+      console.log('🔐 Creating Firebase user account...')
       const cred = await createUserWithEmailAndPassword(auth as any, email, password)
+      console.log('✅ Firebase user created successfully')
+      
       const idToken = await cred.user.getIdToken(true)
+      console.log('🎫 Got Firebase ID token')
 
       // Call backend to create user in DB and set session
+      console.log('📤 Sending user data to backend...')
       const response = await fetch('/api/auth/firebase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -176,18 +181,40 @@ export default function SignupPage() {
       })
 
       const data = await response.json()
+      console.log('📥 Backend response:', data)
 
       if (response.ok) {
         toast.success('Account created successfully!')
+        console.log('✅ Account setup complete, redirecting...')
         router.push('/onboarding')
       } else {
         setError(data.error || 'Failed to create account')
         toast.error(data.error || 'Failed to create account')
       }
     } catch (error: any) {
-      console.error('Signup error:', error)
-      setError(error.message || 'Failed to create account. Please try again.')
-      toast.error(error.message || 'Failed to create account')
+      console.error('❌ Signup error:', error)
+      console.error('Error code:', error?.code)
+      console.error('Error message:', error?.message)
+      
+      // Handle Firebase-specific errors with helpful messages
+      let errorMessage = error.message || 'Failed to create account. Please try again.'
+      
+      if (error.code === 'auth/operation-not-allowed') {
+        errorMessage = 'Email/Password authentication is not enabled in Firebase. Please wait a moment and try again, or contact support.'
+        console.error('⚠️ Firebase Error: Email/Password provider may not be properly configured.')
+        console.error('🔍 Check Firebase Console → Authentication → Sign-in method → Email/Password')
+      } else if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered. Please try logging in instead.'
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak. Please use a stronger password (at least 6 characters).'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address format.'
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your internet connection and try again.'
+      }
+      
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

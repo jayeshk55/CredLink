@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 // Modern Template
 const ModernCardPreview: React.FC<DigitalCardProps> = ({
@@ -11,8 +12,11 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
   skills = "", portfolio = "", experience = "", services = "", review = "", documentUrl, onDocumentClick,
 }) => {
 
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
-  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = capitalizedFirstName ? capitalizedFirstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);

@@ -10,6 +10,7 @@ import DigitalCardPreview from "@/components/cards/DigitalCardPreview";
 import FlatCardPreview from "@/components/cards/FlatCardPreview";
 import ModernCardPreview from "@/components/cards/ModernCardPreview";
 import SleekCardPreview from "@/components/cards/SleekCardPreview";
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -66,40 +67,32 @@ interface ConnectionFormData {
 }
 
 // ----------------- Card Preview Component -----------------
-const CardPreview: React.FC<{
-  card: Card;
-  onDocumentClick: (url: string) => void;
-}> = ({ card, onDocumentClick }) => {
+const CardPreview: React.FC<{ card: Card; onDocumentClick: (url: string) => void }> = ({ card, onDocumentClick }) => {
+  const capitalizedFullName = capitalizeFirstLetter(card.fullName || "");
+  const nameParts = capitalizedFullName.split(" ");
+  
   const commonProps = {
-    firstName: card.fullName ? card.fullName.split(" ")[0] : "",
-    middleName:
-      card.fullName?.split(" ").length === 3
-        ? card.fullName.split(" ")[1]
-        : "",
-    lastName: card.fullName ? card.fullName.split(" ").slice(-1).join("") : "",
-
-    title: card.title || "",
+    firstName: nameParts[0] || "",
+    middleName: nameParts.length === 3 ? nameParts[1] : "",
+    lastName: nameParts.length >= 2 ? nameParts.slice(-1).join("") : "",
+    cardName: capitalizeFirstLetter(card.name || ""),
+    title: capitalizeFirstLetter(card.title || ""),
     company: card.company || "",
     location: card.location || "",
     about: card.bio || card.about || card.description || "",
-
     skills: card.skills || "",
     portfolio: card.portfolio || "",
     experience: card.experience || "",
     services: card.services || "",
     review: card.review || "",
-
     photo: card.profileImage || card.photo || "",
     cover: card.coverImage || card.bannerImage || card.cover || "",
-
     email: card.email || "",
     phone: card.phone || "",
     linkedin: card.linkedinUrl || card.linkedin || "",
     website: card.websiteUrl || card.website || "",
-
     themeColor1: card.selectedColor || "#3b82f6",
     themeColor2: card.selectedColor2 || "#2563eb",
-
     documentUrl: card.documentUrl || "",
     onDocumentClick,
   };

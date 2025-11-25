@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from './cardType.module.css';
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 export interface DigitalCardProps {
   firstName?: string;
@@ -61,8 +62,11 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   documentUrl,
 }) => {
 
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || name || 'Your Name';
-  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : (name ? name.charAt(0).toUpperCase() : "J");
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || name || 'Your Name';
+  const firstLetter = capitalizedFirstName ? capitalizedFirstName.charAt(0).toUpperCase() : (name ? name.charAt(0).toUpperCase() : "J");
 
   const parsedCompany = (() => {
     const atIndex = experience.indexOf('@');

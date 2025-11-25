@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 // ====================================================================
 // START: DigitalCardPreview Component (Modified to accept theme)
@@ -56,8 +57,11 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   themeColor2, 
   fontFamily, 
 }) => {
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
-  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = capitalizedFirstName ? capitalizedFirstName.charAt(0).toUpperCase() : "J";
   const parsedCompany = (() => {
     const atIndex = experience.indexOf('@');
     if (atIndex !== -1) {
@@ -340,8 +344,11 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
-  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = capitalizedFirstName ? capitalizedFirstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
@@ -572,8 +579,11 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
-  const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || 'Your Name';
+  const firstLetter = capitalizedFirstName ? capitalizedFirstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
@@ -813,7 +823,10 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
   email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
   skills = "", portfolio = "", experience = "", services = "", review = ""
 }) => {
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Your Name';
+  const capitalizedFirstName = capitalizeFirstLetter(firstName);
+  const capitalizedMiddleName = capitalizeFirstLetter(middleName);
+  const capitalizedLastName = capitalizeFirstLetter(lastName);
+  const fullName = [capitalizedFirstName, capitalizedMiddleName, capitalizedLastName].filter(Boolean).join(' ') || 'Your Name';
   const firstLetter = firstName ? firstName.charAt(0).toUpperCase() : "J";
   
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';

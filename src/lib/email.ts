@@ -1,14 +1,46 @@
 import nodemailer from 'nodemailer'
 
-// Create transporter for Gmail SMTP
-const createTransporter = () => {
+// In production we must have real SMTP creds; in non-production we can fallback to Ethereal
+const createTransporter = async () => {
+  const hasCreds = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS)
+
+  if (!hasCreds) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('SMTP credentials (SMTP_USER/SMTP_PASS) are missing in production. Configure Hostinger SMTP before sending emails.')
+    }
+    // Development / testing fallback: Ethereal ephemeral SMTP
+    const testAccount = await nodemailer.createTestAccount()
+    console.warn('⚠️ SMTP credentials missing; using Ethereal test account. Set SMTP_USER/SMTP_PASS for production.')
+    console.warn(`🔍 Preview emails at: https://ethereal.email/messages (login: ${testAccount.user})`)
+    return nodemailer.createTransport({
+      host: testAccount.smtp.host,
+      port: testAccount.smtp.port,
+      secure: testAccount.smtp.secure,
+      auth: { user: testAccount.user, pass: testAccount.pass },
+    })
+  }
+
+  const host = process.env.SMTP_HOST || 'smtp.hostinger.com'
+  const port = parseInt(process.env.SMTP_PORT || '587')
+  // If explicit secure flag provided use it; otherwise auto true for port 465
+  const explicitSecure = process.env.SMTP_SECURE
+  const secure = explicitSecure ? explicitSecure === 'true' : port === 465
+
+  // Basic validation to catch common misconfiguration where an email is placed in SMTP_HOST
+  if (host.includes('@')) {
+    throw new Error(`Invalid SMTP_HOST '${host}'. Use the mail server hostname (e.g. smtp.hostinger.com), not an email address.`)
+  }
+  if (!/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(host)) {
+    console.warn(`⚠️ SMTP_HOST '${host}' does not look like a valid hostname. Check your .env.`)
+  }
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // false for 587, true for 465
+    host,
+    port,
+    secure,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.SMTP_USER as string,
+      pass: process.env.SMTP_PASS as string,
     },
   })
 }
@@ -22,7 +54,7 @@ export interface EmailOptions {
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
-    const transporter = createTransporter()
+    const transporter = await createTransporter()
     
     const mailOptions = {
       from: {
@@ -37,6 +69,10 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
 
     const result = await transporter.sendMail(mailOptions)
     console.log('✅ Email sent successfully:', result.messageId)
+    // If using Ethereal, output preview URL
+    if (nodemailer.getTestMessageUrl(result)) {
+      console.log('🔗 Ethereal preview URL:', nodemailer.getTestMessageUrl(result))
+    }
   } catch (error) {
     console.error('❌ Failed to send email:', error)
     throw new Error('Failed to send email')
