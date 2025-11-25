@@ -222,6 +222,24 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    // Best-effort: sync basic contact info from card into user profile
+    // so admin lists, settings, and search can rely on user.phone/location.
+    try {
+      const profileUpdateData: any = {};
+      if (cardData.phone) profileUpdateData.phone = cardData.phone;
+      if (cardData.location) profileUpdateData.location = cardData.location;
+      if (cardData.fullName) profileUpdateData.fullName = cardData.fullName;
+
+      if (Object.keys(profileUpdateData).length > 0) {
+        await prisma.user.update({
+          where: { id: decoded.userId },
+          data: profileUpdateData,
+        });
+      }
+    } catch (err) {
+      console.error('Failed to sync user profile from card data:', err);
+    }
+
     return NextResponse.json({ 
       success: true,
       message: 'Card created successfully',

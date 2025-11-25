@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -31,6 +31,9 @@ const Sidebar = () => {
   const [pendingConnections, setPendingConnections] = useState(0);
   const [contactsCount, setContactsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
+  const notificationsPrevCountRef = useRef<number>(-1);
+  const messagesPrevCountRef = useRef<number>(-1);
+  const connectionsPrevCountRef = useRef<number>(-1);
 
     useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -54,6 +57,9 @@ const Sidebar = () => {
     let intervalId: any;
 
     const fetchUnread = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         if (!token) return;
@@ -132,6 +138,20 @@ const Sidebar = () => {
         }
 
         setUnreadCount(totalUnread);
+
+        // Show toast on first load or when unread count increases
+        const prev = messagesPrevCountRef.current;
+        const isFirst = prev === -1;
+
+        if ((isFirst && totalUnread > 0) || (!isFirst && totalUnread > prev)) {
+          toast(
+            totalUnread === 1
+              ? 'You have 1 unread message'
+              : `You have ${totalUnread} unread messages`
+          );
+        }
+
+        messagesPrevCountRef.current = totalUnread;
       } catch (e) {
         // ignore
       }
@@ -149,7 +169,8 @@ const Sidebar = () => {
       window.addEventListener('message-read', handleMessagesUpdated as any);
     }
 
-    intervalId = setInterval(fetchUnread, 15000);
+    // Poll every 60 seconds when tab is visible
+    intervalId = setInterval(fetchUnread, 60000);
 
     return () => {
       clearInterval(intervalId);
@@ -180,19 +201,25 @@ const Sidebar = () => {
     };
 
     const fetchNotifications = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/notifications', { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         const list = Array.isArray(data?.notifications) ? data.notifications : [];
-        setNotificationsCount(computeCount(list));
+        const unreadTotal = computeCount(list);
+        setNotificationsCount(unreadTotal);
+        notificationsPrevCountRef.current = unreadTotal;
       } catch (_) {
         // ignore
       }
     };
 
     fetchNotifications();
-    intervalId = setInterval(fetchNotifications, 20000);
+    // Poll every 60 seconds when tab is visible
+    intervalId = setInterval(fetchNotifications, 60000);
 
     const onUpdated = () => {
       fetchNotifications();
@@ -230,6 +257,9 @@ const Sidebar = () => {
     };
 
     const fetchPending = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/users/connections?type=received', {
           credentials: 'include',
@@ -237,15 +267,30 @@ const Sidebar = () => {
         if (!res.ok) return;
         const data = await res.json();
         const requests = Array.isArray(data.requests) ? data.requests : [];
-        setPendingConnections(computePending(requests));
+        const pendingTotal = computePending(requests);
+        setPendingConnections(pendingTotal);
+
+        // Toast on first load or when pending count increases
+        const prev = connectionsPrevCountRef.current;
+        const isFirst = prev === -1;
+
+        if ((isFirst && pendingTotal > 0) || (!isFirst && pendingTotal > prev)) {
+          toast(
+            pendingTotal === 1
+              ? 'You have 1 pending connection request'
+              : `You have ${pendingTotal} pending connection requests`
+          );
+        }
+
+        connectionsPrevCountRef.current = pendingTotal;
       } catch (_) {
         // ignore
       }
     };
 
     fetchPending();
-    // light polling to keep badge in sync
-    intervalId = setInterval(fetchPending, 15000);
+    // light polling to keep badge in sync (every 90 seconds)
+    intervalId = setInterval(fetchPending, 90000);
     // listen for manual refresh signals from pages (optional)
     const onUpdated = () => fetchPending();
     if (typeof window !== 'undefined') {
@@ -290,6 +335,9 @@ const Sidebar = () => {
     };
 
     const fetchContacts = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/contacts', { credentials: 'include' });
         if (!res.ok) return;
@@ -302,7 +350,8 @@ const Sidebar = () => {
     };
 
     fetchContacts();
-    intervalId = setInterval(fetchContacts, 20000);
+    // Poll every 120 seconds when tab is visible
+    intervalId = setInterval(fetchContacts, 120000);
     const onUpdated = () => fetchContacts();
     if (typeof window !== 'undefined') {
       window.addEventListener('contacts-updated', onUpdated as any);

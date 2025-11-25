@@ -40,6 +40,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [accountPhoto, setAccountPhoto] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [userLocation, setUserLocation] = useState<string>("");
   
   // Fetch user data on component mount
   useEffect(() => {
@@ -157,6 +158,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
         setName(user.fullName ?? "");
         setEmail(user.email ?? "");
         setPhoneNumber(user.phone ?? "");
+        setUserLocation(user.location ?? "");
         setAccountPhoto(user.profileImage ?? null);
         setHasPassword(user.hasPassword ?? true);
       } catch (err) {
@@ -417,6 +419,14 @@ export default function AccountSettingsPage(): React.JSX.Element {
             <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Email</label>
             <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               <div className="input-static">{email || "your@email.com"}</div>
+            </div>
+          </div>
+
+          {/* Location row */}
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Location</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <div className="input-static">{userLocation || "Not provided"}</div>
             </div>
           </div>
 

@@ -44,10 +44,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   title = "",
   company = "",
   location = "",
-  about = "Crafting engaging content & SEO strategies",
-  skills = "SEO, Content Creation, Analytics, Social Media",
-  portfolio = "[Link] Latest Campaigns",
-  experience = "Lead SEO Specialist (2021-Present)",
+  about = "",
+  skills = "",
+  portfolio = "",
+  experience = "",
   photo = "",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
@@ -133,35 +133,31 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           )}
 
           {/* Social Row */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-            {/* Mail */}
-            <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16v16H4z" opacity="0"/>
-                <path d="M4 8l8 5 8-5"/>
-                <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-              </svg>
+          {(email || phone) && (
+            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+              {/* Mail */}
+              {email && (
+                <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16v16H4z" opacity="0"/>
+                    <path d="M4 8l8 5 8-5"/>
+                    <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+                  </svg>
+                </div>
+              )}
+              {/* Phone */}
+              {phone && (
+                <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#25D366", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                  </svg>
+                </div>
+              )}
+              {/* LinkedIn */}
+              {/* Globe */}
             </div>
-            {/* Phone */}
-            <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#25D366", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-              </svg>
-            </div>
-            {/* LinkedIn */}
-            <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0A66C2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
-            </div>
-            {/* Globe */}
-            <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0ea5e9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
-              </svg>
-            </div>
-          </div>
-      </div>
+          )}
+        </div>
       </div>
 
       {/* Body */}
@@ -173,29 +169,31 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "12px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
-            <button
-              key={b.text}
-              style={{
-                padding: "8px 14px",
-                background: "#ffffff",
-                color: "#374151",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                boxShadow: "0 3px 8px rgba(0,0,0,0.12)",
-              }}
-            >
-              {b.text}
-            </button>
-          ))}
+            { text: "Services", value: "" },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: "" },
+          ]
+            .filter((b) => b.value && b.value.trim() !== "")
+            .map((b) => (
+              <button
+                key={b.text}
+                style={{
+                  padding: "8px 14px",
+                  background: "#ffffff",
+                  color: "#374151",
+                  border: "none",
+                  borderRadius: "12px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 3px 8px rgba(0,0,0,0.12)",
+                }}
+              >
+                {b.text}
+              </button>
+            ))}
         </div>
       </div>
     </div>

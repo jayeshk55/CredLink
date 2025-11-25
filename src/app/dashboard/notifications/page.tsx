@@ -28,31 +28,6 @@ export default function NotificationsPage() {
     return arr;
   }, [items, sort, clearedIds]);
 
-  // Dummy notifications for development/testing
-  const dummy: NotificationItem[] = [
-    {
-      id: "n1",
-      title: "Welcome to MyKard",
-      message: "Your account was created successfully. Explore your dashboard to get started!",
-      createdAt: new Date().toISOString(),
-      read: false,
-    },
-    {
-      id: "n2",
-      title: "New Connection Request",
-      message: "Alex Johnson sent you a connection request.",
-      createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-      read: false,
-    },
-    {
-      id: "n3",
-      title: "Message Received",
-      message: "Riya Kapoor: Hi! I loved your profile and would like to connect.",
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-      read: true,
-    },
-  ];
-
   useEffect(() => {
     let initialCleared: string[] = [];
     try {
@@ -71,16 +46,17 @@ export default function NotificationsPage() {
         if (res.ok) {
           const data = await res.json();
           const list = Array.isArray(data?.notifications) ? data.notifications : [];
-          setItems(list.length ? list : dummy);
+          setItems(list);
         } else {
-          setItems(dummy);
+          setItems([]);
         }
       } catch {
-        setItems(dummy);
+        setItems([]);
       } finally {
         setLoading(false);
       }
     };
+
     load();
   }, []);
 

@@ -39,12 +39,12 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   title = "",
   company = "",
   location = "",
-  about = "Crafting engaging content & SEO strategies",
-  skills = "SEO, Content Creation, Analytics, Social Media",
-  portfolio = "[Link] Latest Campaigns",
-  experience = "Lead SEO Specialist (2021-Present)",
-  services = "SEO Audits, Slogan Content Campaigns", // Added
-  review = "John transformed our online presence!, Happy Client", // Added
+  about = "",
+  skills = "",
+  portfolio = "",
+  experience = "",
+  services = "",
+  review = "",
   photo = "",
   cover = "",
   email = "",
@@ -86,17 +86,33 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
   const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
 
-  const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
-          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+  const renderItem = (title: string, subtitle?: string) => {
+    const isUrl = /^https?:\/\//i.test(title) || /^[\w.-]+\.[a-z]{2,}/i.test(title);
+    const href = isUrl ? (/^https?:\/\//i.test(title) ? title : `https://${title}`) : undefined;
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+          <div>
+            {isUrl && href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontWeight: 700, color: '#111827', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}
+              >
+                {title}
+              </a>
+            ) : (
+              <div style={{ fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{title}</div>
+            )}
+            {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
@@ -206,34 +222,44 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {location && <p style={{ margin: "10px 0 0", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
 
           {/* Social Row */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
-            {/* Mail */}
-            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16v16H4z" opacity="0"/>
-                <path d="M4 8l8 5 8-5"/>
-                <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-              </svg>
-            </a>
-            {/* Phone */}
-            <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-              </svg>
-            </a>
-            {/* LinkedIn */}
-            <a href={linkedin || 'https://linkedin.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
-            </a>
-            {/* Globe */}
-            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
-              </svg>
-            </a>
-          </div>
+          {(email || phone || linkedin || website) && (
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
+              {/* Mail */}
+              {email && (
+                <a href={`mailto:${email}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16v16H4z" opacity="0"/>
+                    <path d="M4 8l8 5 8-5"/>
+                    <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+                  </svg>
+                </a>
+              )}
+              {/* Phone */}
+              {phone && (
+                <a href={`tel:${phone}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                  </svg>
+                </a>
+              )}
+              {/* LinkedIn */}
+              {linkedin && (
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
+                </a>
+              )}
+              {/* Globe */}
+              {website && (
+                <a href={website} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
+                  </svg>
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -421,48 +447,60 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
         {location && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
         <p style={{ fontSize: "13px", lineHeight: 1.5, color: "#FFFFFF", margin: "0 0 20px", opacity: 0.9 }}>{about}</p>
         
-        <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-          <a href={`mailto:${email}`} style={{
-            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-            border: "1px solid rgba(255, 255, 255, 0.4)"
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-              <path d="M4 8l8 5 8-5"/>
-            </svg>
-          </a>
-          <a href={`tel:${phone}`} style={{
-            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-            border: "1px solid rgba(255, 255, 255, 0.4)"
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-            </svg>
-          </a>
-          <a href={linkedin} style={{
-            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-            border: "1px solid rgba(255, 255, 255, 0.4)"
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
-              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
-            </svg>
-          </a>
-          <a href={website} style={{
-            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
-            border: "1px solid rgba(255, 255, 255, 0.4)"
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
-            </svg>
-          </a>
-        </div>
+        {(email || phone || linkedin || website) && (
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            {email && (
+              <a href={`mailto:${email}`} style={{
+                width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <rect x="4" y="6" width="16" height="12" rx="2" ry="2" />
+                  <path d="M4 8l8 5 8-5" />
+                </svg>
+              </a>
+            )}
 
+            {phone && (
+              <a href={`tel:${phone}`} style={{
+                width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                </svg>
+              </a>
+            )}
+
+            {linkedin && (
+              <a href={linkedin} style={{
+                width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                  <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z" />
+                </svg>
+              </a>
+            )}
+
+            {website && (
+              <a href={website} style={{
+                width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z" />
+                </svg>
+              </a>
+            )}
+          </div>
+        )}
         {/* Pills Section */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
