@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Users2,
   Users,
+  UserPlus,
   Search,
   Settings2,
   HelpCircle,
@@ -382,8 +383,10 @@ const Sidebar = () => {
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 
-  // Sidebar footer items removed on desktop; these options live in the header dropdown / other UI
-  const bottomItems: any[] = [];
+  const bottomItems = [
+    { name: "Settings", path: "/dashboard/settings", icon: <Settings2 /> },
+    { name: "Help & Support", path: "/dashboard/support", icon: <HelpCircle /> },
+  ];
 
   return (
     <>
@@ -478,6 +481,14 @@ const Sidebar = () => {
               </Link>
             );
           })}
+          <button 
+            className="footerLogout" 
+            onClick={handleLogout}
+            suppressHydrationWarning
+          >
+            <X />
+            Logout
+          </button>
         </div>
       </motion.aside>
 
@@ -509,7 +520,7 @@ const Sidebar = () => {
           className={`bottomNavItem ${pathname === "/dashboard/connections" ? "bottomNavItemActive" : ""}`}
         >
           <span className="bottomNavIcon">
-            <Users2 />
+            <UserPlus />
             {pendingConnections > 0 && pathname !== "/dashboard/connections" && (
               <span className="bottomNavBadge">{pendingConnections}</span>
             )}
