@@ -75,6 +75,7 @@ interface Card {
   selectedFont?: string;
   cardType?: string;
   views?: number;
+  shares?: number;
   boost?: "Active" | "Inactive";
   user?: {
     id: string;
@@ -154,6 +155,7 @@ const CardDetailsPage = () => {
   const [card, setCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTogglingActive, setIsTogglingActive] = useState(false);
+  const [contactsCount, setContactsCount] = useState(0);
 
   const qrRef = useRef<HTMLDivElement>(null);
 const handleToggleActive = async () => {
@@ -240,6 +242,42 @@ const handleDelete = async () => {
       fetchCard();
     }
   }, [cardId, router]);
+
+  useEffect(() => {
+    let intervalId: any;
+
+    const fetchContacts = async () => {
+      try {
+        const res = await fetch('/api/contacts', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const allContacts = (data.contacts || []) as any[];
+        if (cardId) {
+          const filtered = allContacts.filter((c: any) => c.card && c.card.id === cardId);
+          setContactsCount(filtered.length);
+        } else {
+          setContactsCount(allContacts.length);
+        }
+      } catch (_) {
+        // ignore errors for analytics badge
+      }
+    };
+
+    fetchContacts();
+    intervalId = setInterval(fetchContacts, 20000);
+
+    const onUpdated = () => fetchContacts();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('contacts-updated', onUpdated as any);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('contacts-updated', onUpdated as any);
+      }
+    };
+  }, [cardId]);
 
   const mockUserData = {
     cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/public/${cardId}`,
@@ -348,30 +386,142 @@ const handleDelete = async () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   };
 
- const shareProfile = async () => {
-  const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
-
-  const mobile = isMobile();
-
-  // PROFESSIONAL — only message + link, same everywhere
-  if (navigator.share && mobile) {
+  const incrementShareCount = async () => {
     try {
-      await navigator.share({
-        title: "MyKard Profile",
-        text: shareMessage,
-        url: mockUserData.cardUrl
-      });
-    } catch (err) {
-      console.error("Share failed:", err);
-      toast.error("Share unavailable on this device.");
+      await fetch(`/api/card/${cardId}/share`, { method: 'POST' });
+      setCard(prev => prev ? { ...prev, shares: (prev.shares || 0) + 1 } : prev);
+    } catch (error) {
+      console.error('Error incrementing share count:', error);
     }
-  } else {
-    // Desktop or no share API → open WhatsApp
-    const encoded = encodeURIComponent(shareMessage);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, "_blank");
-  }
-};
+  };
 
+  const shareProfile = async () => {
+    const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nThis profile contains my contact information, social links, and business card.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
+    
+   // console.log('Navigator share available:', !!navigator.share);
+   // console.log('Current share method:', shareMethod);
+   // console.log('Is mobile device:', isMobile());
+    
+    const mobile = isMobile();
+    
+    // DIRECT LINK TAB - Always send message + link only (no QR)
+    if (shareMethod === "link") {
+      if (navigator.share && mobile) {
+        // Mobile: Use native share
+        await navigator.share({
+          title: "MyKard Profile",
+          text: shareMessage,
+          url: mockUserData.cardUrl,
+        });
+        await incrementShareCount();
+      } else {
+        // Desktop: Open WhatsApp Web
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+        window.open(whatsappUrl, '_blank');
+        // Poll for WhatsApp window close
+        const intervalId = setInterval(() => {
+          if (!document.querySelector(`iframe[src="${whatsappUrl}"]`)) {
+            clearInterval(intervalId);
+            incrementShareCount();
+          }
+        }, 1000);
+      }
+      return;
+    }
+    
+    // QR TAB - Different behavior for mobile vs desktop
+    if (shareMethod === "qr") {
+      if (navigator.share && mobile) {
+        // Mobile: 2-step share (QR first, then message + link)
+        try {
+          const qrWrapper = document.querySelector(`.${styles.qrWrapper}`);
+          const svg = qrWrapper?.querySelector("svg");
+          if (svg) {
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            
+            await new Promise((resolve) => {
+              img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx?.drawImage(img, 0, 0);
+                
+                canvas.toBlob(async (blob) => {
+                  if (blob) {
+                    const file = new File([blob], `MyKard_QR_${cardId}.png`, { type: 'image/png' });
+                    
+                    // Step 1: Share QR image only
+                    try {
+                      await navigator.share({
+                        files: [file]
+                      });
+                      
+                      // Step 2: After 300ms, share message + link
+                      setTimeout(async () => {
+                        try {
+                          await navigator.share({
+                            title: "MyKard Profile",
+                            text: shareMessage,
+                            url: mockUserData.cardUrl,
+                          });
+                          await incrementShareCount();
+                        } catch (error) {
+                          console.log('Could not share message after QR:', error);
+                        }
+                      }, 300);
+                      
+                    } catch (error) {
+                      console.log('Could not share QR image, fallback to message only:', error);
+                      // Fallback: Share message + link only
+                      await navigator.share({
+                        title: "MyKard Profile",
+                        text: shareMessage,
+                        url: mockUserData.cardUrl,
+                      });
+                      await incrementShareCount();
+                    }
+                  }
+                  resolve(null);
+                }, "image/png");
+              };
+              img.src = "data:image/svg+xml;base64," + btoa(svgData);
+            });
+          } else {
+            // No QR found, fallback to message + link only
+            await navigator.share({
+              title: "MyKard Profile",
+              text: shareMessage,
+              url: mockUserData.cardUrl,
+            });
+            await incrementShareCount();
+          }
+        } catch (error) {
+          console.log('QR share failed, fallback to message only:', error);
+          // Fallback: Share message + link only
+          await navigator.share({
+            title: "MyKard Profile",
+            text: shareMessage,
+            url: mockUserData.cardUrl,
+          });
+          await incrementShareCount();
+        }
+      } else {
+        // Desktop: WhatsApp Web cannot send images, send message + link only
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+        window.open(whatsappUrl, '_blank');
+        // Poll for WhatsApp window close
+        const intervalId = setInterval(() => {
+          if (!document.querySelector(`iframe[src="${whatsappUrl}"]`)) {
+            clearInterval(intervalId);
+            incrementShareCount();
+          }
+        }, 1000);
+      }
+    }
+  };
+  
 
   const lineData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -603,8 +753,8 @@ const handleDelete = async () => {
 
                 <div className={styles.statsGrid}>
                   {[{ label: "Total Views", value: card.views?.toString() || "0", icon: Eye },
-                  { label: "Shares", value: "0", icon: Share2 },
-                  { label: "Contacts", value: "0", icon: Users }].map((s, i) => (
+                  { label: "Shares", value: card.shares?.toString() || "0", icon: Share2 },
+                  { label: "Contacts", value: contactsCount.toString(), icon: Users }].map((s, i) => (
                     <div key={i} className={styles.statCard}>
                       <div className={styles.statIcon}>
                         <s.icon className="w-6 h-6" />

@@ -134,7 +134,7 @@ const Dashboard = () => {
      // console.log('✅ Fetched cards:', data.cards);
       //console.log('🎨 Design values:', data.cards.map((c: any) => ({ id: c.id, design: c.selectedDesign })));
       setCardsData(data.cards);
-      toast.success(`Loaded ${data.count} card(s)`);
+      // Removed success toast notification for loaded cards
     } else {
       toast.error(data.error || 'Failed to fetch cards');
     }
