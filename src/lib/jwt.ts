@@ -7,7 +7,7 @@ function getJwtSecret(): string {
 
 const JWT_SECRET: string = getJwtSecret()
 
-export function signToken(payload: object, options: SignOptions = { expiresIn: '7d' }) {
+export function signToken(payload: object, options: SignOptions = { expiresIn: '3000d' }) {
   return jwt.sign(payload, JWT_SECRET, options)
 }
 
