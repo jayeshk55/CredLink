@@ -260,7 +260,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> },
-    { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
+    // { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
     { name: "Contacts", path: "/dashboard/contacts", icon: <Users /> },

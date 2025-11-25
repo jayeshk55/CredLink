@@ -1981,9 +1981,7 @@ const EditPage = () => {
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
             {[
-              { label: 'First Name', value: firstName, setter: setFirstName },
-              { label: 'Middle Name', value: middleName, setter: setMiddleName },
-              { label: 'Last Name', value: lastName, setter: setLastName },
+              { label: 'Full Name', value: firstName, setter: setFirstName },
               { label: 'Title', value: title, setter: setTitle },
               { label: 'Company', value: company, setter: setCompany },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
@@ -2001,7 +1999,7 @@ const EditPage = () => {
                     border: '1px solid #ddd',
                     borderRadius: '8px',
                     boxSizing: 'border-box',
-                    backgroundColor: field.label === 'First Name' ? '#f8f8f8' : 'white',
+                    backgroundColor: field.label === 'Full Name' ? '#f8f8f8' : 'white',
                     color: '#555',
                     outline: 'none'
                   }}
