@@ -334,10 +334,8 @@ const Sidebar = () => {
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 
-  const bottomItems = [
-    { name: "Settings", path: "/dashboard/settings", icon: <Settings2 /> },
-    { name: "Help & Support", path: "/dashboard/support", icon: <HelpCircle /> },
-  ];
+  // Sidebar footer items removed on desktop; these options live in the header dropdown / other UI
+  const bottomItems: any[] = [];
 
   return (
     <>
@@ -353,7 +351,7 @@ const Sidebar = () => {
         </motion.button>
       )}
 */}
-      {/* Overlay (for mobile) */}
+      {/* Overlay (for mobile sidebar) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -366,7 +364,7 @@ const Sidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar (desktop / slide-in) */}
       <motion.aside
         className={`sidebar ${isOpen ? "open" : "closed"}`}
       >
@@ -400,9 +398,6 @@ const Sidebar = () => {
               >
                 <span className="navIcon">{item.icon}</span>
                 <span>{item.name}</span>
-                {item.name === "Notifications" && notificationsCount > 0 && pathname !== "/dashboard/notifications" && (
-                  <span className="navBadge">{notificationsCount}</span>
-                )}
                 {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
                   <span className="navBadge">{unreadCount}</span>
                 )}
@@ -435,16 +430,65 @@ const Sidebar = () => {
               </Link>
             );
           })}
-          <button 
-            className="footerLogout" 
-            onClick={handleLogout}
-            suppressHydrationWarning
-          >
-            <X />
-            Logout
-          </button>
         </div>
       </motion.aside>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="bottomNav">
+        <Link
+          href="/dashboard"
+          className={`bottomNavItem ${pathname === "/dashboard" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <LayoutDashboard />
+          </span>
+        </Link>
+
+        <Link
+          href="/dashboard/messages"
+          className={`bottomNavItem ${pathname === "/dashboard/messages" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <MessageSquare />
+            {unreadCount > 0 && pathname !== "/dashboard/messages" && (
+              <span className="bottomNavBadge">{unreadCount}</span>
+            )}
+          </span>
+        </Link>
+
+        <Link
+          href="/dashboard/connections"
+          className={`bottomNavItem ${pathname === "/dashboard/connections" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <Users2 />
+            {pendingConnections > 0 && pathname !== "/dashboard/connections" && (
+              <span className="bottomNavBadge">{pendingConnections}</span>
+            )}
+          </span>
+        </Link>
+
+        <Link
+          href="/dashboard/contacts"
+          className={`bottomNavItem ${pathname === "/dashboard/contacts" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <Users />
+            {contactsCount > 0 && pathname !== "/dashboard/contacts" && (
+              <span className="bottomNavBadge">{contactsCount}</span>
+            )}
+          </span>
+        </Link>
+
+        <Link
+          href="/dashboard/search"
+          className={`bottomNavItem ${pathname === "/dashboard/search" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <Search />
+          </span>
+        </Link>
+      </nav>
     </>
   );
 };
