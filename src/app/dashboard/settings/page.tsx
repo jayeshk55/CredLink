@@ -40,6 +40,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [accountPhoto, setAccountPhoto] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [userLocation, setUserLocation] = useState<string>("");
   
   // Fetch user data on component mount
   useEffect(() => {
@@ -85,6 +86,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [tempPhoneNumber, setTempPhoneNumber] = useState<string>("");
   const [hasPassword, setHasPassword] = useState<boolean>(true);
 
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [popupMessage, setPopupMessage] = useState<string>("");
+
   // modals / flows
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState<boolean>(false);
@@ -93,31 +97,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [deactivateErrorMessage, setDeactivateErrorMessage] = useState<string>('');
   const [showDeactivateErrorModal, setShowDeactivateErrorModal] = useState<boolean>(false);
 
-  // responsive
-  const { width, isMobile } = useWindowWidth(760);
-
-  // focus UI states for inputs
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
-
-  // fetch profile on mount
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const res = await fetch("/api/profile", { credentials: "include" });
-        if (!res.ok) return;
-        const data = await res.json();
-        const user = data.user ?? {};
-        setName(user.fullName ?? "");
-        setEmail(user.email ?? "");
-        setPhoneNumber(user.phone ?? "");
-        setAccountPhoto(user.profileImage ?? null);
-        setHasPassword(user.hasPassword ?? true);
-      } catch (err) {
-        console.error("Failed to fetch user profile:", err);
-      }
-    };
-    fetchUserProfile();
-  }, []);
 
   // photo change: preview + upload
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +114,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
       fd.append("image", file);
       fd.append("userId", "currentUserId");
       fd.append("fullName", name);
-      
+
       const res = await fetch("/api/profile/upload-image", {
         method: "POST",
         credentials: "include",
@@ -149,18 +128,45 @@ export default function AccountSettingsPage(): React.JSX.Element {
         }, 300);
       } else {
         console.error("Upload failed:", data?.error);
-        alert("Failed to upload image: " + (data?.error ?? "Unknown error"));
+        toast.error("Failed to upload image: " + (data?.error ?? "Unknown error"));
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert("Failed to upload image. Try again.");
+      toast.error("Failed to upload image. Try again.");
     }
   };
 
   const handleRemovePhoto = () => {
     setAccountPhoto(null);
-    alert('Profile photo removed from UI.');
+    toast.success("Profile photo removed from UI.");
   };
+
+  // responsive
+  const { width, isMobile } = useWindowWidth(760);
+
+  // focus UI states for inputs
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
+
+  // fetch profile on mount (detailed profile for phone & photo)
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const res = await fetch("/api/profile", { credentials: "include" });
+        if (!res.ok) return;
+        const data = await res.json();
+        const user = data.user ?? {};
+        setName(user.fullName ?? "");
+        setEmail(user.email ?? "");
+        setPhoneNumber(user.phone ?? "");
+        setUserLocation(user.location ?? "");
+        setAccountPhoto(user.profileImage ?? null);
+        setHasPassword(user.hasPassword ?? true);
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+      }
+    };
+    fetchUserProfile();
+  }, []);
 
   // Send OTP function
   const handleSendOTP = () => {
@@ -174,7 +180,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
       toast.error("Please enter complete OTP");
       return;
     }
-    
+
     setTimeout(() => {
       toast.error("Wrong OTP entered. Please try again.");
     }, 1000);
@@ -313,7 +319,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
       } else if (res.status === 500) {
         toast.error('Something went wrong, please try again later');
       } else {
-        toast.error(data.error || 'Failed to change password');
+        toast.error((data as any).error || 'Failed to change password');
       }
     } catch (e) {
       console.error('Change password error:', e);
@@ -336,7 +342,10 @@ export default function AccountSettingsPage(): React.JSX.Element {
           {/* Save Changes Button - Top Right */}
           <button
             className={`btn-primary ${isMobile ? 'mobile' : 'desktop'}`}
-            onClick={() => alert('All changes saved')}
+            onClick={() => {
+              setPopupMessage('All changes saved');
+              setIsPopupOpen(true);
+            }}
             suppressHydrationWarning
           >
             Save Changes
@@ -413,12 +422,19 @@ export default function AccountSettingsPage(): React.JSX.Element {
             </div>
           </div>
 
+          {/* Location row */}
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Location</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <div className="input-static">{userLocation || "Not provided"}</div>
+            </div>
+          </div>
+
           {/* Phone Number row */}
           <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
             <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Phone Number</label>
             <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                
                 {isEditingPhone ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <input
@@ -468,7 +484,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                         </button>
                       </div>
                     )}
-                    
+
                     {phoneNumber && !isPhoneVerified && (
                       <button onClick={handleSendOTP} className="send-otp-btn">
                         Send OTP
@@ -482,86 +498,86 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
           {/* Password row */}
           {hasPassword && (
-          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
-            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Password</label>
-            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
-              {/* Current Password */}
-              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
-                <input
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  type={showCurrentPassword ? "text" : "password"}
-                  placeholder="Current password"
-                  onFocus={() => setFocusedInput("currentPassword")}
-                  onBlur={() => setFocusedInput(null)}
-                  className="password-input"
-                  aria-label="Current password"
-                />
-                <div className="eye-icon" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
-                  {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+            <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+              <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Password</label>
+              <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+                {/* Current Password */}
+                <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
+                  <input
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    type={showCurrentPassword ? "text" : "password"}
+                    placeholder="Current password"
+                    onFocus={() => setFocusedInput("currentPassword")}
+                    onBlur={() => setFocusedInput(null)}
+                    className="password-input"
+                    aria-label="Current password"
+                  />
+                  <div className="eye-icon" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
+                    {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                  </div>
                 </div>
-              </div>
 
-              {/* New Password */}
-              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
-                <input
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  type={showNewPassword ? "text" : "password"}
-                  placeholder="New password"
-                  onFocus={() => setFocusedInput("newPassword")}
-                  onBlur={() => setFocusedInput(null)}
-                  className="password-input"
-                  aria-label="New password"
-                />
-                <div className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
-                  {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                {/* New Password */}
+                <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
+                  <input
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="New password"
+                    onFocus={() => setFocusedInput("newPassword")}
+                    onBlur={() => setFocusedInput(null)}
+                    className="password-input"
+                    aria-label="New password"
+                  />
+                  <div className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
+                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </div>
                 </div>
-              </div>
 
-              {/* Confirm Password */}
-              <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
-                <input
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm new password"
-                  onFocus={() => setFocusedInput("confirmPassword")}
-                  onBlur={() => setFocusedInput(null)}
-                  className="password-input"
-                  aria-label="Confirm new password"
-                />
-                <div className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                {/* Confirm Password */}
+                <div className={`password-input-container ${isMobile ? 'mobile' : ''}`}>
+                  <input
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm new password"
+                    onFocus={() => setFocusedInput("confirmPassword")}
+                    onBlur={() => setFocusedInput(null)}
+                    className="password-input"
+                    aria-label="Confirm new password"
+                  />
+                  <div className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </div>
                 </div>
-              </div>
 
-              {/* Change Password Button */}
-              <div className="change-password-container">
-                <button className="btn-small" onClick={changePassword} suppressHydrationWarning>
-                  Change Password
-                </button>
+                {/* Change Password Button */}
+                <div className="change-password-container">
+                  <button className="btn-small" onClick={changePassword} suppressHydrationWarning>
+                    Change Password
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           )}
 
           {/* OAuth User Info */}
           {!hasPassword && (
-          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
-            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Authentication</label>
-            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
-              <div className="oauth-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Signed in with Google
+            <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+              <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Authentication</label>
+              <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+                <div className="oauth-badge">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Signed in with Google
+                </div>
               </div>
             </div>
-          </div>
           )}
 
           {/* Deactivate row */}
@@ -579,6 +595,42 @@ export default function AccountSettingsPage(): React.JSX.Element {
           </div>
         </section>
       </main>
+
+      {isPopupOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '10px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+            zIndex: 1001,
+            textAlign: 'center',
+            maxWidth: '300px',
+          }}
+          onClick={() => setIsPopupOpen(false)}
+        >
+          <p style={{ margin: '0 0 15px', fontSize: '15px', color: '#333' }}>{popupMessage}</p>
+          <button
+            onClick={() => setIsPopupOpen(false)}
+            style={{
+              backgroundColor: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '8px 15px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+            }}
+          >
+            Got it!
+          </button>
+        </div>
+      )}
 
       {/* Deactivate Confirmation Modal */}
       {showDeactivateConfirm && (

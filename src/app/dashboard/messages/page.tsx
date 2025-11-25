@@ -369,6 +369,10 @@ export default function MessagesPage() {
         ? { ...m, read: true, incomingCount: 0, status: m.status === "New" ? "Read" : m.status }
         : m
     ));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('messages-updated'));
+      window.dispatchEvent(new Event('message-read'));
+    }
     setDetailId(senderId);
     setReplyId(senderId);
   };

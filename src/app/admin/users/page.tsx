@@ -127,25 +127,31 @@ export default function UsersPage() {
 
   // ✅ Filter logic
   const filteredUsers = users.filter((user) => {
+    const rawSearch = filters.search.toLowerCase().trim();
     const searchMatch =
-      user.fullName?.toLowerCase().includes(filters.search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(filters.search.toLowerCase());
+      !rawSearch ||
+      user.fullName?.toLowerCase().includes(rawSearch) ||
+      user.email?.toLowerCase().includes(rawSearch) ||
+      (user.phone && user.phone.toLowerCase().includes(rawSearch)) ||
+      (user.city && user.city.toLowerCase().includes(rawSearch));
+
+    if (!searchMatch) return false;
 
     if (filters.status === "most-recent") {
       const userDate = new Date(user.createdAt);
       const recentThreshold = new Date();
       recentThreshold.setDate(recentThreshold.getDate() - 7);
-      return userDate >= recentThreshold && searchMatch;
+      return userDate >= recentThreshold;
     }
 
     if (filters.status === "active")
-      return user.status === "active" && searchMatch;
+      return user.status === "active";
     if (filters.status === "inactive")
-      return user.status === "inactive" && searchMatch;
+      return user.status === "inactive";
     if (filters.status === "suspended")
-      return user.status === "blocked" && searchMatch;
+      return user.status === "blocked";
 
-    return searchMatch;
+    return true;
   });
 
   // ✅ Actions (Edit / Delete / More)

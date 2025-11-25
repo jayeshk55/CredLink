@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const CACHE_TTL_MS = 10_000; // 10 seconds
+
+type ContactsCacheEntry = {
+  timestamp: number;
+  payload: {
+    success: boolean;
+    contacts: any[];
+    count: number;
+  };
+};
+
+// Per-user in-memory cache to reduce repeated DB hits
+const contactsCache = new Map<string, ContactsCacheEntry>();
+
 // GET - Retrieve all card connections for the logged-in user
 export async function GET(req: NextRequest) {
   try {
@@ -11,6 +25,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ 
         error: 'Unauthorized - User not found' 
       }, { status: 401 });
+    }
+
+    const cacheKey = userId;
+    const now = Date.now();
+    const cached = contactsCache.get(cacheKey);
+    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+      return NextResponse.json(cached.payload);
     }
 
     // Fetch all card connections where the user is the owner
@@ -39,11 +60,15 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    return NextResponse.json({ 
+    const payload = { 
       success: true,
       contacts: connections,
       count: connections.length
-    });
+    };
+
+    contactsCache.set(cacheKey, { timestamp: now, payload });
+
+    return NextResponse.json(payload);
 
   } catch (error: any) {
     console.error("Error fetching contacts:", error);

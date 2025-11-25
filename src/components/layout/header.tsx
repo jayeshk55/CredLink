@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, User, LogOut, Menu, Bell } from "lucide-react"; // ✅ Added Menu icon for hamburger
+import { ChevronDown, User, LogOut, Menu, Bell, HelpCircle } from "lucide-react"; // ✅ Added Menu icon for hamburger
+
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -100,30 +102,24 @@ export function Header() {
         <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16 px-4 relative">
 
-    {/* LEFT AREA — Hamburger goes here only on mobile */}
-    <div className="flex items-center">
-      {!isLgUp && (
-        <motion.button
-          onClick={() => window.dispatchEvent(new Event("toggle-sidebar"))}
-          whileTap={{ scale: 0.9 }}
-          style={{
-            width: "42px",
-            height: "42px",
-            borderRadius: "10px",
-            background: "linear-gradient(to right, #1e40af, #2563eb)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            border: "none",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-            marginLeft: "17px",   // <-- light spacing ONLY on mobile
-          }}
-        >
-          <Menu size={20} />
-        </motion.button>
-      )}
-    </div>
+  {/* LEFT AREA — Hamburger goes here only on mobile */}
+  <div
+    className="flex items-center"
+    style={!isLgUp ? { paddingLeft: "10px" } : undefined}
+  >
+    {!isLgUp && (
+      <Link href="/dashboard">
+        <Image
+          src="/assets/headerlogo.png"
+          alt="Logo"
+          width={120}
+          height={32}
+          className="h-10 w-auto object-contain"
+        />
+      </Link>
+    )}
+  </div>
+
             {/* RIGHT SIDE - Card Name & Profile */}
             <div
               style={{
@@ -195,7 +191,7 @@ export function Header() {
                     <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
                   </motion.button>
                 )}
-                {/* DROPDOWN MENU - use same style on all screen sizes so it works reliably on mobile */}
+                {/* DROPDOWN MENU - shows Notifications, Help & Support, Account, Logout on all screen sizes */}
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
@@ -246,6 +242,33 @@ export function Header() {
                       >
                         <Bell style={{ width: "16px", height: "16px" }} />
                         <span>Notifications</span>
+                      </Link>
+                      <Link
+                        href="/dashboard/support"
+                        onClick={() => setIsDropdownOpen(false)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 16px",
+                          margin: "6px 0",
+                          fontSize: "14px",
+                          color: "#374151",
+                          textDecoration: "none",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#eff6ff";
+                          e.currentTarget.style.color = "#1d4ed8";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#374151";
+                        }}
+                      >
+                        <HelpCircle style={{ width: "16px", height: "16px" }} />
+                        <span>Help & Support</span>
                       </Link>
                       <Link
                         href="/dashboard/settings"
