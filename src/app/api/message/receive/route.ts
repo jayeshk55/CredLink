@@ -1,6 +1,21 @@
 import { NextRequest,NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const CACHE_TTL_MS = 10_000; // 10 seconds
+
+type MessagesCacheEntry = {
+  timestamp: number;
+  payload: {
+    ok: boolean;
+    messages: any[];
+    sentMessages: any[];
+    senders: any[];
+  };
+};
+
+// Per-user in-memory cache to reduce repeated DB hits
+const messagesCache = new Map<string, MessagesCacheEntry>();
+
 export async function GET(req: NextRequest) {
     try {
         // Extract user ID from middleware headers
@@ -10,6 +25,13 @@ export async function GET(req: NextRequest) {
                 ok: false, 
                 error: "Unauthorized - User not authenticated" 
             }, { status: 401 });
+        }
+
+        const cacheKey = userId;
+        const now = Date.now();
+        const cached = messagesCache.get(cacheKey);
+        if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+            return NextResponse.json(cached.payload);
         }
 
         // Fetch messages sent *to* the user (incoming)
@@ -59,12 +81,17 @@ export async function GET(req: NextRequest) {
             allPartnerIds.has(msg.receiverId)
         );
 
-        return NextResponse.json({ 
+        const payload = { 
             ok: true, 
             messages,       // incoming messages (others -> user)
             sentMessages,   // outgoing messages (user -> others)
             senders 
-        });
+        };
+
+        messagesCache.set(cacheKey, { timestamp: now, payload });
+
+        return NextResponse.json(payload);
+
     } catch (error) {
         console.error('Error fetching messages:', error);
         return NextResponse.json({ 

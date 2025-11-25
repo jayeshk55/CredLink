@@ -3,6 +3,17 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const CACHE_TTL_MS = 10_000; // 10 seconds
+
+type ConnectionsCacheEntry = {
+  timestamp: number;
+  payload: {
+    requests: any[];
+  };
+};
+
+// Per-user in-memory cache to reduce repeated DB hits for dashboard lists
+const connectionsCache = new Map<string, ConnectionsCacheEntry>();
 
 // POST - Send connection request
 export async function POST(req: NextRequest) {
@@ -99,6 +110,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "received"; // received, sent, accepted
 
+    const cacheKey = `${userId}:${type}`;
+    const now = Date.now();
+    const cached = connectionsCache.get(cacheKey);
+    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+      return NextResponse.json(cached.payload);
+    }
+
     let requests;
 
     if (type === "received") {
@@ -188,7 +206,10 @@ export async function GET(req: NextRequest) {
       }));
     }
 
-    return NextResponse.json({ requests });
+    const payload = { requests };
+    connectionsCache.set(cacheKey, { timestamp: now, payload });
+
+    return NextResponse.json(payload);
   } catch (error: any) {
     console.error("Error fetching connections:", error);
     return NextResponse.json(

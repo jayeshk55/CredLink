@@ -57,6 +57,9 @@ const Sidebar = () => {
     let intervalId: any;
 
     const fetchUnread = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         if (!token) return;
@@ -166,7 +169,8 @@ const Sidebar = () => {
       window.addEventListener('message-read', handleMessagesUpdated as any);
     }
 
-    intervalId = setInterval(fetchUnread, 15000);
+    // Poll every 60 seconds when tab is visible
+    intervalId = setInterval(fetchUnread, 60000);
 
     return () => {
       clearInterval(intervalId);
@@ -197,6 +201,9 @@ const Sidebar = () => {
     };
 
     const fetchNotifications = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/notifications', { credentials: 'include' });
         if (!res.ok) return;
@@ -211,7 +218,8 @@ const Sidebar = () => {
     };
 
     fetchNotifications();
-    intervalId = setInterval(fetchNotifications, 20000);
+    // Poll every 60 seconds when tab is visible
+    intervalId = setInterval(fetchNotifications, 60000);
 
     const onUpdated = () => {
       fetchNotifications();
@@ -249,6 +257,9 @@ const Sidebar = () => {
     };
 
     const fetchPending = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/users/connections?type=received', {
           credentials: 'include',
@@ -278,8 +289,8 @@ const Sidebar = () => {
     };
 
     fetchPending();
-    // light polling to keep badge in sync
-    intervalId = setInterval(fetchPending, 15000);
+    // light polling to keep badge in sync (every 90 seconds)
+    intervalId = setInterval(fetchPending, 90000);
     // listen for manual refresh signals from pages (optional)
     const onUpdated = () => fetchPending();
     if (typeof window !== 'undefined') {
@@ -324,6 +335,9 @@ const Sidebar = () => {
     };
 
     const fetchContacts = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
       try {
         const res = await fetch('/api/contacts', { credentials: 'include' });
         if (!res.ok) return;
@@ -336,7 +350,8 @@ const Sidebar = () => {
     };
 
     fetchContacts();
-    intervalId = setInterval(fetchContacts, 20000);
+    // Poll every 120 seconds when tab is visible
+    intervalId = setInterval(fetchContacts, 120000);
     const onUpdated = () => fetchContacts();
     if (typeof window !== 'undefined') {
       window.addEventListener('contacts-updated', onUpdated as any);
