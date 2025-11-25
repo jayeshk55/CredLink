@@ -172,7 +172,9 @@
 /* ----------- MOBILE STYLES ----------- */
 .mobileToggle {
   position: fixed;
-  top: 1rem;
+  top: 0.75rem; /* Perfect alignment */
+  left: 1rem;
+  transform: translateY(2px); /* small adjustment to match profile icon */
   z-index: 50;
   background: linear-gradient(to right, #1e40af, #2563eb);
   color: white;
@@ -183,6 +185,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 
 .mobileToggleClosed {
   left: 1rem;
