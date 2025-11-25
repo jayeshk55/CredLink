@@ -55,6 +55,11 @@ export default function ContactsPage() {
         const data = await response.json();
         setContacts(data.contacts || []);
         if (typeof window !== 'undefined') {
+          try {
+            window.localStorage.setItem('dashboard-contacts-last-opened', new Date().toISOString());
+          } catch {
+            // ignore
+          }
           window.dispatchEvent(new Event('contacts-updated'));
         }
       } catch (error: any) {
@@ -93,6 +98,29 @@ export default function ContactsPage() {
 
   const handleSourceClick = (sourceUrl: string) => {
     window.open(sourceUrl, '_blank');
+  };
+
+  const handleDeleteContact = async (id: string) => {
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || 'Failed to delete contact');
+      }
+
+      setContacts(prev => prev.filter(c => c.id !== id));
+      toast.success('Contact deleted successfully');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('contacts-updated'));
+      }
+    } catch (error: any) {
+      console.error('Error deleting contact:', error);
+      toast.error(error?.message || 'Failed to delete contact');
+    }
   };
 
   return (
@@ -237,6 +265,14 @@ export default function ContactsPage() {
                           )}
                         </span>
                       </p>
+
+                      <button
+                        onClick={() => handleDeleteContact(contact.id)}
+                        className={styles.deleteButton}
+                        title="Delete contact"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
