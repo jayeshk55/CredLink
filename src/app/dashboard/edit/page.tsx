@@ -2094,20 +2094,9 @@ const EditPage = () => {
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
             {[
-              { label: 'Prefix', value: prefix, setter: setPrefix },
-              { label: 'First Name', value: firstName, setter: setFirstName },
-              { label: 'Middle Name', value: middleName, setter: setMiddleName },
-              { label: 'Last Name', value: lastName, setter: setLastName },
-              { label: 'Suffix', value: suffix, setter: setSuffix },
-              // { label: 'Accreditations', value: accreditations, setter: setAccreditations },
-              // { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
-              // { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
-              // { label: 'Pronouns', value: pronouns, setter: setPronouns },
-              // { label: 'Affiliation', value: affiliation, setter: setAffiliation },
+              { label: 'Full Name', value: firstName, setter: setFirstName },
               { label: 'Title', value: title, setter: setTitle },
-              // { label: 'Department', value: department, setter: setDepartment },
               { label: 'Company', value: company, setter: setCompany },
-              // { label: 'Headline', value: headline, setter: setHeadline },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
@@ -2123,14 +2112,13 @@ const EditPage = () => {
                     border: '1px solid #ddd',
                     borderRadius: '8px',
                     boxSizing: 'border-box',
-                    backgroundColor: field.label === 'First Name' ? '#f8f8f8' : 'white',
+                    backgroundColor: field.label === 'Full Name' ? '#f8f8f8' : 'white',
                     color: '#555',
                     outline: 'none'
                   }}
                 />
               </div>
             ))}
-
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea
