@@ -130,6 +130,7 @@ model Card {
   status         String?          @default("draft") @db.VarChar(20)
   suffix         String?          @db.VarChar(20)
   views          Int              @default(0)
+  shares         Int              @default(0)
   selectedColor2 String?          @default("#00c0fd") @map("selected_color2") @db.VarChar(20)
   experience     String?          @db.Text
   portfolio      String?          @db.Text
