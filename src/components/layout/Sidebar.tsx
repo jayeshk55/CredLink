@@ -32,9 +32,17 @@ const Sidebar = () => {
   const [contactsCount, setContactsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
 
-  useEffect(() => {
+    useEffect(() => {
     // Set mounted flag to ensure client-side only updates
     setIsMounted(true);
+  }, []);
+
+  // 👇 ADD THIS — Sidebar listens for header hamburger toggle
+  useEffect(() => {
+    const toggle = () => setIsOpen(prev => !prev);
+    window.addEventListener("toggle-sidebar", toggle);
+
+    return () => window.removeEventListener("toggle-sidebar", toggle);
   }, []);
 
   useEffect(() => {
@@ -266,7 +274,7 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile Menu Button (only when sidebar is closed) */}
+      {/* Mobile Menu Button (only when sidebar is closed) 
       {isMounted && !isOpen && (
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
@@ -277,7 +285,7 @@ const Sidebar = () => {
           <Menu size={22} />
         </motion.button>
       )}
-
+*/}
       {/* Overlay (for mobile) */}
       <AnimatePresence>
         {isOpen && (
