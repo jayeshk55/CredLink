@@ -338,6 +338,16 @@ const PublicCardPage = () => {
     if (cardId) fetchCard();
   }, [cardId]);
 
+  // Increment view count when the public page is viewed
+  useEffect(() => {
+    if (!cardId) return;
+
+    // Fire-and-forget; backend will ignore owner views
+    fetch(`/api/card/${cardId}/view`, { method: "POST" }).catch((err) => {
+      console.error("Error incrementing view count:", err);
+    });
+  }, [cardId]);
+
   const handleFormSubmit = async (formData: ConnectionFormData) => {
     setIsSubmitting(true);
     try {

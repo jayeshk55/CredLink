@@ -463,33 +463,6 @@ const Sidebar = () => {
           })}
         </nav>
 
-        {/* Footer Links */}
-        <div className="navFooter">
-          {bottomItems.map((item) => {
-            const isActive = pathname === item.path;
-            return (
-              <Link
-                href={item.path}
-                key={item.name}
-                className={`footerLink ${isActive ? "activeNav" : ""}`}
-                onClick={() => {
-                  setIsOpen(false);
-                }}
-              >
-                <span className="navIcon">{item.icon}</span>
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-          <button 
-            className="footerLogout" 
-            onClick={handleLogout}
-            suppressHydrationWarning
-          >
-            <X />
-            Logout
-          </button>
-        </div>
       </motion.aside>
 
       {/* Mobile Bottom Navigation */}
