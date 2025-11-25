@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -31,6 +31,7 @@ const Sidebar = () => {
   const [pendingConnections, setPendingConnections] = useState(0);
   const [contactsCount, setContactsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
+  const notificationsPrevCountRef = useRef<number>(-1);
 
     useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -162,7 +163,30 @@ const Sidebar = () => {
         if (!res.ok) return;
         const data = await res.json();
         const list = Array.isArray(data?.notifications) ? data.notifications : [];
-        setNotificationsCount(computeCount(list));
+        const unreadTotal = computeCount(list);
+        setNotificationsCount(unreadTotal);
+
+        // Show toast on first load or when unread count increases, if user isn't
+        // already on a page where they'd naturally see the notifications.
+        const prev = notificationsPrevCountRef.current;
+        const isFirst = prev === -1;
+        const currentPath =
+          typeof window !== 'undefined' ? window.location.pathname : pathname;
+        const isNotificationsPage = currentPath === '/dashboard/notifications';
+        const isMessagesPage = currentPath === '/dashboard/messages';
+        const isConnectionsPage = currentPath === '/dashboard/connections';
+
+        if (!isNotificationsPage && !isMessagesPage && !isConnectionsPage) {
+          if ((isFirst && unreadTotal > 0) || (!isFirst && unreadTotal > prev)) {
+            toast(
+              unreadTotal === 1
+                ? 'You have 1 new notification'
+                : `You have ${unreadTotal} new notifications`
+            );
+          }
+        }
+
+        notificationsPrevCountRef.current = unreadTotal;
       } catch (_) {
         // ignore
       }

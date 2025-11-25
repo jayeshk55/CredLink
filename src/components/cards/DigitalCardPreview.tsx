@@ -43,10 +43,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   title = "",
   company = "",
   location = "",
-  about = "Crafting engaging content & SEO strategies",
-  skills = "SEO, Content Creation, Analytics, Social Media",
-  portfolio = "[Link] Latest Campaigns",
-  experience = "Lead SEO Specialist (2021-Present)",
+  about = "",
+  skills = "",
+  portfolio = "",
+  experience = "",
   services = "",
   review = "",
   photo = "",
@@ -81,9 +81,22 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   const openPortfolio = () => {
     const val = (portfolio || '').trim();
-    if (!val) { setActivePanel('Portfolio'); return; }
-    const hasProto = /^https?:\/\//i.test(val);
-    const url = hasProto ? val : `https://${val}`;
+    if (!val) {
+      setActivePanel('Portfolio');
+      return;
+    }
+
+    const items = val.split(',').map((s) => s.trim()).filter(Boolean);
+
+    // If there are multiple portfolio entries, show the panel so each is clickable
+    if (items.length !== 1) {
+      setActivePanel('Portfolio');
+      return;
+    }
+
+    const target = items[0];
+    const hasProto = /^https?:\/\//i.test(target);
+    const url = hasProto ? target : `https://${target}`;
     if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
   };
 
@@ -283,23 +296,46 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-            ...(documentUrl ? [{ text: "Docs" }] : []),
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+            .filter((b) => b.value && b.value.trim() !== "")
+            .map((b) => (
+              <button
+                key={b.text}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (b.text === 'Portfolio') {
+                    openPortfolio();
+                  } else {
+                    setActivePanel(b.text as Section);
+                  }
+                }}
+                style={{
+                  padding: "8px 14px",
+                  background: "rgba(255, 255, 255, 0.2)",
+                  color: "#FFFFFF",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "12px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+                }}
+              >
+                {b.text}
+              </button>
+            ))}
+
+          {documentUrl && (
             <button
-              key={b.text}
               onClick={(e) => {
                 e.stopPropagation();
-                if (b.text === 'Portfolio') {
-                  openPortfolio();
-                } else if (b.text === 'Docs' && documentUrl) {
+                if (documentUrl) {
                   onDocumentClick?.(documentUrl);
-                } else {
-                  setActivePanel(b.text as Section);
                 }
               }}
               style={{
@@ -314,9 +350,9 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
               }}
             >
-              {b.text}
+              Docs
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -386,22 +422,46 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 return (
                   panels[activePanel]
                     ?.split(",")
-                    .map((item, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          background: "#f9fafb",
-                          padding: "10px 12px",
-                          marginBottom: "10px",
-                          borderRadius: "8px",
-                          fontSize: "14px",
-                          color: "#111827",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                        }}
-                      >
-                        {item.trim()}
-                      </div>
-                    ))
+                    .map((item, i) => {
+                      const trimmed = item.trim();
+                      if (!trimmed) return null;
+                      const isUrl = /^https?:\/\//i.test(trimmed) || /^[\w.-]+\.[a-z]{2,}/i.test(trimmed);
+                      const href = isUrl
+                        ? (/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`)
+                        : undefined;
+
+                      return (
+                        <div
+                          key={i}
+                          style={{
+                            background: "#f9fafb",
+                            padding: "10px 12px",
+                            marginBottom: "10px",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            color: "#111827",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                          }}
+                        >
+                          {isUrl && href ? (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: "#111827",
+                                textDecoration: "none",
+                                wordBreak: "break-all",
+                              }}
+                            >
+                              {trimmed}
+                            </a>
+                          ) : (
+                            trimmed
+                          )}
+                        </div>
+                      );
+                    })
                 );
               })()}
             </div>

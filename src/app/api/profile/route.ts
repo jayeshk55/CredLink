@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fullName, phone } = body
+    const { fullName, phone, location } = body
 
     // Update user profile
     const updatedUser = await prisma.user.update({
@@ -82,12 +82,14 @@ export async function PUT(request: NextRequest) {
       data: {
         ...(fullName && { fullName }),
         ...(phone && { phone }),
+        ...(location && { location }),
       },
       select: {
         id: true,
         email: true,
         fullName: true,
         phone: true,
+        location: true,
         profileImage: true,
         createdAt: true,
         updatedAt: true

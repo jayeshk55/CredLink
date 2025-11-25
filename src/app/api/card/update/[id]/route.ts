@@ -390,6 +390,23 @@ updateData.lastName = lastName ?? "";
       updateData.coverImage = signedUrl;
     }
 
+    // Best-effort: sync basic contact info from card into user profile
+    try {
+      const profileUpdateData: any = {};
+      if (updateData.phone !== undefined) profileUpdateData.phone = updateData.phone;
+      if (updateData.location !== undefined) profileUpdateData.location = updateData.location;
+      if (updateData.fullName !== undefined) profileUpdateData.fullName = updateData.fullName;
+
+      if (Object.keys(profileUpdateData).length > 0) {
+        await prisma.user.update({
+          where: { id: decoded.userId },
+          data: profileUpdateData,
+        });
+      }
+    } catch (err) {
+      console.error('Failed to sync user profile from card data on update:', err);
+    }
+
     // Update card
     const updatedCard = await prisma.card.update({
       where: { id: cardId },
