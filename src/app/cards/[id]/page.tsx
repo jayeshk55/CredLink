@@ -245,11 +245,31 @@ const handleDelete = async () => {
     cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/public/${cardId}`,
   };
 
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
+ const copyToClipboard = async (text: string) => {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Mobile fallback
+      const input = document.createElement("input");
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      document.body.removeChild(input);
+    }
+
     setCopied(true);
+    toast.success("Link copied!");
     setTimeout(() => setCopied(false), 1500);
-  };
+
+  } catch (err) {
+    console.error("Copy failed:", err);
+    toast.error("Unable to copy. Try manually.");
+  }
+};
+
 
   const downloadQR = () => {
     // Generate QR code for download regardless of current tab
@@ -328,113 +348,30 @@ const handleDelete = async () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   };
 
-  const shareProfile = async () => {
-    const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nThis profile contains my contact information, social links, and business card.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
-    
-   // console.log('Navigator share available:', !!navigator.share);
-   // console.log('Current share method:', shareMethod);
-   // console.log('Is mobile device:', isMobile());
-    
-    const mobile = isMobile();
-    
-    // DIRECT LINK TAB - Always send message + link only (no QR)
-    if (shareMethod === "link") {
-      if (navigator.share && mobile) {
-        // Mobile: Use native share
-        await navigator.share({
-          title: "MyKard Profile",
-          text: shareMessage,
-          url: mockUserData.cardUrl,
-        });
-      } else {
-        // Desktop: Open WhatsApp Web
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
-        window.open(whatsappUrl, '_blank');
-      }
-      return;
+ const shareProfile = async () => {
+  const shareMessage = `Here is my MyKard digital profile. You can view my details and connect with me here.\n\nClick the link below to view the card:\n${mockUserData.cardUrl}`;
+
+  const mobile = isMobile();
+
+  // PROFESSIONAL — only message + link, same everywhere
+  if (navigator.share && mobile) {
+    try {
+      await navigator.share({
+        title: "MyKard Profile",
+        text: shareMessage,
+        url: mockUserData.cardUrl
+      });
+    } catch (err) {
+      console.error("Share failed:", err);
+      toast.error("Share unavailable on this device.");
     }
-    
-    // QR TAB - Different behavior for mobile vs desktop
-    if (shareMethod === "qr") {
-      if (navigator.share && mobile) {
-        // Mobile: 2-step share (QR first, then message + link)
-        try {
-          const qrWrapper = document.querySelector(`.${styles.qrWrapper}`);
-          const svg = qrWrapper?.querySelector("svg");
-          if (svg) {
-            const svgData = new XMLSerializer().serializeToString(svg);
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
-            
-            await new Promise((resolve) => {
-              img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx?.drawImage(img, 0, 0);
-                
-                canvas.toBlob(async (blob) => {
-                  if (blob) {
-                    const file = new File([blob], `MyKard_QR_${cardId}.png`, { type: 'image/png' });
-                    
-                    // Step 1: Share QR image only
-                    try {
-                      await navigator.share({
-                        files: [file]
-                      });
-                      
-                      // Step 2: After 300ms, share message + link
-                      setTimeout(async () => {
-                        try {
-                          await navigator.share({
-                            title: "MyKard Profile",
-                            text: shareMessage,
-                            url: mockUserData.cardUrl,
-                          });
-                        } catch (error) {
-                          console.log('Could not share message after QR:', error);
-                        }
-                      }, 300);
-                      
-                    } catch (error) {
-                      console.log('Could not share QR image, fallback to message only:', error);
-                      // Fallback: Share message + link only
-                      await navigator.share({
-                        title: "MyKard Profile",
-                        text: shareMessage,
-                        url: mockUserData.cardUrl,
-                      });
-                    }
-                  }
-                  resolve(null);
-                }, "image/png");
-              };
-              img.src = "data:image/svg+xml;base64," + btoa(svgData);
-            });
-          } else {
-            // No QR found, fallback to message + link only
-            await navigator.share({
-              title: "MyKard Profile",
-              text: shareMessage,
-              url: mockUserData.cardUrl,
-            });
-          }
-        } catch (error) {
-          console.log('QR share failed, fallback to message only:', error);
-          // Fallback: Share message + link only
-          await navigator.share({
-            title: "MyKard Profile",
-            text: shareMessage,
-            url: mockUserData.cardUrl,
-          });
-        }
-      } else {
-        // Desktop: WhatsApp Web cannot send images, send message + link only
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
-        window.open(whatsappUrl, '_blank');
-      }
-    }
-  };
+  } else {
+    // Desktop or no share API → open WhatsApp
+    const encoded = encodeURIComponent(shareMessage);
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, "_blank");
+  }
+};
+
 
   const lineData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
