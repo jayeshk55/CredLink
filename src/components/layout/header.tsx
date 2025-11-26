@@ -18,6 +18,19 @@ export function Header() {
   const [isLgUp, setIsLgUp] = useState(false); // ✅ detect screen size
   const [activeCardName, setActiveCardName] = useState<string>("");
 
+  const getInitials = (value?: string | null) => {
+    if (!value) return "U";
+    const base = value.includes("@") ? value.split("@")[0] : value;
+    const letters = base
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+    return letters || "U";
+  };
+
   // ✅ Detect large screen
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -100,7 +113,7 @@ export function Header() {
       {/* HEADER WRAPPER */}
       <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center h-16 px-4 relative">
+        <div className="flex justify-between items-center h-14 px-4 relative">
 
   {/* LEFT AREA — Hamburger goes here only on mobile */}
   <div
@@ -163,7 +176,15 @@ export function Header() {
                         }}
                       />
                     ) : (
-                      <User style={{ width: "16px", height: "16px", color: "white" }} />
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          color: "#ffffff",
+                        }}
+                      >
+                        {getInitials(user?.fullName || user?.email || "")}
+                      </span>
                     )}
                   </motion.button>
                 ) : (
@@ -175,8 +196,9 @@ export function Header() {
                       width: "44px",
                       height: "44px",
                       borderRadius: "9999px",
-                      background:
-                        "radial-gradient(120% 120% at 30% 20%, #60a5fa 0%, #2563eb 40%, #1e40af 100%)",
+                      background: user?.profileImage
+                        ? "transparent"
+                        : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                       border: "1px solid rgba(147, 197, 253, 0.5)",
                       boxShadow:
                         "0 6px 18px rgba(37, 99, 235, 0.35), inset 0 0 12px rgba(147, 197, 253, 0.35)",
@@ -188,7 +210,28 @@ export function Header() {
                     }}
                     aria-label="Open profile menu"
                   >
-                    <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
+                    {user?.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="Profile"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "9999px",
+                        }}
+                      />
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: "16px",
+                          fontWeight: 600,
+                          color: "#ffffff",
+                        }}
+                      >
+                        {getInitials(user?.fullName || user?.email || "")}
+                      </span>
+                    )}
                   </motion.button>
                 )}
                 {/* DROPDOWN MENU - shows Notifications, Help & Support, Account, Logout on all screen sizes */}

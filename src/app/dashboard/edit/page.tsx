@@ -2898,7 +2898,8 @@ const EditPage = () => {
       backgroundColor: '#f0f2f5', 
       padding: '10px', 
       boxSizing: 'border-box',
-      gap: '15px'
+      gap: '15px',
+      paddingBottom: '110px'
     }}>
       <style>{`
         @media (min-width: 768px) {

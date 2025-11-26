@@ -11,6 +11,9 @@ interface MessageItem {
   id: string;
   name: string;
   email: string;
+  title?: string;
+  company?: string;
+  profileImage?: string;
   message: string;
   date: string;
   status: MessageStatus;
@@ -214,7 +217,7 @@ export default function MessagesPage() {
         const inboxMessages = data.messages || [];
         const sentMessages = data.sentMessages || [];
 
-        const sendersMap: Record<string, { id: string; fullName?: string; email?: string }> = {};
+        const sendersMap: Record<string, { id: string; fullName?: string; email?: string; title?: string; company?: string; profileImage?: string }> = {};
         (data.senders || []).forEach((s: any) => {
           sendersMap[s.id] = s;
         });
@@ -291,6 +294,9 @@ export default function MessagesPage() {
               id: latest.id,
               name: sender.fullName || 'Unknown User',
               email: sender.email || '',
+              title: sender.title,
+              company: sender.company,
+              profileImage: sender.profileImage,
               message: latest.text,
               date: latest.date,
               status: conversationStatus,
@@ -463,7 +469,7 @@ export default function MessagesPage() {
     textLight: "#94A3B8",
     primary: "#4F46E5",
     primaryLight: "#EEF2FF",
-    primaryGradient: "linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)",
+    primaryGradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
     border: "#E2E8F0",
     danger: "#EF4444",
     successBg: "#ECFDF5",
@@ -579,12 +585,14 @@ export default function MessagesPage() {
       gap: "16px",
       position: "relative" as const,
     }),
-    avatar: (name: string) => ({
+    avatar: (name: string, profileImage?: string) => ({
       width: "48px",
       height: "48px",
       borderRadius: "14px",
-      background: colors.primaryGradient,
-      color: "#FFF",
+      background: profileImage ? `url(${profileImage})` : colors.primaryGradient,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      color: profileImage ? "#FFF" : "#FFF",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -592,6 +600,7 @@ export default function MessagesPage() {
       fontWeight: 700,
       flexShrink: 0,
       boxShadow: "0 4px 12px rgba(99, 102, 241, 0.25)",
+      overflow: "hidden",
     }),
     unreadDot: {
       display: "none",
@@ -791,8 +800,16 @@ export default function MessagesPage() {
                   style={styles.messageRow(m.id, m.read)}
                 >
                   {/* Avatar */}
-                  <div style={styles.avatar(m.name)}>
-                    {getInitials(m.name)}
+                  <div style={styles.avatar(m.name, m.profileImage)}>
+                    {m.profileImage ? (
+                      <img
+                        src={m.profileImage}
+                        alt={m.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      getInitials(m.name)
+                    )}
                   </div>
 
                   {/* Content */}
@@ -829,6 +846,22 @@ export default function MessagesPage() {
                         )}
                       </div>
                     </div>
+
+                    {(m.title || m.company) && (
+                      <p
+                        style={{
+                          margin: 0,
+                          marginBottom: 2,
+                          fontSize: "12px",
+                          color: colors.textSec,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {[m.title, m.company].filter(Boolean).join(" • ")}
+                      </p>
+                    )}
 
                     <p
                       className="message-text-left"
@@ -895,11 +928,32 @@ export default function MessagesPage() {
                     <ChevronLeft style={{ color: colors.textSec }} />
                   </button>
                 )}
-                <div style={{ ...styles.avatar(activeMessage.name), width: "40px", height: "40px", fontSize: "12px", background: "#1E293B" }}>
-                  {getInitials(activeMessage.name)}
+                <div
+                  style={{
+                    ...styles.avatar(activeMessage.name),
+                    width: "40px",
+                    height: "40px",
+                    fontSize: "12px",
+                    background: "#1E293B",
+                  }}
+                >
+                  {activeMessage.profileImage ? (
+                    <img
+                      src={activeMessage.profileImage}
+                      alt={activeMessage.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    getInitials(activeMessage.name)
+                  )}
                 </div>
                 <div>
                   <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: colors.textMain }}>{activeMessage.name}</h2>
+                  {(activeMessage.title || activeMessage.company) && (
+                    <p style={{ fontSize: "12px", margin: 0, color: colors.textSec }}>
+                      {[activeMessage.title, activeMessage.company].filter(Boolean).join(" • ")}
+                    </p>
+                  )}
                   <p style={{ fontSize: "12px", margin: 0, color: colors.textSec }}>{activeMessage.email}</p>
                 </div>
               </div>

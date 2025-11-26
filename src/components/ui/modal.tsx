@@ -30,8 +30,13 @@ export function Modal({
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.box} role="dialog" aria-modal="true">
+    <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.box}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.header}>
           {title ? <h3 className={styles.title}>{title}</h3> : null}
           <button aria-label="Close" onClick={onClose} className={styles.closeBtn}>✕</button>

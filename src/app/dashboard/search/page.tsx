@@ -13,6 +13,9 @@ type Profile = {
   company?: string;
   designation?: string;
   category?: string;
+  profileImage?: string;
+  email?: string;
+  phone?: string;
   verified?: boolean;
   reviews?: number;
   views?: number;
@@ -26,12 +29,21 @@ export default function SearchPage() {
   );
 }
 
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U";
+
 function SearchPageContent() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const dummyProfiles: Profile[] = [
-    { id: "1", username: "arnav_wasnik", name: "Arnav Wasnik", designation: "Frontend Developer", company: "BoostNow Solutions", city: "Nagpur", category: "Technology", verified: true, views: 245 },
-    { id: "2", username: "sarthak_patil", name: "Sarthak Patil", designation: "Backend Engineer", company: "CredLink", city: "Pune", category: "Engineering", verified: true, views: 189 },
-    { id: "3", username: "rohan_sharma", name: "Rohan Sharma", designation: "UI/UX Designer", company: "FigmaWorks", city: "Mumbai", category: "Design", verified: true, views: 312 }
+    { id: "1", username: "arnav_wasnik", name: "Arnav Wasnik", designation: "Frontend Developer", company: "BoostNow Solutions", city: "Nagpur", category: "Technology", verified: true, views: 245, email: "arnav@example.com", phone: "+91 1234567890" },
+    { id: "2", username: "sarthak_patil", name: "Sarthak Patil", designation: "Backend Engineer", company: "CredLink", city: "Pune", category: "Engineering", verified: true, views: 189, email: "sarthak@example.com", phone: "+91 9876543210" },
+    { id: "3", username: "rohan_sharma", name: "Rohan Sharma", designation: "UI/UX Designer", company: "FigmaWorks", city: "Mumbai", category: "Design", verified: true, views: 312, email: "rohan@example.com", phone: "+91 5555555555" }
   ];
 
   const [loading, setLoading] = useState(true);
@@ -65,10 +77,14 @@ function SearchPageContent() {
           company: user.company || undefined,
           designation: user.title || undefined,
           category: user.department || undefined,
+          profileImage: user.profileImage || undefined,
+          email: user.email || undefined,
+          phone: user.phone || undefined,
           verified: user.status === "active",
           reviews: 0,
           views: user.views || 0,
         }));
+
         if (mappedProfiles.length === 0) setProfiles(dummyProfiles);
         else setProfiles(mappedProfiles);
       } catch (error) {
@@ -155,9 +171,7 @@ function SearchPageContent() {
   }, [query, profiles]);
 
   return (
-    // Allow dropdown to extend outside; top-level container uses visible overflow
     <div style={{ position: "relative", overflow: "visible", minHeight: "100vh", background: "linear-gradient(180deg,#f6fafb,#eef5f7)" }}>
-      {/* background glows */}
       <div aria-hidden style={{
         position: "absolute",
         inset: 0,
@@ -186,9 +200,8 @@ function SearchPageContent() {
         /* cards grid */
         .grid { margin-top:16px; display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
         .card { border-radius:12px; padding:12px; background:#fff; border:1px solid rgba(0,0,0,0.04); box-shadow:0 8px 28px rgba(2,6,23,0.06); display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:92px; }
-        .avatar { width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:22px; color:#fff; background: var(--gradient-primary); box-shadow: 0 6px 18px rgba(99,102,241,0.08); }
+        .avatar { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:22px; color:#fff; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 6px 18px rgba(99,102,241,0.08); overflow:hidden; }
         .name { font-weight:700; font-size:16px; color:#0F172A; margin:0; }
-        .designation { font-size:13px; color:#475569; margin:0; }
         .city { font-size:12px; color:#94A3B8; margin-top:6px; }
 
         .connect { padding:10px 14px; border-radius:12px; font-weight:600; font-size:13px; border:none; cursor:pointer; background: var(--gradient-primary); color:#071A52; box-shadow:0 8px 26px rgba(99,102,241,0.08); }
@@ -220,30 +233,24 @@ function SearchPageContent() {
             <div className="subtitle">Discover and connect with top professionals — quick, safe, and effortless.</div>
           </div>
 
-          {/* <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <div style={{ padding: "10px 12px", borderRadius: 12, background: "linear-gradient(90deg, rgba(2,6,23,0.06), rgba(9,14,34,0.06))", border: "1px solid rgba(0,0,0,0.02)" }}>
-              <div style={{ fontSize: 12, color: "#94A3B8" }}>Results</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>{filtered.length ?? 0}</div>
-            </div>
-          </div> */}
-        </div>
-
-        <div className="search-panel">
-          <div className="row">
-            <div className="left">
-              <div className="icon"><Search style={{ width: 16, height: 16, color: "#94A3B8" }} /></div>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by name, skills, company, or city..."
-                aria-label="Search"
-              />
+          <div className="search-panel">
+            <div className="row">
+              <div className="left">
+                <div className="icon"><Search style={{ width: 16, height: 16, color: "#94A3B8" }} /></div>
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by name, skills, company, or city..."
+                  aria-label="Search"
+                />
+              </div>
             </div>
 
-          </div>
-
-          <div className="meta">
-            {hasQuery ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}` : "Search to see results"}
+            <div className="meta">
+              {hasQuery
+                ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}`
+                : "Search to see results"}
+            </div>
           </div>
         </div>
 
@@ -256,10 +263,20 @@ function SearchPageContent() {
             filtered.map((p, i) => (
               <div key={`${p.username}-${i}`} className="card" role="article" aria-label={p.name}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                  <div className="avatar">{p.name.charAt(0) || "U"}</div>
+                  <div className="avatar">
+                    {p.profileImage ? (
+                      <img
+                        src={p.profileImage}
+                        alt={p.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                      />
+                    ) : (
+                      getInitials(p.name || "User")
+                    )}
+                  </div>
+
                   <div style={{ minWidth: 0 }}>
                     <div className="name">{p.name}</div>
-                    {p.designation && <div className="designation">{p.designation} • {p.company ?? ""}</div>}
                     <div className="city">📍 {p.city}</div>
                   </div>
                 </div>
@@ -273,11 +290,17 @@ function SearchPageContent() {
                       acceptedConnections.has(p.id)
                         ? { background: "#04c74cff", color: "#fff", cursor: "not-allowed", boxShadow: "none" }
                         : sentRequests.has(p.id)
-                        ? { background: "#0f48e4ff)", color: "#fff", cursor: "not-allowed", boxShadow: "none" }
+                        ? { background: "#0f48e4ff", color: "#fff", cursor: "not-allowed", boxShadow: "none" }
                         : { color: "#fff" }
                     }
                   >
-                    {acceptedConnections.has(p.id) ? "Connected" : (connectingUserId === p.id ? "Connecting..." : (sentRequests.has(p.id) ? "Sent" : "Connect"))}
+                    {acceptedConnections.has(p.id)
+                      ? "Connected"
+                      : connectingUserId === p.id
+                      ? "Connecting..."
+                      : sentRequests.has(p.id)
+                      ? "Sent"
+                      : "Connect"}
                   </button>
                 </div>
               </div>

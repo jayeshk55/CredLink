@@ -95,7 +95,7 @@ export default function Header() {
         }}
       >
       <nav className="max-w-7xl mx-auto px-8 pt-6 pb-2" style={{ paddingLeft: '2rem', paddingRight: '2rem',paddingTop: '0.5rem' }}>
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo - Left Side */}
           <Link href="/" className="flex items-center group">
             <Image
@@ -103,7 +103,7 @@ export default function Header() {
               alt="Logo"
               width={144}
               height={144}
-              className="w-48 h-12 object-cover transition-all duration-300 group-hover:scale-105"
+              className="w-40 h-10 object-cover transition-all duration-300 group-hover:scale-105"
               onError={(e) => {
                 console.log('Image failed to load:', e);
                 e.currentTarget.style.display = 'none';

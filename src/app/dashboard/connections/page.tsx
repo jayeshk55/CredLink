@@ -24,10 +24,11 @@ interface Contact {
   name: string;
   title: string;
   company: string;
+  avatar?: string;
+
   tags: string[];
   associatedCard: string;
   dateAdded: string;
-  avatar?: string;
   email?: string;
   phone?: string;
   location?: string;
@@ -197,6 +198,8 @@ export default function DashboardContactPage() {
           name: connection.user?.fullName || 'Unknown User',
           title: connection.user?.title || 'No Title',
           company: connection.user?.company || 'No Company',
+          avatar: connection.user?.profileImage || undefined,
+
           tags: ['Professional'],
           associatedCard: 'Professional',
           dateAdded: new Date(connection.updatedAt).toISOString().split('T')[0],
@@ -243,6 +246,8 @@ export default function DashboardContactPage() {
           name: request.sender?.fullName || 'Unknown User',
           title: request.sender?.title || 'No Title',
           company: request.sender?.company || 'No Company',
+          avatar: request.sender?.profileImage || undefined,
+
           tags: ['Professional'],
           associatedCard: 'Professional',
           dateAdded: new Date(request.createdAt).toISOString().split('T')[0],
@@ -345,7 +350,15 @@ export default function DashboardContactPage() {
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return (
+      name
+        .split(' ')
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2) || 'U'
+    );
   };
 
   // Helper to map tags to specific module classes for color (defined in CSS module)
@@ -489,6 +502,7 @@ export default function DashboardContactPage() {
                 skills=""
                 portfolio=""
                 experience=""
+                photo={previewContact.avatar}
               />
             </div>
           </Modal>
@@ -916,18 +930,45 @@ export default function DashboardContactPage() {
                           <td className={styles.tableDataCell}>
                             <div className={styles.flexCenterGap}>
                               <div className={styles.avatarPlaceholder}>
-                                <span className={styles.avatarText}>
-                                  {sortedContacts.indexOf(contact) + 1}
-                                </span>
+                                {contact.avatar ? (
+                                  <img
+                                    src={contact.avatar}
+                                    alt={contact.name}
+                                    className={styles.avatarImage}
+                                  />
+                                ) : (
+                                  <span className={styles.avatarText}>
+                                    {getInitials(contact.name)}
+                                  </span>
+                                )}
                               </div>
-                              <button
-                                onClick={() => setPreviewContact(contact)}
-                                className={styles.contactNameButton}
-                              >
-                                {contact.name}
-                              </button>
+                              <div>
+                                <button
+                                  onClick={() => setPreviewContact(contact)}
+                                  className={styles.contactNameButton}
+                                >
+                                  {contact.name}
+                                </button>
+                                {(contact.location || contact.phone || contact.email) && (
+                                  <div
+                                    style={{
+                                      marginTop: 4,
+                                      fontSize: 12,
+                                      color: "#6b7280",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                    }}
+                                  >
+                                    {[contact.location, contact.phone, contact.email]
+                                      .filter(Boolean)
+                                      .join(" • ")}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </td>
+
                           <td className={styles.tableDataCell}>
                             <span className={styles.tableCellText}>{contact.title}</span>
                           </td>
@@ -984,9 +1025,46 @@ export default function DashboardContactPage() {
                         <div className={styles.mobileCardInner} style={{ marginLeft: 0 }}>
                           <div className={styles.mobileCardContent}>
                             <div className={styles.mobileCardHeader}>
-                              <div>
-                                <h3 className={styles.mobileCardTitle} onClick={() => setPreviewContact(contact)} style={{ cursor: 'pointer' }}>{contact.name}</h3>
-                                <p className={styles.mobileCardSubtitle}>{contact.title}</p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div className={styles.mobileAvatarPlaceholder}>
+                                  {contact.avatar ? (
+                                    <img
+                                      src={contact.avatar}
+                                      alt={contact.name}
+                                      className={styles.avatarImage}
+                                    />
+                                  ) : (
+                                    <span className={styles.mobileAvatarText}>
+                                      {getInitials(contact.name)}
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <h3
+                                    className={styles.mobileCardTitle}
+                                    onClick={() => setPreviewContact(contact)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {contact.name}
+                                  </h3>
+                                  {contact.title && (
+                                    <p className={styles.mobileCardSubtitle}>{contact.title}</p>
+                                  )}
+                                  {(contact.company || contact.location) && (
+                                    <p className={styles.mobileCardSubtitle}>
+                                      {[contact.company, contact.location]
+                                        .filter(Boolean)
+                                        .join(' • ')}
+                                    </p>
+                                  )}
+                                  {(contact.phone || contact.email) && (
+                                    <p className={styles.mobileCardSubtitle}>
+                                      {[contact.phone, contact.email]
+                                        .filter(Boolean)
+                                        .join(' • ')}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                               <div className={styles.mobileCardActions}>
                                 <button

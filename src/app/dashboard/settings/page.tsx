@@ -14,7 +14,6 @@ import "./account-settings.css";
  * - All styles moved to account-settings.css
  * - Duplicate Account Photo section removed
  */
-
 /* ---------- helpers ---------- */
 function useWindowWidth(breakpoint = 760) {
   const [width, setWidth] = useState<number>(1200);
@@ -30,7 +29,7 @@ function useWindowWidth(breakpoint = 760) {
   }, []);
   
   return { width, isMobile: isMounted ? width <= breakpoint : false };
-}
+} // Added closing brace here
 
 /* ---------- main component ---------- */
 export default function AccountSettingsPage(): React.JSX.Element {
@@ -41,36 +40,38 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [userLocation, setUserLocation] = useState<string>("");
-  
-  // Fetch user data on component mount
+  const [company, setCompany] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+
+  // Fetch basic user data on mount (name/email)
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/auth/me', {
+        const response = await fetch('/api/user/me', {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
-        
+
         const userData = await response.json();
         setName(userData.name || userData.email.split('@')[0]);
         setEmail(userData.email || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
-        // Fallback to empty strings if there's an error
         setName('');
         setEmail('');
       }
     };
-    
+
     fetchUserData();
   }, []);
 
+  // password / phone / flags
   const [password, setPassword] = useState<string>("**********");
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
@@ -97,18 +98,15 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [deactivateErrorMessage, setDeactivateErrorMessage] = useState<string>('');
   const [showDeactivateErrorModal, setShowDeactivateErrorModal] = useState<boolean>(false);
 
-
   // photo change: preview + upload
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // immediate preview
     const reader = new FileReader();
     reader.onload = () => setAccountPhoto(reader.result as string);
     reader.readAsDataURL(file);
 
-    // upload to backend (Cloudinary handler)
     try {
       const fd = new FormData();
       fd.append("image", file);
@@ -159,6 +157,8 @@ export default function AccountSettingsPage(): React.JSX.Element {
         setEmail(user.email ?? "");
         setPhoneNumber(user.phone ?? "");
         setUserLocation(user.location ?? "");
+        setCompany(user.company ?? "");
+        setTitle(user.title ?? "");
         setAccountPhoto(user.profileImage ?? null);
         setHasPassword(user.hasPassword ?? true);
       } catch (err) {
@@ -276,6 +276,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
         credentials: 'include',
         body: JSON.stringify({ fullName: newName }),
       });
+
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         console.error('Name update failed:', error);
@@ -285,6 +286,75 @@ export default function AccountSettingsPage(): React.JSX.Element {
       return true;
     } catch (err) {
       console.error('Name update error:', err);
+      return false;
+    }
+  };
+
+  const updateCompanyInDatabase = async (newCompany: string) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ company: newCompany }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('Company update failed:', error);
+        return false;
+      }
+      setTimeout(() => { checkAuth(); }, 200);
+      return true;
+    } catch (err) {
+      console.error('Company update error:', err);
+      return false;
+    }
+  };
+
+  const updateTitleInDatabase = async (newTitle: string) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ title: newTitle }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('Title update failed:', error);
+        return false;
+      }
+      setTimeout(() => { checkAuth(); }, 200);
+      return true;
+    } catch (err) {
+      console.error('Title update error:', err);
+      return false;
+    }
+  };
+
+  const updateLocationInDatabase = async (newLocation: string) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ location: newLocation }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('Location update failed:', error);
+        return false;
+      }
+      setTimeout(() => { checkAuth(); }, 200);
+      return true;
+    } catch (err) {
+      console.error('Location update error:', err);
       return false;
     }
   };
@@ -363,7 +433,17 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 {accountPhoto ? (
                   <img src={accountPhoto} alt="profile" className="avatar-img" />
                 ) : (
-                  <div className="avatar-placeholder">{name?.charAt(0)?.toUpperCase() ?? "U"}</div>
+                  <div className="avatar-placeholder">
+                    {(
+                      (name || email || "U")
+                        .split(" ")
+                        .filter(Boolean)
+                        .map((part: string) => part[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2) || "U"
+                    )}
+                  </div>
                 )}
 
                 <label className="upload-label">
@@ -422,11 +502,51 @@ export default function AccountSettingsPage(): React.JSX.Element {
             </div>
           </div>
 
+          {/* Title row */}
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Title</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onFocus={() => setFocusedInput("title")}
+                onBlur={() => { setFocusedInput(null); updateTitleInDatabase(title); }}
+                className={`form-input ${isMobile ? 'mobile' : ''}`}
+                aria-label="Title"
+                suppressHydrationWarning
+              />
+            </div>
+          </div>
+
+          {/* Company row */}
+          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Company</label>
+            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+              <input
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                onFocus={() => setFocusedInput("company")}
+                onBlur={() => { setFocusedInput(null); updateCompanyInDatabase(company); }}
+                className={`form-input ${isMobile ? 'mobile' : ''}`}
+                aria-label="Company"
+                suppressHydrationWarning
+              />
+            </div>
+          </div>
+
           {/* Location row */}
           <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
             <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Location</label>
             <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
-              <div className="input-static">{userLocation || "Not provided"}</div>
+              <input
+                value={userLocation}
+                onChange={(e) => setUserLocation(e.target.value)}
+                onFocus={() => setFocusedInput("location")}
+                onBlur={() => { setFocusedInput(null); updateLocationInDatabase(userLocation); }}
+                className={`form-input ${isMobile ? 'mobile' : ''}`}
+                aria-label="Location"
+                suppressHydrationWarning
+              />
             </div>
           </div>
 
