@@ -456,7 +456,19 @@ export default function MessagesPage() {
     } catch (err) { alert('Error sending reply.'); }
   };
 
-  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const getInitials = (name: string, email?: string) => {
+    const value = name || email || "U";
+    const base = value.includes("@") ? value.split("@")[0] : value;
+    return (
+      base
+        .split(" ")
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U"
+    );
+  };
 
   // ------------------ STYLES ------------------ //
   
@@ -588,7 +600,7 @@ export default function MessagesPage() {
     avatar: (name: string, profileImage?: string) => ({
       width: "48px",
       height: "48px",
-      borderRadius: "14px",
+      borderRadius: "50%",
       background: profileImage ? `url(${profileImage})` : colors.primaryGradient,
       backgroundSize: "cover",
       backgroundPosition: "center",
@@ -808,7 +820,7 @@ export default function MessagesPage() {
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     ) : (
-                      getInitials(m.name)
+                      getInitials(m.name, m.email)
                     )}
                   </div>
 
@@ -930,11 +942,10 @@ export default function MessagesPage() {
                 )}
                 <div
                   style={{
-                    ...styles.avatar(activeMessage.name),
+                    ...styles.avatar(activeMessage.name, activeMessage.profileImage),
                     width: "40px",
                     height: "40px",
                     fontSize: "12px",
-                    background: "#1E293B",
                   }}
                 >
                   {activeMessage.profileImage ? (
@@ -944,7 +955,7 @@ export default function MessagesPage() {
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   ) : (
-                    getInitials(activeMessage.name)
+                    getInitials(activeMessage.name, activeMessage.email)
                   )}
                 </div>
                 <div>

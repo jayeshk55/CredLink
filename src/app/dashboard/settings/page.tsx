@@ -95,7 +95,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState<boolean>(false);
   const [showPasswordSuccessModal, setShowPasswordSuccessModal] = useState<boolean>(false);
   const [showDeactivateSuccessModal, setShowDeactivateSuccessModal] = useState<boolean>(false);
-  const [deactivateErrorMessage, setDeactivateErrorMessage] = useState<string>('');
+  const [deactivateErrorMessage, setDeactivateErrorMessage] = useState<string>("");
   const [showDeactivateErrorModal, setShowDeactivateErrorModal] = useState<boolean>(false);
 
   // photo change: preview + upload
@@ -134,9 +134,32 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  const handleRemovePhoto = () => {
-    setAccountPhoto(null);
-    toast.success("Profile photo removed from UI.");
+  // remove profile photo: clear from DB and UI
+  const handleRemovePhoto = async () => {
+    try {
+      const res = await fetch("/api/profile/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ profileImage: null }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        console.error("Failed to remove profile image:", error);
+        toast.error("Failed to remove profile photo. Please try again.");
+        return;
+      }
+
+      setAccountPhoto(null);
+      toast.success("Profile photo removed.");
+      setTimeout(() => {
+        checkAuth();
+      }, 300);
+    } catch (err) {
+      console.error("Error removing profile image:", err);
+      toast.error("Failed to remove profile photo. Please try again.");
+    }
   };
 
   // responsive
@@ -199,8 +222,8 @@ export default function AccountSettingsPage(): React.JSX.Element {
       return;
     }
 
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phoneRegex.test(tempPhoneNumber.replace(/\s/g, ''))) {
+    const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+    if (!phoneRegex.test(tempPhoneNumber.replace(/\s/g, ""))) {
       toast.error("Please enter a valid phone number");
       return;
     }
@@ -210,7 +233,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ phone: tempPhoneNumber })
+        body: JSON.stringify({ phone: tempPhoneNumber }),
       });
 
       if (res.ok) {
@@ -234,19 +257,19 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   const handleDeactivateAccount = async () => {
     try {
-      const response = await fetch('/api/auth/deactivate-account', {
-        method: 'POST',
+      const response = await fetch("/api/auth/deactivate-account", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({}),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setDeactivateErrorMessage(data.error || 'Failed to deactivate account');
+        setDeactivateErrorMessage(data.error || "Failed to deactivate account");
         setShowDeactivateErrorModal(true);
         setShowDeactivateConfirm(false);
         return;
@@ -254,13 +277,13 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
       setShowDeactivateConfirm(false);
       setShowDeactivateSuccessModal(true);
-      
+
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = "/";
       }, 2000);
     } catch (error) {
-      console.error('Deactivate account error:', error);
-      setDeactivateErrorMessage('Failed to deactivate account. Please try again.');
+      console.error("Deactivate account error:", error);
+      setDeactivateErrorMessage("Failed to deactivate account. Please try again.");
       setShowDeactivateErrorModal(true);
       setShowDeactivateConfirm(false);
     }
@@ -268,162 +291,145 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   const updateNameInDatabase = async (newName: string) => {
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ fullName: newName }),
       });
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('Name update failed:', error);
+        console.error("Name update failed:", error);
         return false;
       }
-      setTimeout(() => { checkAuth(); }, 200);
+      setTimeout(() => {
+        checkAuth();
+      }, 200);
       return true;
     } catch (err) {
-      console.error('Name update error:', err);
+      console.error("Name update error:", err);
       return false;
     }
   };
 
   const updateCompanyInDatabase = async (newCompany: string) => {
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ company: newCompany }),
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('Company update failed:', error);
+        console.error("Company update failed:", error);
         return false;
       }
-      setTimeout(() => { checkAuth(); }, 200);
+      setTimeout(() => {
+        checkAuth();
+      }, 200);
       return true;
     } catch (err) {
-      console.error('Company update error:', err);
+      console.error("Company update error:", err);
       return false;
     }
   };
 
   const updateTitleInDatabase = async (newTitle: string) => {
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ title: newTitle }),
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('Title update failed:', error);
+        console.error("Title update failed:", error);
         return false;
       }
-      setTimeout(() => { checkAuth(); }, 200);
+      setTimeout(() => {
+        checkAuth();
+      }, 200);
       return true;
     } catch (err) {
-      console.error('Title update error:', err);
+      console.error("Title update error:", err);
       return false;
     }
   };
 
   const updateLocationInDatabase = async (newLocation: string) => {
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
+      const response = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ location: newLocation }),
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        console.error('Location update failed:', error);
+        console.error("Location update failed:", error);
         return false;
       }
-      setTimeout(() => { checkAuth(); }, 200);
+      setTimeout(() => {
+        checkAuth();
+      }, 200);
       return true;
     } catch (err) {
-      console.error('Location update error:', err);
+      console.error("Location update error:", err);
       return false;
     }
   };
 
   const changePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error('Please fill all password fields');
+      toast.error("Please fill all password fields");
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('New password and confirm password do not match');
+      toast.error("New password and confirm password do not match");
       return;
     }
     try {
-      const res = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      
+
       if (res.status === 200) {
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
         setShowPasswordSuccessModal(true);
       } else if (res.status === 400) {
-        toast.error('Invalid input or password mismatch');
+        toast.error("Invalid input or password mismatch");
       } else if (res.status === 401) {
-        toast.error('Current password is incorrect');
+        toast.error("Current password is incorrect");
       } else if (res.status === 500) {
-        toast.error('Something went wrong, please try again later');
+        toast.error("Something went wrong, please try again later");
       } else {
-        toast.error((data as any).error || 'Failed to change password');
+        toast.error((data as any).error || "Failed to change password");
       }
     } catch (e) {
-      console.error('Change password error:', e);
-      toast.error('Something went wrong, please try again later');
+      console.error("Change password error:", e);
+      toast.error("Something went wrong, please try again later");
     }
   };
 
   return (
     <div className="account-settings-page">
-      {/* HERO */}
-      <section className="hero-section">
-        <div className={`hero-inner ${isMobile ? 'mobile' : ''}`}>
-          <div className="hero-text">
-            <h1 className={`hero-title ${isMobile ? 'mobile' : 'desktop'}`}>
-              Account <span className="hero-title-accent">Settings</span>
-            </h1>
-            <p className="hero-lead">Update your profile, security settings and preferences.</p>
-          </div>
-
-          {/* Save Changes Button - Top Right */}
-          <button
-            className={`btn-primary ${isMobile ? 'mobile' : 'desktop'}`}
-            onClick={() => {
-              setPopupMessage('All changes saved');
-              setIsPopupOpen(true);
-            }}
-            suppressHydrationWarning
-          >
-            Save Changes
-          </button>
-        </div>
-      </section>
-
-      {/* MAIN */}
       <main className={`settings-container ${isMobile ? 'mobile' : ''}`}>
         {/* Profile overview card */}
         <section aria-labelledby="profile-heading" className="settings-card profile-card">
@@ -434,15 +440,19 @@ export default function AccountSettingsPage(): React.JSX.Element {
                   <img src={accountPhoto} alt="profile" className="avatar-img" />
                 ) : (
                   <div className="avatar-placeholder">
-                    {(
-                      (name || email || "U")
-                        .split(" ")
-                        .filter(Boolean)
-                        .map((part: string) => part[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2) || "U"
-                    )}
+                    {(() => {
+                      const value = name || email || "U";
+                      const base = value.includes("@") ? value.split("@")[0] : value;
+                      return (
+                        base
+                          .split(" ")
+                          .filter(Boolean)
+                          .map((part: string) => part[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2) || "U"
+                      );
+                    })()}
                   </div>
                 )}
 

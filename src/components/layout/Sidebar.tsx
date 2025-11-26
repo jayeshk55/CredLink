@@ -13,6 +13,7 @@ import {
   Search,
   Settings2,
   HelpCircle,
+  ContactRound,
   Menu,
   X,
 } from "lucide-react";
@@ -379,7 +380,7 @@ const Sidebar = () => {
     // { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
-    { name: "Contacts", path: "/dashboard/contacts", icon: <Users /> },
+    { name: "Contacts", path: "/dashboard/contacts", icon: <ContactRound /> },
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 
@@ -488,6 +489,16 @@ const Sidebar = () => {
           </span>
         </Link>
 
+        {/* Center search icon in the bottom nav */}
+        <Link
+          href="/dashboard/search"
+          className={`bottomNavItem ${pathname === "/dashboard/search" ? "bottomNavItemActive" : ""}`}
+        >
+          <span className="bottomNavIcon">
+            <Search />
+          </span>
+        </Link>
+
         <Link
           href="/dashboard/connections"
           className={`bottomNavItem ${pathname === "/dashboard/connections" ? "bottomNavItemActive" : ""}`}
@@ -505,19 +516,10 @@ const Sidebar = () => {
           className={`bottomNavItem ${pathname === "/dashboard/contacts" ? "bottomNavItemActive" : ""}`}
         >
           <span className="bottomNavIcon">
-            <Users />
+            <ContactRound />
             {contactsCount > 0 && pathname !== "/dashboard/contacts" && (
               <span className="bottomNavBadge">{contactsCount}</span>
             )}
-          </span>
-        </Link>
-
-        <Link
-          href="/dashboard/search"
-          className={`bottomNavItem ${pathname === "/dashboard/search" ? "bottomNavItemActive" : ""}`}
-        >
-          <span className="bottomNavIcon">
-            <Search />
           </span>
         </Link>
       </nav>
