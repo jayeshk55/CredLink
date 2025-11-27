@@ -15,7 +15,7 @@ if (typeof document !== 'undefined') {
 }
 */
 
-import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin, Send, X } from 'lucide-react';
+import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin, Send, X, User } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 interface Contact {
@@ -1057,11 +1057,9 @@ export default function DashboardContactPage() {
                                         .join(' • ')}
                                     </p>
                                   )}
-                                  {(contact.phone || contact.email) && (
+                                  {contact.phone && (
                                     <p className={styles.mobileCardSubtitle}>
-                                      {[contact.phone, contact.email]
-                                        .filter(Boolean)
-                                        .join(' • ')}
+                                      {contact.phone}
                                     </p>
                                   )}
                                 </div>
@@ -1097,7 +1095,6 @@ export default function DashboardContactPage() {
                               </div>
                             </div>
                             <div className={styles.mobileCardFooter}>
-                              <p className={styles.mobileCompanyText}>{contact.company}</p>
                               <span className={styles.mobileDateText}>Connected: {contact.dateAdded}</span>
                             </div>
 
@@ -1121,12 +1118,6 @@ export default function DashboardContactPage() {
                   </div>
                 </div>
 
-                {/* Footer */}
-                <div className={styles.tableFooter}>
-                  <p className={styles.tableFooterText}>
-                    1 - {Math.min(sortedContacts.length, contactsList.length)} of {contactsList.length} contacts
-                  </p>
-                </div>
               </div>
             ) : (
               /* Cards View */
@@ -1154,32 +1145,35 @@ export default function DashboardContactPage() {
                               styles.cardFront4
                             }`}>
                               
-                              {/* Decorative Elements */}
-                              <div className={styles.cardDecorativeElement}>
-                                <div className={`${styles.cardCircle} ${
-                                  index % 4 === 1 ? styles.circle1 :
-                                  index % 4 === 2 ? styles.circle2 :
-                                  index % 4 === 3 ? styles.circle3 :
-                                  styles.circle4
-                                }`}></div>
-                              </div>
+                              {/* Top-right action removed for a cleaner card front */}
                               
                               <div className={styles.cardContentFlex}>
-                                {/* Name and Title */}
-                                <h3 className={styles.cardName}>{contact.name}</h3>
-                                <p className={styles.cardTitle}>{contact.title}</p>
-                                <p className={styles.cardCompany}>{contact.company}</p>
+                                {/* Name and Title with avatar */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
+                                  <div className={styles.avatarPlaceholder}>
+                                    {contact.avatar ? (
+                                      <img src={contact.avatar} alt={contact.name} className={styles.avatarImage} />
+                                    ) : (
+                                      <span className={styles.avatarText}>{getInitials(contact.name)}</span>
+                                    )}
+                                  </div>
+                                  <h3 className={styles.cardName} style={{ margin: 0 }}>{contact.name}</h3>
+                                </div>
+                                <div style={{ marginLeft: 40 }}>
+                                  <p className={styles.cardTitle}>{contact.title}</p>
+                                  <p className={styles.cardCompany}>{contact.company}</p>
 
-                                {/* Tags */}
-                                <div className={styles.cardTagsFlex}>
-                                  {contact.tags.slice(0, 2).map((tag, index) => (
-                                    <span
-                                      key={index}
-                                      className={`${styles.cardTag} ${getTagClass(tag)}`}
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
+                                  {/* Tags */}
+                                  <div className={styles.cardTagsFlex}>
+                                    {contact.tags.slice(0, 2).map((tag, index) => (
+                                      <span
+                                        key={index}
+                                        className={`${styles.cardTag} ${getTagClass(tag)}`}
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>

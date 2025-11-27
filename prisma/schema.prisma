@@ -130,7 +130,6 @@ model Card {
   status         String?          @default("draft") @db.VarChar(20)
   suffix         String?          @db.VarChar(20)
   views          Int              @default(0)
-  shares         Int              @default(0)
   selectedColor2 String?          @default("#00c0fd") @map("selected_color2") @db.VarChar(20)
   experience     String?          @db.Text
   portfolio      String?          @db.Text
@@ -138,6 +137,7 @@ model Card {
   services       String?          @db.Text
   skills         String?          @db.Text
   documentUrl    String?          @map("document_url") @db.VarChar(1000)
+  shares         Int              @default(0)
   connections    CardConnection[]
   user           User             @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
 
