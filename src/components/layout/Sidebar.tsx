@@ -407,17 +407,52 @@ const Sidebar = () => {
     };
 
     fetchContacts();
-    // Poll every 120 seconds when tab is visible
     intervalId = setInterval(fetchContacts, 120000);
-    const onUpdated = () => fetchContacts();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('contacts-updated', onUpdated as any);
-    }
+
     return () => {
       clearInterval(intervalId);
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('contacts-updated', onUpdated as any);
+    };
+  }, []);
+
+  useEffect(() => {
+    let intervalId: any;
+
+    const computeCount = (list: any[]) => {
+      let cleared: string[] = [];
+      try {
+        if (typeof window !== 'undefined') {
+          const stored = window.localStorage.getItem('dashboard-cleared-notifications');
+          if (stored) cleared = JSON.parse(stored);
+        }
+      } catch {
+        cleared = [];
       }
+      const clearedSet = new Set(cleared || []);
+      return list.filter((n: any) => !clearedSet.has(n.id)).length;
+    };
+
+    const fetchNotifications = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        return;
+      }
+      try {
+        const res = await fetch('/api/notifications', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data.notifications) ? data.notifications : [];
+        const unreadTotal = computeCount(list);
+        setNotificationsCount(unreadTotal);
+        notificationsPrevCountRef.current = unreadTotal;
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    fetchNotifications();
+    intervalId = setInterval(fetchNotifications, 60000);
+
+    return () => {
+      clearInterval(intervalId);
     };
   }, []);
 
@@ -435,8 +470,8 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> },
     // { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
-    { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
-    { name: "Lead", path: "/dashboard/contacts", icon: <ContactRound /> },
+    { name: "Connections", path: "/dashboard/connections", icon: <ContactRound /> },
+    { name: "Lead", path: "/dashboard/contacts", icon: <PersonNetworkIcon /> },
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 
@@ -504,7 +539,7 @@ const Sidebar = () => {
                   setIsOpen(false);
                 }}
               >
-                <span className="navIcon">{item.icon}</span>
+                <span className={`navIcon ${item.name === "Lead" ? "navIconLead" : ""}`}>{item.icon}</span>
                 <span>{item.name}</span>
                 {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
                   <span className="navBadge">{unreadCount}</span>
@@ -512,7 +547,7 @@ const Sidebar = () => {
                 {item.name === "Connections" && pendingConnections > 0 && pathname !== "/dashboard/connections" && (
                   <span className="navBadge">{pendingConnections}</span>
                 )}
-                {item.name === "Contacts" && contactsCount > 0 && pathname !== "/dashboard/contacts" && (
+                {item.name === "Lead" && contactsCount > 0 && pathname !== "/dashboard/contacts" && (
                   <span className="navBadge">{contactsCount}</span>
                 )}
               </Link>
@@ -559,10 +594,8 @@ const Sidebar = () => {
           href="/dashboard/connections"
           className={`bottomNavItem ${pathname === "/dashboard/connections" ? "bottomNavItemActive" : ""}`}
         >
-          <span className="bottomNavIcon bottomNavIconConnections">
-            <span className="connectionSvg">
-              <PersonNetworkIcon />
-            </span>
+          <span className="bottomNavIcon">
+            <ContactRound />
             {pendingConnections > 0 && pathname !== "/dashboard/connections" && (
               <span className="bottomNavBadge">{pendingConnections}</span>
             )}
@@ -573,8 +606,10 @@ const Sidebar = () => {
           href="/dashboard/contacts"
           className={`bottomNavItem ${pathname === "/dashboard/contacts" ? "bottomNavItemActive" : ""}`}
         >
-          <span className="bottomNavIcon">
-            <ContactRound />
+          <span className="bottomNavIcon bottomNavIconConnections">
+            <span className="connectionSvg">
+              <PersonNetworkIcon />
+            </span>
             {contactsCount > 0 && pathname !== "/dashboard/contacts" && (
               <span className="bottomNavBadge">{contactsCount}</span>
             )}

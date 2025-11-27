@@ -108,6 +108,11 @@
   transform: scale(1.1);
 }
 
+.navIconLead svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
 /* ----------- ACTIVE LINK ----------- */
 .activeNav {
   background: #ffffff;
@@ -220,7 +225,7 @@
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  height: 64px;
+  height: 56px;
   width: 100%;
   max-width: 380px;
   background: #2563eb; /* blue bar */
@@ -254,8 +259,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 9999px;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -282,8 +287,8 @@
 
 /* Slightly larger container for connections icon only */
 .bottomNavIconConnections {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 }
 
 /* Inactive state: keep connections icon pure white */
@@ -330,10 +335,28 @@
   color: #0b1f4d;          /* dark blue icon color */
 }
 
+/* Ensure only one bottom nav item appears active at a time */
+.bottomNavItem:not(.bottomNavItemActive) .bottomNavIcon {
+  background-color: transparent !important;
+  color: #e5e7eb !important;
+}
+
 /* Hide sidebar on mobile (use only bottom nav) */
 @media (max-width: 1023px) {
   .sidebar {
     display: none;
+  }
+  
+  /* Ensure page starts at top on reload for mobile */
+  html, body {
+    scroll-behavior: smooth;
+    scroll-padding-top: 0;
+  }
+  
+  /* Force scroll reset on page load for mobile */
+  @page {
+    size: auto;
+    margin: 0;
   }
 }
 
