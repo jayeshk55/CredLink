@@ -336,6 +336,7 @@
   grid-template-columns: 1fr;
   gap: 1.5rem;
   animation: slideInUp 0.8s ease-out;
+  justify-items: center;
 }
 
 /* --- Contact Card --- */
@@ -349,6 +350,7 @@
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   width: 100%;
+  max-width: 520px;
   box-sizing: border-box;
 }
 
@@ -386,11 +388,110 @@
   text-align: left;
 }
 
+.contactMainColumns {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.profileColumn {
+  flex: 1 1 40%;
+  min-width: 0;
+}
+
+.channelColumn {
+  flex: 1 1 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Key-value contact info grid (Phone / Email) */
+.contactDetailGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 1.25rem;
+}
+
+.detailLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+.detailValueButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  cursor: pointer;
+  word-break: break-all;
+}
+
+.detailValueButton:hover {
+  color: #1e67f4;
+}
+
+.inlineContactRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.inlineIconButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: none;
+  background-color: #e5edff;
+  color: #1e67f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  padding: 0;
+}
+
+.inlineIconButton:hover {
+  background-color: #1e67f4;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(30, 103, 244, 0.3);
+}
+
+.inlineContactText {
+  font-size: 0.8rem;
+  color: #4b5563;
+  background-color: #eef2ff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
 /* Avatar properly sized, aligned left */
 .avatar {
   width: 3.5rem;
   height: 3.5rem;
-  background: linear-gradient(135deg, #1e67f4 0%, #1652cc 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: #ffffff;
   border-radius: 50%;
   display: flex;
@@ -446,23 +547,28 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.75rem;
-  color: #9ca3af;
-  background-color: #f3f4f6;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: #ffffff;
+  background-color: #1e67f4;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
   font-weight: 600;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(30, 103, 244, 0.25);
 }
 
 /* --- Contact Actions (Email/Phone/Source Buttons) --- */
 /* Buttons responsive, full-width on mobile, horizontal on desktop */
 .contactActions {
   display: flex;
+  flex-direction: row;
   gap: 0.75rem;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: stretch;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
 }
 
 /* Button styling - interactive, smooth transitions */
@@ -578,15 +684,15 @@
 		margin: 0 -0.375rem;
 	}
 
-  /* Mobile - reduce avatar size */
+  /* Mobile - reduce avatar size but keep it left-aligned */
   .avatar {
     width: 3rem;
     height: 3rem;
     font-size: 1.2rem;
-    margin: 0 auto;
+    margin: 0;
   }
 
-  /* Mobile - header flexible layout */
+  /* Mobile - header inline: avatar+name left, timestamp right */
   .contactHeader {
     flex-direction: row;
     gap: 0.75rem;
@@ -594,19 +700,34 @@
     justify-content: space-between;
   }
 
-  .contactInfo {
+  .contactMainColumns {
     flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .profileColumn,
+  .channelColumn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .contactInfo {
+    flex-direction: row;
     align-items: center;
-    text-align: center;
+    text-align: left;
   }
 
   .contactDetails {
-    text-align: center;
+    text-align: left;
+  }
+
+  .contactRow {
+    padding: 0.5rem 0.75rem;
   }
 
   .contactMeta {
-    align-self: center;
-    margin-top: 0.25rem;
+    align-self: auto;
+    margin-top: 0;
   }
 
   .contactCard {
@@ -620,7 +741,7 @@
 
   .contactName {
     font-size: 1rem;
-    text-align: center;
+    text-align: left;
   }
 
   .contactCardText {

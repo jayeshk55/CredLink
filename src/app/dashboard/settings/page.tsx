@@ -59,7 +59,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
         }
 
         const userData = await response.json();
-        setName(userData.name || userData.email.split('@')[0]);
+        setName(userData.name || userData.email?.split('@')[0] || '');
         setEmail(userData.email || '');
       } catch (error) {
         console.error('Error fetching user data:', error);

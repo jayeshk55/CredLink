@@ -34,6 +34,21 @@ const formatRelativeTime = (dateString: string): string => {
   return `${Math.floor(diffInSeconds / 31536000)} years ago`;
 };
 
+// Helper function to compute initials, aligned with header/connections/messages
+const getInitials = (name: string, email?: string): string => {
+  const value = name || email || "U";
+  const base = value.includes("@") ? value.split("@")[0] : value;
+  return (
+    base
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "U"
+  );
+};
+
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<ContactConnection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -224,10 +239,11 @@ export default function ContactsPage() {
               <div className={styles.contactsList}>
                 {filteredContacts.map((contact) => (
                   <div key={contact.id} className={styles.contactCard}>
+                    {/* Header: avatar + name on left, timestamp on right */}
                     <div className={styles.contactHeader}>
                       <div className={styles.contactInfo}>
                         <div className={styles.avatar}>
-                          {contact.name.charAt(0).toUpperCase()}
+                          {getInitials(contact.name, contact.email)}
                         </div>
                         <div className={styles.contactDetails}>
                           <h3 className={styles.contactName}>{contact.name}</h3>
@@ -241,25 +257,38 @@ export default function ContactsPage() {
                       </div>
                     </div>
 
+                    {/* Contact info grid: Phone / Email key-value pairs */}
+                    <div className={styles.contactDetailGrid}>
+                      {contact.phone && (
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Phone</span>
+                          <button
+                            type="button"
+                            onClick={() => handlePhoneClick(contact.phone)}
+                            className={styles.detailValueButton}
+                            title={contact.phone}
+                          >
+                            {contact.phone}
+                          </button>
+                        </div>
+                      )}
+                      {contact.email && (
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Email</span>
+                          <button
+                            type="button"
+                            onClick={() => handleEmailClick(contact.email)}
+                            className={styles.detailValueButton}
+                            title={contact.email}
+                          >
+                            {contact.email}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer: source + delete */}
                     <div className={styles.contactActions}>
-                      <button
-                        onClick={() => handleEmailClick(contact.email)}
-                        className={`${styles.actionButton} ${styles.messageButton}`}
-                        title="Send email"
-                      >
-                        <Mail size={16} />
-                        {contact.email}
-                      </button>
-
-                      <button
-                        onClick={() => handlePhoneClick(contact.phone)}
-                        className={`${styles.actionButton} ${styles.phoneButton}`}
-                        title="Call phone"
-                      >
-                        <Phone size={16} />
-                        {contact.phone}
-                      </button>
-
                       <p
                         className={styles.contactCardText}
                         onClick={() => {
