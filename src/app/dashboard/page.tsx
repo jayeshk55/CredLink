@@ -115,7 +115,12 @@ const Dashboard = () => {
     if (isAuthenticated && !isLoading) {
       fetchCards();
     }
- }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading]);
+
+  // Force scroll to top on mount to fix reload scroll offset
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
  const fetchCards = async () => {
    try {
