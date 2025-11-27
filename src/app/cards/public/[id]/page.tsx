@@ -56,6 +56,7 @@ interface Card {
     fullName: string;
     username: string;
     email: string;
+    location?: string;
   };
 }
 

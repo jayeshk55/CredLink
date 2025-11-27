@@ -82,6 +82,7 @@ interface Card {
     fullName: string;
     username: string;
     email: string;
+    location?: string;
   };
 }
 
@@ -95,7 +96,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
   cardName: card.cardName || '',
   title: card.title || '',
   company: card.company || '',
-  location: card.location || '',
+  location: card.location || card.user?.location || '',
   about: card.bio || card.about || card.description || '',
   skills: card.skills || '',
   portfolio: card.portfolio || '',

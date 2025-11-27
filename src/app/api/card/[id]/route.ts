@@ -18,6 +18,7 @@ export async function GET(
             fullName: true,
             username: true,
             email: true,
+            location: true,
           }
         }
       }

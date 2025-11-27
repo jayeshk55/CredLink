@@ -74,7 +74,7 @@ const Dashboard = () => {
     cardName: capitalizeFirstLetter(card.cardName || card.name || ''),
     title: card.title || '',
     company: card.company || '',
-    location: card.location || '',
+    location: card.location || (card as any).user?.location || '',
     about: card.bio || card.about || card.description || '',
     skills: card.skills || '',
     portfolio: card.portfolio || '',

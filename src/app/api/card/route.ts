@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
             id: true,
             fullName: true,
             username: true,
+            location: true,
           }
         }
       } as any
