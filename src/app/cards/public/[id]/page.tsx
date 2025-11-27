@@ -431,7 +431,15 @@ const PublicCardPage = () => {
           isSubmitting={isSubmitting}
           onSubmit={handleFormSubmit}
         />
+        {/* ---- MyKard Create Section ---- */}
+<div className={styles.createSection}>
+  <p className={styles.poweredText}>Powered by <strong>MyKard.in</strong></p>
+
+  <a href="https://www.mykard.in/auth/signup" className={styles.createButton}>
+    Create Your Digital Card
+  </a>
       </div>
+            </div>
 
       {/* ---------------- DOCUMENT VIEWER ---------------- */}
       {selectedDocumentUrl && (

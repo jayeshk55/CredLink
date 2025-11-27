@@ -221,8 +221,8 @@
   left: 50%;
   transform: translateX(-50%);
   height: 64px;
-  width: 90%;
-  max-width: 420px;
+  width: 100%;
+  max-width: 380px;
   background: #2563eb; /* blue bar */
   display: flex;
   align-items: center;
@@ -264,6 +264,41 @@
   width: 22px;
   height: 22px;
   color: currentColor; /* inherit white/gray from item */
+}
+
+/* PNG connection icon for mobile bottom nav */
+.bottomNavIcon .connectionIcon,
+.bottomNavIcon .connectionIconActive {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* SVG connection icon wrapper: slightly larger and bold */
+.bottomNavIcon .connectionSvg svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* Slightly larger container for connections icon only */
+.bottomNavIconConnections {
+  width: 48px;
+  height: 48px;
+}
+
+/* Inactive state: keep connections icon pure white */
+.bottomNavItem:not(.bottomNavItemActive) .connectionSvg {
+  color: #ffffff;
+}
+
+/* Inactive: white icon on blue bar */
+.bottomNavIcon .connectionIcon {
+  filter: invert(1);
+}
+
+/* Active: black icon on white chip */
+.bottomNavIcon .connectionIconActive {
+  filter: invert(0);
 }
 
 .bottomNavLabel {

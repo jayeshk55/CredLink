@@ -175,6 +175,28 @@ export default function ContactsPage() {
         </div>
       </div>
 
+      {/* Desktop Inline Search Bar */}
+      <div className={styles.desktopSearchBar}>
+        <div className={styles.desktopSearchContainer}>
+          <Search className={styles.desktopSearchIcon} />
+          <input
+            type="text"
+            placeholder={`Search ${contacts.length} contact${contacts.length !== 1 ? 's' : ''}`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.desktopSearchInput}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className={styles.desktopClearButton}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Results */}
       <div className={styles.resultsSection}>
         {loading ? (

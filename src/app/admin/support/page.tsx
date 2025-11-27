@@ -167,7 +167,7 @@ export default function SupportPage() {
           toast.success(`Ticket marked as ${newStatus.toLowerCase()} - Email sent to ${ticket.userName}`);
         } else {
           toast.success(`Ticket marked as ${newStatus.toLowerCase()} (Email service unavailable)`);
-          console.log('Status update email that would be sent:', emailData);
+       //   console.log('Status update email that would be sent:', emailData);
         }
       } catch (emailError) {
         console.error('Email sending failed:', emailError);
@@ -266,11 +266,11 @@ export default function SupportPage() {
         setReplyText("");
         
         // Show what would have been sent
-        console.log('Email that would be sent:', {
-          to: ticket.userEmail,
-          subject: `Re: ${ticket.subject} [Ticket #${ticket.id}]`,
-          message: replyText
-        });
+        // console.log('Email that would be sent:', {
+        //   to: ticket.userEmail,
+        //   subject: `Re: ${ticket.subject} [Ticket #${ticket.id}]`,
+        //   message: replyText
+        // });
       }
     } catch (error) {
       console.error('Error sending reply:', error);
@@ -283,14 +283,14 @@ export default function SupportPage() {
         setReplyText("");
         
         // Log the email details for debugging
-        console.log('Reply details:', {
-          ticketId: id,
-          userEmail: ticket.userEmail,
-          userName: ticket.userName,
-          subject: ticket.subject,
-          replyMessage: replyText,
-          timestamp: new Date().toISOString()
-        });
+        // console.log('Reply details:', {
+        //   ticketId: id,
+        //   userEmail: ticket.userEmail,
+        //   userName: ticket.userName,
+        //   subject: ticket.subject,
+        //   replyMessage: replyText,
+        //   timestamp: new Date().toISOString()
+        // });
       } else {
         toast.error('Failed to send reply');
       }

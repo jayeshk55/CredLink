@@ -22,6 +22,62 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 
+const PersonNetworkIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Outer rounded chip */}
+    <circle
+      cx="9"
+      cy="12"
+      r="4.6"
+      stroke="currentColor"
+      strokeWidth="1"
+      fill="none"
+    />
+
+    {/* Central node */}
+    <circle cx="9" cy="11" r="1.3" stroke="currentColor" strokeWidth="1" />
+
+    {/* Orbiting nodes */}
+    <circle cx="18.5" cy="8" r="1.4" stroke="currentColor" strokeWidth="1" />
+    <circle cx="19.5" cy="12" r="1.4" stroke="currentColor" strokeWidth="1" />
+    <circle cx="18.5" cy="16" r="1.4" stroke="currentColor" strokeWidth="1" />
+
+    {/* Connection lines */}
+    <path
+      d="M13 12L17 8.6"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <path
+      d="M13 12H18.2"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <path
+      d="M13 12L17 15.4"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+
+    {/* Simple shoulders/body under the head */}
+    <path
+      d="M7.2 14.2C7.7 13.1 8.6 12.5 9 12.5H9.1C9.6 12.5 10.5 13.1 11 14.2"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -380,7 +436,7 @@ const Sidebar = () => {
     // { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
-    { name: "Contacts", path: "/dashboard/contacts", icon: <ContactRound /> },
+    { name: "Lead", path: "/dashboard/contacts", icon: <ContactRound /> },
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 
@@ -503,8 +559,10 @@ const Sidebar = () => {
           href="/dashboard/connections"
           className={`bottomNavItem ${pathname === "/dashboard/connections" ? "bottomNavItemActive" : ""}`}
         >
-          <span className="bottomNavIcon">
-            <UserPlus />
+          <span className="bottomNavIcon bottomNavIconConnections">
+            <span className="connectionSvg">
+              <PersonNetworkIcon />
+            </span>
             {pendingConnections > 0 && pathname !== "/dashboard/connections" && (
               <span className="bottomNavBadge">{pendingConnections}</span>
             )}

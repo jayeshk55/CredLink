@@ -40,6 +40,7 @@ const PREDEFINED_COLORS = [
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingCounts, setLoadingCounts] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const [showModal, setShowModal] = useState(false)
@@ -73,7 +74,10 @@ export default function CategoriesPage() {
       
       const data = await response.json()
       if (data.success) {
-        setCategories(data.categories)
+        const baseCategories: Category[] = data.categories
+        setCategories(baseCategories)
+        // Compute user counts after fetching categories
+        computeUserCounts(baseCategories)
       } else {
         throw new Error(data.error || 'Failed to fetch categories')
       }
@@ -82,6 +86,27 @@ export default function CategoriesPage() {
       toast.error('Failed to load categories')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const computeUserCounts = async (cats: Category[]) => {
+    try {
+      setLoadingCounts(true)
+      const res = await fetch('/api/users', { credentials: 'include' })
+      if (!res.ok) throw new Error('Failed to fetch users for counts')
+      const data = await res.json()
+      const users: any[] = data.users || []
+      const counts: Record<string, number> = {}
+      users.forEach(u => {
+        const categoryName = (u.category || '').trim()
+        if (!categoryName) return
+        counts[categoryName] = (counts[categoryName] || 0) + 1
+      })
+      setCategories(prev => prev.map(c => ({ ...c, userCount: counts[c.name] || 0 })))
+    } catch (e) {
+      console.error('Failed computing user counts:', e)
+    } finally {
+      setLoadingCounts(false)
     }
   }
 
@@ -793,12 +818,18 @@ export default function CategoriesPage() {
                           fontSize: '0.875rem',
                           color: 'var(--text-secondary)'
                         }}>
-                          <span style={{
-                            fontWeight: '600',
-                            color: 'var(--text-primary)'
-                          }}>
-                            {category.userCount || 0}
-                          </span> users
+                          {loadingCounts ? (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>...</span>
+                          ) : (
+                            <>
+                              <span style={{
+                                fontWeight: '600',
+                                color: 'var(--text-primary)'
+                              }}>
+                                {category.userCount || 0}
+                              </span> users
+                            </>
+                          )}
                         </span>
                       </div>
                       <div style={{

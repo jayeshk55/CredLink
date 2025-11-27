@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
             ...allSentMessages.map((msg: any) => msg.receiverId)
         ]);
 
-        // Fetch details for all conversation partners
+        // Fetch details for all conversation partners, including profile image & basic info
         const senders = await (prisma as any).user.findMany({
             where: {
                 id: { in: Array.from(allPartnerIds) },
@@ -69,6 +69,9 @@ export async function GET(req: NextRequest) {
                 id: true,
                 fullName: true,
                 email: true,
+                title: true,
+                company: true,
+                profileImage: true,
             },
         });
 

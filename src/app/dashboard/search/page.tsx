@@ -182,13 +182,12 @@ function SearchPageContent() {
 
       <style>{`
         /* Core responsive & futuristic styles inline so you can paste this file directly */
-        .wrap { position: relative; z-index: 10; max-width: 1100px; margin: 18px auto; padding: 28px; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+        .wrap { position: relative; z-index: 10; max-width: 1200px; margin: 18px auto; padding: 28px; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
         .header { display:flex; flex-direction: column; align-items:center; gap:8px; text-align:center; margin-bottom: 12px; }
         .title { font-size:28px; font-weight:700; color:#111827; line-height:1.05; margin:0; text-align:center; }
         .subtitle { color:#4B5563; font-size:16px; line-height:1.5; max-width: 600px; margin: 0 auto; }
         .search-panel { margin-top:18px; background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius:14px; padding:14px; border:1px solid rgba(0,0,0,0.04); box-shadow: 0 10px 30px rgba(2,6,23,0.08); overflow: visible; }
 
-        .row { display:flex; gap:12px; align-items:center; width:100%; }
         .left { flex:1; position:relative; }
         .left input { width:100%; padding:12px 16px 12px 44px; border-radius:12px; border:1px solid #E2E8F0; background: #fff; color:#0F172A; font-size:14px; outline:none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .left input::placeholder { color: rgba(15,23,42,0.4); }
@@ -208,10 +207,11 @@ function SearchPageContent() {
 
         /* responsive: small screens (mobile phones) */
         @media (max-width: 720px) {
-          .wrap { padding: 6px 8px; }
+          .wrap { padding: 6px 4px; }
           .title { font-size:24px; }
-          .row { flex-direction: column; align-items: stretch; gap:12px; }
-          .left input { padding: 12px 16px 12px 44px; font-size:15px; }
+          .left input { padding: 12px 16px 12px 44px; font-size:14px; }
+          .left input::placeholder { font-size:13px; }
+          .meta { text-align:center; }
           .grid { grid-template-columns: 1fr; }
           .card { align-items:flex-start; gap:10px; }
           .avatar { width:56px; height:56px; font-size:20px; }
@@ -232,26 +232,22 @@ function SearchPageContent() {
             <div className="title">Search Professionals</div>
             <div className="subtitle">Discover and connect with top professionals — quick, safe, and effortless.</div>
           </div>
+        </div>
 
-          <div className="search-panel">
-            <div className="row">
-              <div className="left">
-                <div className="icon"><Search style={{ width: 16, height: 16, color: "#94A3B8" }} /></div>
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by name, skills, company, or city..."
-                  aria-label="Search"
-                />
-              </div>
-            </div>
+        <div className="left" style={{ marginTop: 18 }}>
+          <div className="icon"><Search style={{ width: 16, height: 16, color: "#94A3B8" }} /></div>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by name, skills, company, or city..."
+            aria-label="Search"
+          />
+        </div>
 
-            <div className="meta">
-              {hasQuery
-                ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}`
-                : "Search to see results"}
-            </div>
-          </div>
+        <div className="meta">
+          {hasQuery
+            ? `Showing ${filtered.length} result${filtered.length !== 1 ? "s" : ""}`
+            : "Search to see results"}
         </div>
 
         <div className="grid" style={{ marginTop: 12 }}>

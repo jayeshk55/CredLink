@@ -111,9 +111,14 @@ export function Header() {
   return (
     <>
       {/* HEADER WRAPPER */}
-      <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
+      <header
+        className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50"
+        style={!isLgUp ? { paddingTop: "4px" } : undefined}
+      >
         <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center h-14 px-4 relative">
+        <div
+          className="flex justify-between items-center h-14 px-4 relative"
+        >
 
   {/* LEFT AREA — Hamburger goes here only on mobile */}
   <div
@@ -127,13 +132,13 @@ export function Header() {
           alt="Logo"
           width={120}
           height={32}
-          className="h-10 w-auto object-contain"
+          className="h-8 w-auto object-contain"
         />
       </Link>
     )}
   </div>
 
-            {/* RIGHT SIDE - Card Name & Profile */}
+            {/* RIGHT SIDE - Notifications & Profile */}
             <div
               style={{
                 display: "flex",
@@ -143,6 +148,14 @@ export function Header() {
                 paddingRight: "32px",
               }}
             >
+              {/* Notifications icon in header (desktop & mobile) */}
+              <Link
+                href="/dashboard/notifications"
+                className="relative flex items-center justify-center"
+              >
+                <Bell className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors" />
+              </Link>
+
               <div className="relative" data-profile-menu>
                 {isLgUp ? (
                   <motion.button
@@ -234,7 +247,7 @@ export function Header() {
                     )}
                   </motion.button>
                 )}
-                {/* DROPDOWN MENU - shows Notifications, Help & Support, Account, Logout on all screen sizes */}
+                {/* DROPDOWN MENU - shows Help & Support, Account, Logout on all screen sizes */}
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
@@ -259,33 +272,6 @@ export function Header() {
                         transform: "translateX(-16px)",
                       }}
                     >
-                      <Link
-                        href="/dashboard/notifications"
-                        onClick={() => setIsDropdownOpen(false)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          padding: "12px 16px",
-                          margin: "6px 0",
-                          fontSize: "14px",
-                          color: "#374151",
-                          textDecoration: "none",
-                          transition: "all 0.2s ease",
-                          borderRadius: "8px",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#eff6ff";
-                          e.currentTarget.style.color = "#1d4ed8";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "#374151";
-                        }}
-                      >
-                        <Bell style={{ width: "16px", height: "16px" }} />
-                        <span>Notifications</span>
-                      </Link>
                       <Link
                         href="/dashboard/support"
                         onClick={() => setIsDropdownOpen(false)}
