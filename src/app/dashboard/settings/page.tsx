@@ -428,31 +428,57 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  return (
+  const [savePopup, setSavePopup] = useState(false);
+
+const triggerSavePopup = () => {
+  setSavePopup(true);
+  setTimeout(() => setSavePopup(false), 1500);
+};
+const handleManualSave = async () => {
+  try {
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        fullName: name,
+        title: title,
+        company: company,
+        location: userLocation,
+      }),
+    });
+
+    if (!res.ok) {
+      toast.error("Failed to save changes");
+      return;
+    }
+
+    triggerSavePopup();   // <--- smooth success popup
+    checkAuth();
+  } catch (err) {
+    toast.error("Error saving data");
+  }
+};
+
+return (
     <div className="account-settings-page">
-      <main className={`settings-container ${isMobile ? 'mobile' : ''}`}>
-        {/* Profile overview card */}
+      <main className={`settings-container ${isMobile ? "mobile" : ""}`}>
+        
+        {/* Profile Card */}
         <section aria-labelledby="profile-heading" className="settings-card profile-card">
-          <div className={`profile-row ${isMobile ? 'mobile' : ''}`}>
-            <div className={`avatar-block ${isMobile ? 'mobile' : ''}`}>
-              <div className={`avatar-wrap ${isMobile ? 'mobile' : ''}`}>
+          <div className={`profile-row ${isMobile ? "mobile" : ""}`}>
+            <div className={`avatar-block ${isMobile ? "mobile" : ""}`}>
+              <div className={`avatar-wrap ${isMobile ? "mobile" : ""}`}>
                 {accountPhoto ? (
                   <img src={accountPhoto} alt="profile" className="avatar-img" />
                 ) : (
                   <div className="avatar-placeholder">
-                    {(() => {
-                      const value = name || email || "U";
-                      const base = value.includes("@") ? value.split("@")[0] : value;
-                      return (
-                        base
-                          .split(" ")
-                          .filter(Boolean)
-                          .map((part: string) => part[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2) || "U"
-                      );
-                    })()}
+                    {(name || email || "U")
+                      .split(" ")
+                      .map((p) => p[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)}
                   </div>
                 )}
 
@@ -469,7 +495,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
               </div>
 
               {accountPhoto && (
-                <button type="button" className="remove-photo-btn" onClick={handleRemovePhoto}>
+                <button type="button" className="remove-photo-btn" onClick={() => setAccountPhoto(null)}>
                   Remove
                 </button>
               )}
@@ -479,6 +505,13 @@ export default function AccountSettingsPage(): React.JSX.Element {
               <h2 className="profile-name">{name}</h2>
               <div className="profile-email">{email}</div>
             </div>
+            {/* Save Button */}
+              <div className="profile-save-wrapper">
+  <button className="profile-save-btn" onClick={handleManualSave}>
+    Save
+  </button>
+</div>
+
           </div>
         </section>
 
@@ -864,6 +897,29 @@ export default function AccountSettingsPage(): React.JSX.Element {
           onVerify={handleVerifyOTP}
         />
       )}
+
+      {savePopup && (
+ <div
+  style={{
+    position: "fixed",
+    bottom: "40px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "white",
+    padding: "14px 22px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+    fontSize: "15px",
+    fontWeight: "600",
+    color: "#2563eb",
+    zIndex: 1000,
+    animation: "smoothFade 0.35s ease",
+  }}
+>
+  ✓ Profile Saved Successfully
+</div>
+)}
+
     </div>
   );
 }
