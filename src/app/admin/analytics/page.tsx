@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -53,8 +53,8 @@ export default function AnalyticsPage() {
     newUsersForPeriod: 0
   });
 
-  // Real data for category distribution pie chart
-  const [categoryData, setCategoryData] = useState<any[]>([]);
+  // Backend (unfiltered) category distribution
+  const [categoryDataRaw, setCategoryDataRaw] = useState<any[]>([]);
 
   const [engagementData, setEngagementData] = useState<any[]>([]);
 
@@ -329,6 +329,11 @@ export default function AnalyticsPage() {
     toDate: "",
     usersPeriod: "thisWeek", // New filter for users metric
   });
+
+  // Dynamic options fetched from backend
+  const [cities, setCities] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingMeta, setLoadingMeta] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
@@ -345,6 +350,37 @@ export default function AnalyticsPage() {
     };
     updatePeriodCount();
   }, [filters.usersPeriod]);
+
+  // Fetch dynamic cities & categories once
+  useEffect(() => {
+    const fetchMeta = async () => {
+      setLoadingMeta(true);
+      try {
+        // Cities
+        const cityRes = await fetch('/api/admin/analytics/cities');
+        const cityJson = await cityRes.json();
+        if (cityRes.ok && cityJson.success) {
+          setCities(cityJson.cities || []);
+          setOverview((prev: any) => ({ ...prev, activeCities: (cityJson.cities || []).length }));
+        }
+        // Categories
+        const catRes = await fetch('/api/admin/categories');
+        const catJson = await catRes.json();
+        if (catRes.ok && catJson.success) {
+          const list = (catJson.categories || [])
+            .filter((c: any) => c.isActive) // Only show active categories
+            .map((c: any) => c.name)
+            .sort((a: string, b: string) => a.localeCompare(b));
+          setCategories(list);
+        }
+      } catch (e) {
+        console.error('Meta fetch failed', e);
+      } finally {
+        setLoadingMeta(false);
+      }
+    };
+    fetchMeta();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -374,7 +410,7 @@ export default function AnalyticsPage() {
               .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
             const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
            // console.debug('[Analytics] categoryData (poll)', mapped);
-            setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+            setCategoryDataRaw(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
           }
           setEngagementData(data.trafficData);
           setActivityData(data.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
@@ -396,7 +432,7 @@ export default function AnalyticsPage() {
               .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
             const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
            // console.debug('[Analytics] categoryData (sse)', mapped);
-            setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+            setCategoryDataRaw(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
           }
           setEngagementData(payload.trafficData);
           setActivityData(payload.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
@@ -434,9 +470,10 @@ export default function AnalyticsPage() {
 
   // ===== Export Handlers =====
   const exportCSV = () => {
+    const source = filteredActivityRows.length ? filteredActivityRows : activityData;
     const csvContent = [
       ["Date", "New Users", "Connections", "Top City", "Top Category"],
-      ...activityData.map((r) => [r.date, r.newUsers, r.connections, r.topCity, r.topCategory]),
+      ...source.map((r: any) => [r.date, r.newUsers, r.connections, r.topCity, r.topCategory]),
     ]
       .map((row) => row.join(","))
       .join("\n");
@@ -452,6 +489,81 @@ export default function AnalyticsPage() {
   const exportPDF = () => window.print();
 
   const COLORS = ["#2563eb", "#3b82f6", "#93c5fd", "#1d4ed8", "#60a5fa"];
+
+  // ===== Filtered derived data (city/category/date) =====
+  const filteredActivityRows = useMemo(() => {
+    // Helper to parse row date (assumes format like 'Nov 1') fallback to today
+    const parseRowDate = (label: string) => {
+      const currentYear = new Date().getFullYear();
+      const parsed = Date.parse(`${label} ${currentYear}`);
+      return isNaN(parsed) ? new Date() : new Date(parsed);
+    };
+    const from = filters.fromDate ? new Date(filters.fromDate) : null;
+    const to = filters.toDate ? new Date(filters.toDate) : null;
+    return activityData.map((row: any) => {
+      const rowDateObj = parseRowDate(row.date);
+      if (from && rowDateObj < from) return null;
+      if (to && rowDateObj > to) return null;
+      const filteredUsers = (row.usersJoined || []).filter((u: any) => {
+        if (filters.city !== 'all' && u.city !== filters.city) return false;
+        if (filters.category !== 'all' && u.category !== filters.category) return false;
+        return true;
+      });
+      if (filteredUsers.length === 0) return null;
+      // Recompute newUsers, topCity, topCategory for this filtered row
+      const cityCounts: Record<string, number> = {};
+      const catCounts: Record<string, number> = {};
+      filteredUsers.forEach((u: any) => {
+        cityCounts[u.city] = (cityCounts[u.city] || 0) + 1;
+        catCounts[u.category] = (catCounts[u.category] || 0) + 1;
+      });
+      const topCity = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || row.topCity;
+      const topCategory = Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || row.topCategory;
+      return {
+        ...row,
+        usersJoined: filteredUsers,
+        newUsers: filteredUsers.length,
+        topCity,
+        topCategory,
+      };
+    }).filter(Boolean);
+  }, [activityData, filters.city, filters.category, filters.fromDate, filters.toDate]);
+
+  // Category distribution based on filtered users (overrides raw for charts)
+  const filteredCategoryData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredActivityRows.forEach((row: any) => {
+      (row.usersJoined || []).forEach((u: any) => {
+        counts[u.category] = (counts[u.category] || 0) + 1;
+      });
+    });
+    const entries = Object.entries(counts).map(([category, count]) => ({ category, count }));
+    // Fallback to raw if no entries
+    if (entries.length === 0) return categoryDataRaw;
+    return entries.sort((a,b)=>b.count-a.count);
+  }, [filteredActivityRows, categoryDataRaw]);
+
+  // Update metrics based on filtered results (city/category/date)
+  useEffect(() => {
+    const totalFilteredNewUsers = filteredActivityRows.reduce((sum: number, r: any) => sum + (r.newUsers || 0), 0);
+    
+    // Compute unique cities from filtered users
+    const uniqueCities = new Set<string>();
+    const uniqueUsers = new Set<string>();
+    filteredActivityRows.forEach((row: any) => {
+      (row.usersJoined || []).forEach((u: any) => {
+        if (u.city) uniqueCities.add(u.city);
+        if (u.name) uniqueUsers.add(u.name);
+      });
+    });
+    
+    setOverview((prev: any) => ({ 
+      ...prev, 
+      newUsersForPeriod: totalFilteredNewUsers,
+      activeCities: uniqueCities.size,
+      totalUsers: uniqueUsers.size
+    }));
+  }, [filteredActivityRows]);
 
   if (loading) return <div className="flex justify-center items-center min-h-screen text-lg">Loading analytics...</div>;
 
@@ -474,21 +586,16 @@ export default function AnalyticsPage() {
       <div className={styles.filtersSection}>
         <select value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })}>
           <option value="all">All Cities</option>
-          <option value="Nagpur">Nagpur</option>
-          <option value="Pune">Pune</option>
-          <option value="Delhi">Delhi</option>
+          {cities.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
 
         <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
           <option value="all">All Categories</option>
-          <option value="Doctor">Doctor</option>
-          <option value="Designer">Designer</option>
-          <option value="Developer">Developer</option>
-          <option value="Artist">Artist</option>
+          {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
 
-        <select 
-          value={filters.usersPeriod} 
+        <select
+          value={filters.usersPeriod}
           onChange={(e) => setFilters({ ...filters, usersPeriod: e.target.value })}
           className={styles.periodFilter}
         >
@@ -497,7 +604,6 @@ export default function AnalyticsPage() {
           <option value="last3Months">Last 3 Months</option>
           <option value="thisYear">This Year</option>
         </select>
-
       </div>
 
       {/* ===== METRIC CARDS ===== */}
@@ -533,7 +639,7 @@ export default function AnalyticsPage() {
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <PieChart width={420} height={300}>
               <Pie
-                data={categoryData}
+                data={filteredCategoryData}
                 dataKey="count"
                 nameKey="category"
                 cx="50%"
@@ -546,7 +652,7 @@ export default function AnalyticsPage() {
                 paddingAngle={2}
                 isAnimationActive={false}
               >
-                {categoryData.map((entry, index) => (
+                {filteredCategoryData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -595,7 +701,7 @@ export default function AnalyticsPage() {
             </tr>
           </thead>
           <tbody>
-            {activityData.map((row: any, i: number) => {
+            {(filteredActivityRows.length ? filteredActivityRows : activityData).map((row: any, i: number) => {
               const users = row.usersJoined || [];
               const firstTwo = users.slice(0, 2);
               const remaining = Math.max(users.length - 2, 0);
@@ -604,29 +710,35 @@ export default function AnalyticsPage() {
                   <td className="py-2 font-medium">{row.date}</td>
                   <td className="text-blue-600 font-semibold">{row.newUsers}</td>
                   <td className="py-2 max-w-md">
-                    <div className="flex flex-wrap gap-1">
-                      {firstTwo.map((user: any, idx: number) => (
-                        <div key={idx} className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg">
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-xs text-blue-600 mt-1">
-                            <span className="bg-green-100 text-green-700 px-1 rounded">{user.city}</span>
-                            {' '}
-                            <span className="bg-purple-100 text-purple-700 px-1 rounded">{user.category}</span>
+                    {users.length === 0 ? (
+                      <span className="text-xs text-gray-400">No users match filters</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {firstTwo.map((user: any, idx: number) => (
+                          <div key={idx} className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg">
+                            <div className="font-medium">{user.name}</div>
+                            <div className="text-xs text-blue-600 mt-1">
+                              <span className="bg-green-100 text-green-700 px-1 rounded">{user.city}</span>{' '}
+                              <span className="bg-purple-100 text-purple-700 px-1 rounded">{user.category}</span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                      {remaining > 0 && (
-                        <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
-                          +{remaining} Others
-                        </span>
-                      )}
-                    </div>
+                        ))}
+                        {remaining > 0 && (
+                          <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">+{remaining} Others</span>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td className="text-black font-medium">{row.topCity}</td>
                   <td className="text-black font-medium">{row.topCategory}</td>
                 </tr>
               );
             })}
+            {filteredActivityRows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="py-4 text-center text-sm text-gray-500">No activity rows match current filters.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
