@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, User, LogOut, Menu, Bell, HelpCircle } from "lucide-react"; // ✅ Added Menu icon for hamburger
+import { ChevronDown, User, LogOut, Menu, Bell, HelpCircle } from "lucide-react";
 
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
@@ -15,7 +15,7 @@ export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, checkAuth, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLgUp, setIsLgUp] = useState(false); // ✅ detect screen size
+  const [isLgUp, setIsLgUp] = useState(false);
   const [activeCardName, setActiveCardName] = useState<string>("");
 
   const getInitials = (value?: string | null) => {
@@ -31,7 +31,7 @@ export function Header() {
     return letters || "U";
   };
 
-  // ✅ Detect large screen
+  
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
     const onChange = () => setIsLgUp(mql.matches);
@@ -40,17 +40,17 @@ export function Header() {
     return () => mql.removeEventListener("change", onChange);
   }, []);
 
-  // Fetch user's active card
+
   useEffect(() => {
     const fetchActiveCard = async () => {
       if (!isAuthenticated) return;
-      
+
       try {
-        const response = await fetch('/api/card');
+        const response = await fetch("/api/card");
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.cards && data.cards.length > 0) {
-            // Get the first active card
+    
             const activeCard = data.cards.find((card: any) => card.cardActive !== false);
             if (activeCard) {
               setActiveCardName(activeCard.cardName || "My Card");
@@ -65,7 +65,7 @@ export function Header() {
     fetchActiveCard();
   }, [isAuthenticated]);
 
-  // Ensure auth check runs on mount
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -74,8 +74,7 @@ export function Header() {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as HTMLElement | null;
       if (!target) return;
-
-      if (!target.closest('[data-profile-menu]')) {
+      if (!target.closest("[data-profile-menu]")) {
         setIsDropdownOpen(false);
       }
     }
@@ -84,12 +83,10 @@ export function Header() {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownOpen]);
 
-  // Dynamic page title
+
   const getPageTitle = () => {
     const path = pathname.split("/").filter(Boolean);
     if (path.length === 0) return "Home";
@@ -112,33 +109,37 @@ export function Header() {
     <>
       {/* HEADER WRAPPER */}
       <header
-        className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50"
-        style={!isLgUp ? { paddingTop: "4px" } : undefined}
+        className="
+          bg-white/95 backdrop-blur-sm shadow-sm 
+          border-b border-gray-200/50 
+          sticky top-0 z-50
+        "
       >
         <div className="max-w-7xl mx-auto">
-        <div
-          className="flex justify-between items-center h-14 px-4 relative"
-        >
+          <div
+            className="
+              flex justify-between items-center 
+              h-13 sm:h-12 lg:h-14 
+              px-3 sm:px-4 
+              relative
+            "
+          >
+            {/* LEFT AREA */}
+            <div className="flex items-center">
+              {!isLgUp && (
+                <Link href="/dashboard">
+                  <Image
+                    src="/assets/headerlogo.png"
+                    alt="Logo"
+                    width={120}
+                    height={32}
+                    className="h-8 w-auto object-contain"
+                  />
+                </Link>
+              )}
+            </div>
 
-  {/* LEFT AREA — Hamburger goes here only on mobile */}
-  <div
-    className="flex items-center"
-    style={!isLgUp ? { paddingLeft: "10px" } : undefined}
-  >
-    {!isLgUp && (
-      <Link href="/dashboard">
-        <Image
-          src="/assets/headerlogo.png"
-          alt="Logo"
-          width={120}
-          height={32}
-          className="h-8 w-auto object-contain"
-        />
-      </Link>
-    )}
-  </div>
-
-            {/* RIGHT SIDE - Notifications & Profile */}
+            {/* RIGHT SIDE */}
             <div
               style={{
                 display: "flex",
@@ -148,7 +149,7 @@ export function Header() {
                 paddingRight: "32px",
               }}
             >
-              {/* Notifications icon in header (desktop & mobile) */}
+
               <Link
                 href="/dashboard/notifications"
                 className="relative flex items-center justify-center"
@@ -247,7 +248,8 @@ export function Header() {
                     )}
                   </motion.button>
                 )}
-                {/* DROPDOWN MENU - shows Help & Support, Account, Logout on all screen sizes */}
+
+                {/* DROPDOWN */}
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
@@ -265,7 +267,8 @@ export function Header() {
                         backdropFilter: "blur(8px)",
                         border: "1px solid rgba(229, 231, 235, 0.5)",
                         borderRadius: "12px",
-                        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(147, 197, 253, 0.25) inset",
+                        boxShadow:
+                          "0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(147, 197, 253, 0.25) inset",
                         paddingTop: "10px",
                         paddingBottom: "10px",
                         zIndex: 9999,
@@ -299,6 +302,7 @@ export function Header() {
                         <HelpCircle style={{ width: "16px", height: "16px" }} />
                         <span>Help & Support</span>
                       </Link>
+
                       <Link
                         href="/dashboard/settings"
                         onClick={() => setIsDropdownOpen(false)}
@@ -326,6 +330,7 @@ export function Header() {
                         <User style={{ width: "16px", height: "16px" }} />
                         <span>Account</span>
                       </Link>
+
                       <button
                         onClick={handleLogout}
                         style={{
@@ -361,9 +366,6 @@ export function Header() {
             </div>
           </div>
         </div>
-
-        {/* Spacer */}
-        <div style={{ height: "8px", visibility: "hidden" }}></div>
       </header>
     </>
   );

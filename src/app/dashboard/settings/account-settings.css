@@ -1146,3 +1146,52 @@ textarea {
 }
 
 }
+/* Wrapper to control position */
+.profile-save-wrapper {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.profile-row {
+  position: relative;
+}
+@media (max-width: 760px) {
+  .profile-save-wrapper {
+    position: static;
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    transform: none;
+  }
+}
+
+/* Sleek Save button */.profile-save-btn {
+  background: #2563eb;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.profile-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+.profile-save-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+
+@keyframes smoothFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
