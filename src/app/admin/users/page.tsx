@@ -26,6 +26,8 @@ interface User {
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
@@ -118,11 +120,29 @@ export default function UsersPage() {
         setLoading(false);
       }
     };
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const res = await fetch('/api/admin/categories');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const list = (data.categories || [])
+          .filter((c: any) => c.isActive) // Only show active categories
+          .map((c: any) => c.name)
+          .sort((a: string, b: string) => a.localeCompare(b));
+        setCategories(list);
+      }
+    } catch (e) {
+      console.error('Error fetching categories:', e);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
   
   useEffect(() => {
-    
-
     fetchUsers();
+    fetchCategories();
   }, []);
 
   // ✅ Filter logic
@@ -460,10 +480,25 @@ export default function UsersPage() {
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label> Category</label>
-                  <input
-                    value={editForm.category}
-                    onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-                  />
+                  {loadingCategories ? (
+                    <div style={{fontSize:'0.85rem', color:'#666'}}>Loading categories...</div>
+                  ) : (
+                    <select
+                      value={editForm.category || ''}
+                      onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                    >
+                      <option value="">Select Category</option>
+                      {(() => {
+                        // Ensure current category appears even if not in list
+                        const current = editForm.category;
+                        const options = categories.slice();
+                        if (current && !options.includes(current)) options.unshift(current);
+                        return options.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ));
+                      })()}
+                    </select>
+                  )}
                 </div>
                 <div className={styles.formGroup}>
                   <label> Status</label>
