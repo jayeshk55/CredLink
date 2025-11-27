@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, Users, Mail, Phone, Calendar, ExternalLink } from "lucide-react";
+import { Search, Users, Mail, Phone, Calendar, ExternalLink, MoreHorizontal } from "lucide-react";
 import { toast } from "react-hot-toast";
 import styles from "./contacts.module.css";
 
@@ -38,6 +38,7 @@ export default function ContactsPage() {
   const [contacts, setContacts] = useState<ContactConnection[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Fetch contacts from API
   useEffect(() => {
@@ -141,40 +142,36 @@ export default function ContactsPage() {
           <div className={styles.titleSection}>
             <h1 className={styles.title}>
               {/* <Users className={styles.titleIcon} /> */}
-              My Contacts
+              Lead
             </h1>
             <p className={styles.subtitle}>
-              People who connected with your cards
+             People who reached out using your MyKard link.
             </p>
-          </div>
-          <div className={styles.statsSection}>
-            <div className={styles.statCard}>
-              <span className={styles.statNumber}>{contacts.length}</span>
-              <span className={styles.statLabel}>Total Contacts</span>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Search Bar */}
       <div className={styles.searchSection}>
-        <div className={styles.searchContainer}>
-          <Search className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search contacts by name, email, phone, or card..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.searchInput}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className={styles.clearButton}
-            >
-              ×
-            </button>
-          )}
+        <div className={styles.searchRow}>
+          <div className={styles.searchContainer}>
+            <Search className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder={`Search ${contacts.length} contact${contacts.length !== 1 ? 's' : ''}`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className={styles.clearButton}
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -238,6 +235,25 @@ export default function ContactsPage() {
                           <Calendar size={14} />
                           {formatRelativeTime(contact.createdAt)}
                         </span>
+                        <div className={styles.dropdownContainer}>
+                          <button
+                            onClick={() => setOpenDropdown(openDropdown === contact.id ? null : contact.id)}
+                            className={styles.moreButton}
+                            title="More options"
+                          >
+                            <MoreHorizontal size={16} />
+                          </button>
+                          {openDropdown === contact.id && (
+                            <div className={styles.dropdownMenu}>
+                              <button 
+                                onClick={() => handleDeleteContact(contact.id)}
+                                className={styles.dropdownItemDelete}
+                              >
+                                Delete Contact
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -275,14 +291,10 @@ export default function ContactsPage() {
                           )}
                         </span>
                       </p>
-
-                      <button
-                        onClick={() => handleDeleteContact(contact.id)}
-                        className={styles.deleteButton}
-                        title="Delete contact"
-                      >
-                        Delete
-                      </button>
+                      <div className={styles.mobileTimeStamp}>
+                        <Calendar size={14} />
+                        {formatRelativeTime(contact.createdAt)}
+                      </div>
                     </div>
                   </div>
                 ))}
