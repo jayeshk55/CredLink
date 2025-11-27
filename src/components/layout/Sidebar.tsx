@@ -436,7 +436,7 @@ const Sidebar = () => {
     // { name: "Notifications", path: "/dashboard/notifications", icon: <Bell /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
-    { name: "Contacts", path: "/dashboard/contacts", icon: <ContactRound /> },
+    { name: "Lead", path: "/dashboard/contacts", icon: <ContactRound /> },
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 

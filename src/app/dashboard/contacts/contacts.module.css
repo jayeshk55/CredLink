@@ -133,15 +133,30 @@
 }
 
 .statNumber {
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #1e67f4;
 }
 
 .statLabel {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #6b7280;
   font-weight: 600;
+}
+
+.inlineStatCard {
+  flex: 1 1 0;
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(30, 103, 244, 0.18);
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(30, 103, 244, 0.06);
+  margin-left: auto;
+  gap: 0.5rem;
 }
 
 /* --- Search Section --- */
@@ -156,11 +171,54 @@
   box-sizing: border-box;
 }
 
+.searchRow {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 900px;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
 .searchContainer {
   position: relative;
   width: 100%;
-  max-width: 550px;
+  max-width: none;
+  flex: 1 1 auto;
+  min-width: 0;
   box-sizing: border-box;
+}
+
+.inlineStatCard {
+  flex: 0 0 20%;
+  min-width: 20%;
+  max-width: 20%;
+  margin-left: auto;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(30, 103, 244, 0.18);
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(30, 103, 244, 0.06);
+  gap: 0.25rem;
+}
+
+/* Mobile adjustments for inline stat card */
+@media (max-width: 768px) {
+  .inlineStatCard {
+    padding: 0.5rem 0.6rem;
+    gap: 0.2rem;
+  }
+  
+  .statNumber {
+    font-size: 1rem;
+  }
+  
+  .statLabel {
+    font-size: 0.65rem;
+  }
 }
 
 /* iOS-style search bar - 28-30px radius, curved, responsive */
@@ -336,7 +394,6 @@
   grid-template-columns: 1fr;
   gap: 1.5rem;
   animation: slideInUp 0.8s ease-out;
-  justify-items: center;
 }
 
 /* --- Contact Card --- */
@@ -350,7 +407,6 @@
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   width: 100%;
-  max-width: 520px;
   box-sizing: border-box;
 }
 
@@ -364,23 +420,42 @@
 /* --- Contact Header (Avatar + Name + Timestamp) --- */
 .contactHeader {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
-  gap: 1rem;
-  flex-wrap: wrap;
+}
+
+.contactMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: auto;
+  max-width: 50%;
+}
+
+.contactMetaTop {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: 100%;
+  margin-bottom: 0.75rem;
 }
 
 .contactInfo {
   display: flex;
-  align-items: flex-start;
-  gap: 0.4rem;
-  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .contactDetails {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -388,110 +463,11 @@
   text-align: left;
 }
 
-.contactMainColumns {
-  display: flex;
-  flex: 1 1 auto;
-  gap: 1rem;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.profileColumn {
-  flex: 1 1 40%;
-  min-width: 0;
-}
-
-.channelColumn {
-  flex: 1 1 50%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-/* Key-value contact info grid (Phone / Email) */
-.contactDetailGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.25rem 0;
-}
-
-.detailRow {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  column-gap: 1.25rem;
-}
-
-.detailLabel {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #9ca3af;
-}
-
-.detailValueButton {
-  border: none;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  text-align: right;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #111827;
-  cursor: pointer;
-  word-break: break-all;
-}
-
-.detailValueButton:hover {
-  color: #1e67f4;
-}
-
-.inlineContactRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
-  flex-wrap: wrap;
-}
-
-.inlineIconButton {
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
-  border: none;
-  background-color: #e5edff;
-  color: #1e67f4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  padding: 0;
-}
-
-.inlineIconButton:hover {
-  background-color: #1e67f4;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(30, 103, 244, 0.3);
-}
-
-.inlineContactText {
-  font-size: 0.8rem;
-  color: #4b5563;
-  background-color: #eef2ff;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
-  max-width: 100%;
-  word-wrap: break-word;
-}
-
 /* Avatar properly sized, aligned left */
 .avatar {
   width: 3.5rem;
   height: 3.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #1e67f4 0%, #1652cc 100%);
   color: #ffffff;
   border-radius: 50%;
   display: flex;
@@ -501,6 +477,7 @@
   font-weight: 800;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(30, 103, 244, 0.2);
+  order: -1;
 }
 
 /* Text wraps gracefully, no overflow */
@@ -523,6 +500,19 @@
   line-height: 1.5;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Remove container styling from contacted via on mobile */
+@media (max-width: 768px) {
+  .contactCardText {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
 }
 
 .cardName {
@@ -536,39 +526,110 @@
   font-size: 0.8rem;
 }
 
-/* Timestamp badge top-right, minimal */
-.contactMeta {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
 .timeStamp {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.8rem;
-  color: #ffffff;
-  background-color: #1e67f4;
-  padding: 0.4rem 0.9rem;
-  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  background-color: #f3f4f6;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(30, 103, 244, 0.25);
+}
+
+.mobileTimeStamp {
+  display: none;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/* --- Dropdown Menu --- */
+.dropdownContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.moreButton {
+  background: none;
+  border: none;
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: all 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moreButton:hover {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e6e9ee;
+  border-radius: 0.625rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.dropdownItemDelete {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out;
+  font-weight: 500;
+}
+
+.dropdownItemDelete:hover {
+  background-color: #fef2f2;
+}
+
+/* Hide desktop timestamp on mobile */
+@media (max-width: 768px) {
+  .timeStamp {
+    display: none;
+  }
+
+  .mobileTimeStamp {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
 }
 
 /* --- Contact Actions (Email/Phone/Source Buttons) --- */
 /* Buttons responsive, full-width on mobile, horizontal on desktop */
 .contactActions {
   display: flex;
-  flex-direction: row;
   gap: 0.75rem;
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #e5e7eb;
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
 /* Button styling - interactive, smooth transitions */
@@ -605,6 +666,84 @@
   transform: translateY(0);
 }
 
+/* --- Desktop Inline Search Bar (matches search page) --- */
+.desktopSearchBar {
+  display: none;
+  margin-bottom: 2rem;
+  position: relative;
+  width: 100%;
+}
+
+.desktopSearchContainer {
+  position: relative;
+  width: 100%;
+}
+
+.desktopSearchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #94A3B8;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.desktopSearchInput {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background: #fff;
+  color: #0F172A;
+  font-size: 14px;
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.desktopSearchInput:focus {
+  border-color: #1e67f4;
+  box-shadow: 0 0 0 4px rgba(30, 103, 244, 0.08), 0 8px 20px rgba(30, 103, 244, 0.15);
+}
+
+.desktopSearchInput::placeholder {
+  color: rgba(15, 23, 42, 0.4);
+}
+
+.desktopClearButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  padding: 0.25rem;
+}
+
+.desktopClearButton:hover {
+  color: #111827;
+}
+
+/* Show desktop search bar only on desktop screens */
+@media (min-width: 769px) {
+  .desktopSearchBar {
+    display: block;
+  }
+  
+  /* Hide original mobile search bar on desktop */
+  .searchSection {
+    display: none;
+  }
+}
+
 /* --- Mobile Responsiveness (CRITICAL) --- */
 /* Mobile fixes - 16-20px side padding, centered layout, full-width cards */
 @media (max-width: 768px) {
@@ -620,6 +759,13 @@
     font-size: 2rem;
     font-weight: 800;
     margin: 0;
+    color: #111827;
+    letter-spacing: -0.025em;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 4px;
+    font-size: 24px;
+    font-weight: bold;
   }
 
   .titleIcon {
@@ -649,9 +795,21 @@
     font-size: 0.75rem;
   }
 
- .searchSection {
+  .searchSection {
     margin-bottom: 2rem;
-} 
+  }
+
+  .searchRow {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .inlineStatCard {
+    flex: 1 1 0;
+    min-width: 120px;
+    margin-left: 0;
+    padding: 0.75rem 0.9rem;
+  }
 
   .searchInput {
     font-size: 16px;
@@ -663,71 +821,84 @@
     grid-template-columns: 1fr;
     gap: 0.625rem;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .actionButton {
     width: 100%;
     flex: 0 1 auto;
-    justify-content: center;
+    justify-content: flex-start;
+    background-color: #f3f4f6;
+    border: 1px solid #e6e9ee;
+    padding: 0.75rem 1rem;
   }
 
   .phoneButton {
-    justify-self: center;
-    width: auto;
-    min-width: 60%;
+    justify-self: flex-start;
+    width: 100%;
+    min-width: auto;
   }
 
 	/* Slightly wider message card left/right on mobile */
 	.messageButton {
-		width: calc(100% + 0.75rem);
-		margin: 0 -0.375rem;
+		width: 100%;
+		margin: 0;
 	}
 
-  /* Mobile - reduce avatar size but keep it left-aligned */
+  .mobileTimeStamp {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  /* Mobile - reduce avatar size */
   .avatar {
     width: 3rem;
     height: 3rem;
     font-size: 1.2rem;
-    margin: 0;
+    margin: 0 auto;
   }
 
-  /* Mobile - header inline: avatar+name left, timestamp right */
+  /* Mobile - header flexible layout */
   .contactHeader {
     flex-direction: row;
-    gap: 0.75rem;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-  }
-
-  .contactMainColumns {
-    flex-direction: column;
     gap: 0.75rem;
+    margin-bottom: 1rem;
   }
 
-  .profileColumn,
-  .channelColumn {
-    flex: 1 1 100%;
+  .contactMeta {
+    justify-content: flex-end;
+    margin-left: 0;
+    align-items: flex-start;
+    flex-shrink: 0;
+    width: auto;
+    max-width: 50%;
+  }
+
+  .contactMetaTop {
+    justify-content: flex-end;
+    margin-left: 0;
     width: 100%;
+    margin-bottom: 0.75rem;
   }
 
   .contactInfo {
-    flex-direction: row;
+    display: flex;
     align-items: center;
-    text-align: left;
+    gap: 0.75rem;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .contactDetails {
     text-align: left;
-  }
-
-  .contactRow {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .contactMeta {
-    align-self: auto;
-    margin-top: 0;
+    align-items: flex-start;
   }
 
   .contactCard {
@@ -741,7 +912,7 @@
 
   .contactName {
     font-size: 1rem;
-    text-align: left;
+    text-align: center;
   }
 
   .contactCardText {
