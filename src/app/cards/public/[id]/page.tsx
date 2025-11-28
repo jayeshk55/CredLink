@@ -434,7 +434,7 @@ const PublicCardPage = () => {
         />
         {/* ---- MyKard Create Section ---- */}
 <div className={styles.createSection}>
-  <p className={styles.poweredText}>Powered by <strong>MyKard.in</strong></p>
+  <p className={styles.poweredText}>Created by <strong>MyKard.in</strong></p>
 
   <a href="https://www.mykard.in/auth/signup" className={styles.createButton}>
     Create Your Digital Card

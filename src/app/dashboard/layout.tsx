@@ -7,86 +7,98 @@ import { Header } from "@/components/layout/header";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { isAuthenticated, checkAuth, isLoading } = useAuth();
+  const { checkAuth } = useAuth();
+
   const [isLgUp, setIsLgUp] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  /* ---------------- CHECK AUTH ---------------- */
   useEffect(() => {
-    // Check auth when dashboard layout mounts
     checkAuth();
+  }, []);
+
+  /* ---------------- BREAKPOINT CHECK ---------------- */
+  useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
-    const onChange = () => setIsLgUp(mql.matches);
-    onChange();
-    // @ts-ignore
-    (mql.addEventListener ? mql.addEventListener("change", onChange) : mql.addListener(onChange));
-    return () => {
-      // @ts-ignore
-      (mql.removeEventListener ? mql.removeEventListener("change", onChange) : mql.removeListener(onChange));
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    const update = () => setIsLgUp(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
-    const mqMobile = window.matchMedia("(max-width: 767px)");
-    const handleMobileChange = () => setIsMobile(mqMobile.matches);
-    handleMobileChange();
-    // @ts-ignore
-    (mqMobile.addEventListener ? mqMobile.addEventListener("change", handleMobileChange) : mqMobile.addListener(handleMobileChange));
-    return () => {
-      // @ts-ignore
-      (mqMobile.removeEventListener ? mqMobile.removeEventListener("change", handleMobileChange) : mqMobile.removeListener(handleMobileChange));
-    };
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
 
-  const isCreateOrEditPage = pathname === "/dashboard/create" || pathname === "/dashboard/edit";
-  const isContactsPage = pathname === "/dashboard/contacts";
-  const isSearchPage = pathname === "/dashboard/search";
-  const isNotificationsPage = pathname === "/dashboard/notifications";
+  /* ---------------- RESET SCROLL ON PAGE CHANGE ---------------- */
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
-  const shouldSkipPadding = isMobile && (isCreateOrEditPage || isContactsPage || isSearchPage || isNotificationsPage);
-  const mainStyle: React.CSSProperties = shouldSkipPadding
-    ? { background: "transparent" }
-    : {
-        padding: "24px",
-        background: "transparent",
-      };
+ // Pages that require FULL WIDTH with 0 padding like Create page
+const noPaddingPages = [
+  "/dashboard/create",
+  "/dashboard/edit",
+  "/dashboard/search",
+  "/dashboard/connections",
+];
+
+const isNoPaddingPage = noPaddingPages.includes(pathname);
+
+const mainStyle: React.CSSProperties = isMobile && isNoPaddingPage
+  ? {
+      paddingTop: "0px",
+      paddingLeft: "0px",
+      paddingRight: "0px",
+      paddingBottom: "60px", // required for floating navbar
+      margin: "0px",
+      background: "transparent",
+    }
+  : {
+      paddingTop: "8px",
+      paddingLeft: "12px",
+      paddingRight: "12px",
+      paddingBottom: "60px",
+      background: "transparent",
+    };
+
 
   return (
-    <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
-      {/* Sidebar */}
-      <Sidebar />
+    <div
+      className="h-screen overflow-x-hidden"
+      style={{ backgroundColor: "#f8fafc" }}
+    >
+      {/* FIXED SIDEBAR (Always below header) */}
+      <div className="fixed left-0 top-0 h-full w-72 z-40">
+        <Sidebar />
+      </div>
 
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <div
         className="h-full flex flex-col"
-        style={{ 
-          marginLeft: isLgUp ? '18rem' : '0', // 18rem = 288px matches sidebar width
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          transition: 'margin-left 0.3s ease-in-out'
+        style={{
+          marginLeft: isLgUp ? "18rem" : "0",
+          transition: "margin-left 0.3s ease",
+          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
         }}
       >
-        {/* Header */}
-        <div className="sticky top-0 z-30 bg-white shadow-sm">
-          {/* Removed duplicate mobile hamburger - using Sidebar's blue hamburger instead */}
+        {/* FIXED HEADER (Always above main, below sidebar) */}
+        <header className="sticky top-0 z-30 bg-white shadow-sm">
           <Header />
-        </div>
+        </header>
 
-        {/* Main Page Area */}
-        <main 
-          className="flex-1 overflow-y-auto"
-          style={mainStyle}
-        >
+        {/* PAGES */}
+        <main className="flex-1 overflow-y-auto" style={mainStyle}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           >
             {children}
           </motion.div>
