@@ -18,6 +18,29 @@
   overflow: visible !important;
 }
 
+/* Dashboard Header Fix */
+.dashboard-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 50 !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+}
+
+/* Reset scroll position on page load */
+html, body {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+/* Force scroll reset on page load */
+@page {
+  size: auto;
+  margin: 0;
+}
+
 @supports (-webkit-touch-callout: none) {
   .mobile-fixed-header {
     position: absolute !important;

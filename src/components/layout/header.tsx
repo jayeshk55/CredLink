@@ -109,20 +109,11 @@ export function Header() {
     <>
       {/* HEADER WRAPPER */}
       <header
-        className="
-          bg-white/95 backdrop-blur-sm shadow-sm 
-          border-b border-gray-200/50 
-          sticky top-0 z-50
-        "
+        className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50"
       >
         <div className="max-w-7xl mx-auto">
           <div
-            className="
-              flex justify-between items-center 
-              h-13 sm:h-12 lg:h-14 
-              px-3 sm:px-4 
-              relative
-            "
+            className="flex justify-between items-center h-13 sm:h-12 lg:h-14 px-3 sm:px-4 relative"
           >
             {/* LEFT AREA */}
             <div className="flex items-center">
