@@ -7,7 +7,7 @@
   left: 0 !important;
   right: 0 !important;
   width: 100vw !important;
-  min-height: 80px !important;
+  min-height: 50px !important;
   height: auto !important;
   z-index: 999999 !important;
   transform: translate3d(0, 0, 0) !important;
