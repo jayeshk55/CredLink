@@ -34,27 +34,6 @@ export default function DashboardLayout({
   }, []);
 
   useEffect(() => {
-    // Reset scroll position to top on page load
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    
-    // Also reset on route changes
-    const handleRouteChange = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
-    
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', handleRouteChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, [pathname]);
-
-  useEffect(() => {
     const mqMobile = window.matchMedia("(max-width: 767px)");
     const handleMobileChange = () => setIsMobile(mqMobile.matches);
     handleMobileChange();
@@ -94,7 +73,7 @@ export default function DashboardLayout({
         }}
       >
         {/* Header */}
-        <div className="bg-white shadow-sm dashboard-header">
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
           {/* Removed duplicate mobile hamburger - using Sidebar's blue hamburger instead */}
           <Header />
         </div>
