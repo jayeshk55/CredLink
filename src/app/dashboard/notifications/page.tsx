@@ -87,11 +87,25 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div style={{ padding: '24px 24px 120px' }}>
-      <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827", marginBottom: 8 }}>
+    <div style={{ padding: '16px 16px 120px' }}>
+      <h1 style={{ 
+        fontSize: '28px', 
+        fontWeight: 700, 
+        color: '#111827', 
+        marginBottom: 8,
+        lineHeight: '1.05',
+        textAlign: 'center',
+        fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial'
+      }}>
         Notifications
       </h1>
-      <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 12 }}>
+      <p style={{ 
+        fontSize: '14px', 
+        color: "#6b7280", 
+        marginBottom: 12,
+        textAlign: 'center',
+        lineHeight: '1.4'
+      }}>
         Stay up to date with your account activity
       </p>
 

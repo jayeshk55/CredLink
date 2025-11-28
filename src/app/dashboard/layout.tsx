@@ -99,9 +99,6 @@ export default function DashboardLayout({
           <Header />
         </div>
 
-        {/* Spacer to push content below header */}
-        <div className="h-14 bg-white"></div>
-
         {/* Main Page Area */}
         <main 
           className="flex-1 overflow-y-auto"
