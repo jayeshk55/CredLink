@@ -2679,7 +2679,8 @@ const EditPage = () => {
       backgroundColor: '#f0f2f5', 
       padding: '10px', 
       boxSizing: 'border-box',
-      gap: '15px'
+      gap: '15px',
+      paddingBottom: '110px'
     }}>
       <style>{`
         @media (min-width: 768px) {
@@ -2704,7 +2705,7 @@ const EditPage = () => {
       <style>{`
         .create-wrap { padding: 10px; }
         @media (max-width: 720px) {
-          .create-wrap { padding: 6px 8px !important; }
+          .create-wrap { padding: 6px 8px 120px !important; }
         }
       `}</style>
 
