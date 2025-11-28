@@ -881,7 +881,7 @@ export default function MessagesPage() {
                       </div>
                     </div>
 
-                    {(m.title || m.company) && (
+                    {/* {(m.title || m.company) && (
                       <p
                         style={{
                           margin: 0,
@@ -895,7 +895,7 @@ export default function MessagesPage() {
                       >
                         {[m.title, m.company].filter(Boolean).join(" • ")}
                       </p>
-                    )}
+                    )} */}
 
                     <p
                       className="message-text-left"
@@ -981,16 +981,23 @@ export default function MessagesPage() {
                   )}
                 </div>
                 <div>
-                  <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: colors.textMain }}>{activeMessage.name}</h2>
+                  <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: colors.textMain, marginBottom: '4px' }}>{activeMessage.name}</h2>
                   {(activeMessage.title || activeMessage.company) && (
                     <p style={{ fontSize: "12px", margin: 0, color: colors.textSec }}>
                       {[activeMessage.title, activeMessage.company].filter(Boolean).join(" • ")}
                     </p>
                   )}
-                  <p style={{ fontSize: "12px", margin: 0, color: colors.textSec }}>{activeMessage.email}</p>
                 </div>
               </div>
-              <button onClick={() => setDetailId(null)} style={{ background: "transparent", border: "none", cursor: "pointer", color: colors.textLight }}>
+              <button 
+                onClick={() => setDetailId(null)} 
+                style={{ 
+                  background: "transparent", 
+                  border: "none", 
+                  cursor: "pointer", 
+                  color: colors.textLight 
+                }}
+              >
                 <X style={{ width: "20px", height: "20px" }} />
               </button>
             </div>
