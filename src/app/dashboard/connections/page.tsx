@@ -80,10 +80,23 @@ export default function DashboardContactPage() {
   const [approveModal, setApproveModal] = useState<{isOpen: boolean, request: Contact | null}>({isOpen: false, request: null});
   const filterRef = useRef<HTMLDivElement>(null);
   const [hasUnreadRequests, setHasUnreadRequests] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
     setHasUnreadRequests(connectionRequests.length > 0 && activeTab !== 'requests');
   }, [connectionRequests, activeTab]);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 420px)');
+    const onChange = () => setIsSmallScreen(mql.matches);
+    onChange();
+    // @ts-ignore
+    (mql.addEventListener ? mql.addEventListener('change', onChange) : mql.addListener(onChange));
+    return () => {
+      // @ts-ignore
+      (mql.removeEventListener ? mql.removeEventListener('change', onChange) : mql.removeListener(onChange));
+    };
+  }, []);
 
   const handleTabClick = (tab: 'connections' | 'requests') => {
     setActiveTab(tab);
@@ -928,7 +941,7 @@ export default function DashboardContactPage() {
                       {sortedContacts.map((contact) => (
                         <tr key={contact.id} className={styles.tableRow}>
                           <td className={styles.tableDataCell}>
-                            <div className={styles.flexCenterGap}>
+                            <div className={styles.flexCenterGap} style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                               <div className={styles.avatarPlaceholder}>
                                 {contact.avatar ? (
                                   <img
@@ -942,10 +955,18 @@ export default function DashboardContactPage() {
                                   </span>
                                 )}
                               </div>
-                              <div>
+                              <div style={{ minWidth: 0 }}>
                                 <button
                                   onClick={() => setPreviewContact(contact)}
                                   className={styles.contactNameButton}
+                                  style={{
+                                    display: 'block',
+                                    maxWidth: '320px',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    textAlign: 'left'
+                                  }}
                                 >
                                   {contact.name}
                                 </button>
@@ -978,12 +999,18 @@ export default function DashboardContactPage() {
                           <td className={styles.tableDataDate}>
                             <span>{contact.dateAdded}</span>
                           </td>
-                          <td className={styles.tableDataCell}>
+                          <td className={styles.tableDataCell} style={{ whiteSpace: 'nowrap' }}>
                             <button
                               onClick={() => handleDirectMessage(contact)}
                               className={styles.messageButton}
+                              style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                              aria-label="Message"
                             >
-                              Message
+                              {isSmallScreen ? (
+                                <MessageCircle style={{ width: 16, height: 16 }} />
+                              ) : (
+                                'Message'
+                              )}
                             </button>
                           </td>
                           <td className={styles.tableDataCell}>
@@ -991,6 +1018,7 @@ export default function DashboardContactPage() {
                               <button 
                                 onClick={() => setOpenDropdown(openDropdown === contact.id ? null : contact.id)}
                                 className={styles.moreButton}
+                                style={{ flexShrink: 0 }}
                               >
                                 <MoreHorizontal className={styles.moreIcon} />
                               </button>
@@ -1068,13 +1096,20 @@ export default function DashboardContactPage() {
                                 <button
                                   onClick={() => handleDirectMessage(contact)}
                                   className={styles.mobileMessageButton}
+                                  style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                                  aria-label="Message"
                                 >
-                                  Message
+                                  {isSmallScreen ? (
+                                    <MessageCircle style={{ width: 16, height: 16 }} />
+                                  ) : (
+                                    'Message'
+                                  )}
                                 </button>
                                 <div className={styles.relativeContainer}>
                                   <button 
                                     onClick={() => setOpenDropdown(openDropdown === contact.id ? null : contact.id)}
                                     className={styles.mobileMoreButton}
+                                    style={{ flexShrink: 0 }}
                                   >
                                     <MoreHorizontal className={styles.mobileMoreIcon} />
                                   </button>
