@@ -117,6 +117,27 @@ const Dashboard = () => {
     }
   }, [isAuthenticated, isLoading]);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mqMobile = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mqMobile.matches);
+    };
+    
+    checkMobile();
+    
+    const mqMobile = window.matchMedia("(max-width: 767px)");
+    const handleMobileChange = () => setIsMobile(mqMobile.matches);
+    
+    // @ts-ignore
+    (mqMobile.addEventListener ? mqMobile.addEventListener("change", handleMobileChange) : mqMobile.addListener(handleMobileChange));
+    return () => {
+      // @ts-ignore
+      (mqMobile.removeEventListener ? mqMobile.removeEventListener("change", handleMobileChange) : mqMobile.removeListener(handleMobileChange));
+    };
+  }, []);
+
   // Force scroll to top on mount to fix reload scroll offset
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -184,7 +205,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background px-8 sm:px-14 py-8 lg:ml-64 transition-all duration-300">
+    <div className="min-h-screen bg-background px-8 sm:px-14 py-8 lg:ml-64 transition-all duration-300" style={{ paddingBottom: isMobile ? '110px' : '0' }}>
       {/* Create New Card Button */}
       <div className="flex justify-center my-6">
         <motion.button
