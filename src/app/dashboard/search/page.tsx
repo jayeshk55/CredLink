@@ -212,6 +212,7 @@ function SearchPageContent() {
           .wrap { padding: 2px 1rem; padding-bottom: 80px; }
           .header { gap: 2px; margin-bottom: 8px; }
           .title { font-size:24px; }
+          .subtitle { font-size: 0.8rem; }
           .left input { padding: 12px 16px 12px 44px; font-size:14px; margin-top: 2px; }
           .left input::placeholder { font-size:13px; }
           .meta { text-align:center; }
@@ -222,6 +223,7 @@ function SearchPageContent() {
 
         @media (max-width: 480px) {
           .wrap { padding: 2px 0.75rem; padding-bottom: 80px; }
+          .subtitle { font-size: 0.75rem; }
           .card { min-height: 75px; padding: 6px; gap: 6px; }
           .avatar { width:44px; height:44px; font-size:16px; }
         }
