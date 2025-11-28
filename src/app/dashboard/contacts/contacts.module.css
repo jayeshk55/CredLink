@@ -812,6 +812,11 @@
 
   .searchInput {
     font-size: 12px;
+    padding: 0.5rem 1rem 0.5rem 2.75rem;
+  }
+
+  .searchInput::placeholder {
+    font-size: 12px;
   }
 
   /* Mobile - buttons in a single row */
@@ -977,7 +982,11 @@
 
   .searchInput {
     font-size: 16px;
-    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    padding: 0.5rem 1rem 0.5rem 2.25rem;
+  }
+
+  .searchInput::placeholder {
+    font-size: 12px;
   }
 
   .searchIcon {
