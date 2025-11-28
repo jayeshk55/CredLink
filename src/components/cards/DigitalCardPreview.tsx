@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styles from './cardType.module.css';
 import { capitalizeFirstLetter } from '@/lib/utils';
+import StarBulletModal from "./StarBulletModal";
 
 export interface DigitalCardProps {
   firstName?: string;
@@ -84,24 +85,15 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const [activePanel, setActivePanel] = useState<Section | null>(null);
 
   const openPortfolio = () => {
-    const val = (portfolio || '').trim();
-    if (!val) {
-      setActivePanel('Portfolio');
-      return;
-    }
+    setActivePanel('Portfolio');
+  };
 
-    const items = val.split(',').map((s) => s.trim()).filter(Boolean);
-
-    // If there are multiple portfolio entries, show the panel so each is clickable
-    if (items.length !== 1) {
-      setActivePanel('Portfolio');
-      return;
-    }
-
-    const target = items[0];
-    const hasProto = /^https?:\/\//i.test(target);
-    const url = hasProto ? target : `https://${target}`;
-    if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+  const sectionText: Record<Section, string> = {
+    Services: services || "",
+    Portfolio: portfolio || "",
+    Skills: skills || "",
+    Experience: experience || "",
+    Review: review || "",
   };
 
   return (
@@ -360,118 +352,13 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {/* MODAL INSERTED HERE */}
-      {activePanel && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-            padding: "20px",
-          }}
-          onClick={() => setActivePanel(null)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: "16px",
-              width: "100%",
-              maxWidth: "420px",
-              maxHeight: "80vh",
-              overflow: "auto",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-            }}
-          >
-            <div
-              style={{
-                padding: "16px",
-                borderBottom: "1px solid #eee",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <h3 style={{ margin: 0, color: "#111827", fontWeight: 700 }}>
-                {activePanel}
-              </h3>
-              <button
-                onClick={() => setActivePanel(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                  color: "#6B7280",
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            <div style={{ padding: "16px" }}>
-              {(() => {
-                const panels: Record<string, string> = {
-                  Services: services,
-                  Skills: skills,
-                  Portfolio: portfolio,
-                  Experience: experience,
-                  Review: review,
-                };
-
-                return (
-                  panels[activePanel]
-                    ?.split(",")
-                    .map((item, i) => {
-                      const trimmed = item.trim();
-                      if (!trimmed) return null;
-                      const isUrl = /^https?:\/\//i.test(trimmed) || /^[\w.-]+\.[a-z]{2,}/i.test(trimmed);
-                      const href = isUrl
-                        ? (/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`)
-                        : undefined;
-
-                      return (
-                        <div
-                          key={i}
-                          style={{
-                            background: "#f9fafb",
-                            padding: "10px 12px",
-                            marginBottom: "10px",
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                            color: "#111827",
-                            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                          }}
-                        >
-                          {isUrl && href ? (
-                            <a
-                              href={href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                color: "#111827",
-                                textDecoration: "none",
-                                wordBreak: "break-all",
-                              }}
-                            >
-                              {trimmed}
-                            </a>
-                          ) : (
-                            trimmed
-                          )}
-                        </div>
-                      );
-                    })
-                );
-              })()}
-            </div>
-          </div>
-        </div>
-      )}
+      <StarBulletModal
+        activePanel={activePanel}
+        isMobile={false}
+        themeColor1={themeColor1}
+        panelText={sectionText}
+        onClose={() => setActivePanel(null)}
+      />
 
       </div>
     </div>

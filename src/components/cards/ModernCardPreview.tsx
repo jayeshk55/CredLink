@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
+import StarBulletModal from "./StarBulletModal";
 import { capitalizeFirstLetter } from '@/lib/utils';
 
 // Modern Template
 const ModernCardPreview: React.FC<DigitalCardProps> = ({
   firstName = "", middleName = "", lastName = "", cardName = "",cardType = "",
   title = "", company = "", location = "", about = "", photo = "", cover = "",
-  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  email = "", phone = "", linkedin = "", website = "",
+  themeColor1 = "#3b82f6", themeColor2 = "#2563eb", fontFamily = "system-ui, sans-serif",
   skills = "", portfolio = "", experience = "", services = "", review = "", documentUrl, onDocumentClick,
 }) => {
 
@@ -21,6 +23,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
@@ -49,12 +52,12 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ fontWeight: 700, color: '#111827', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}
+                style={{ fontWeight: 700, color: '#111827', textDecoration: 'none', display: 'block', wordBreak: 'break-word' }}
               >
                 {title}
               </a>
             ) : (
-              <div style={{ fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{title}</div>
+              <div style={{ fontWeight: 700, color: '#111827', wordBreak: 'break-word' }}>{title}</div>
             )}
             {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
           </div>
@@ -63,34 +66,225 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
     );
   };
 
+  const MAX_ITEM_LENGTH = 140;
+
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
       const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
+          {items.map((it, idx) => {
+            const key = `${section}-${idx}`;
+            const isExpanded = !!expandedItems[key];
+            const needsShowMore = it.length > MAX_ITEM_LENGTH;
+            const displayText = !needsShowMore || isExpanded ? it : `${it.slice(0, MAX_ITEM_LENGTH)}...`;
+
+            return (
+              <div key={key}>
+                {renderItem(displayText)}
+                {needsShowMore && (
+                  <button
+                    onClick={() =>
+                      setExpandedItems((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                    style={{
+                      marginTop: 4,
+                      marginLeft: 40,
+                      fontSize: 12,
+                      color: themeColor1,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     }
     if (section === 'Services') {
       const items = servicesList;
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => {
+            const key = `${section}-${idx}`;
+            const isExpanded = !!expandedItems[key];
+            const needsShowMore = it.length > MAX_ITEM_LENGTH;
+            const displayText = !needsShowMore || isExpanded ? it : `${it.slice(0, MAX_ITEM_LENGTH)}...`;
+
+            return (
+              <div key={key}>
+                {renderItem(displayText)}
+                {needsShowMore && (
+                  <button
+                    onClick={() =>
+                      setExpandedItems((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                    style={{
+                      marginTop: 4,
+                      marginLeft: 40,
+                      fontSize: 12,
+                      color: themeColor1,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
     }
     if (section === 'Portfolio') {
       const items = portfolioList;
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => {
+            const key = `${section}-${idx}`;
+            const isExpanded = !!expandedItems[key];
+            const needsShowMore = it.length > MAX_ITEM_LENGTH;
+            const displayText = !needsShowMore || isExpanded ? it : `${it.slice(0, MAX_ITEM_LENGTH)}...`;
+
+            return (
+              <div key={key}>
+                {renderItem(displayText)}
+                {needsShowMore && (
+                  <button
+                    onClick={() =>
+                      setExpandedItems((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                    style={{
+                      marginTop: 4,
+                      marginLeft: 40,
+                      fontSize: 12,
+                      color: themeColor1,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
     }
     if (section === 'Experience') {
       const items = experienceList;
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => {
+            const key = `${section}-${idx}`;
+            const isExpanded = !!expandedItems[key];
+            const needsShowMore = it.length > MAX_ITEM_LENGTH;
+            const displayText = !needsShowMore || isExpanded ? it : `${it.slice(0, MAX_ITEM_LENGTH)}...`;
+
+            return (
+              <div key={key}>
+                {renderItem(displayText)}
+                {needsShowMore && (
+                  <button
+                    onClick={() =>
+                      setExpandedItems((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                    style={{
+                      marginTop: 4,
+                      marginLeft: 40,
+                      fontSize: 12,
+                      color: themeColor1,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
     }
     if (section === 'Review') {
       const items = reviewList;
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => {
+            const key = `${section}-${idx}`;
+            const isExpanded = !!expandedItems[key];
+            const needsShowMore = it.length > MAX_ITEM_LENGTH;
+            const displayText = !needsShowMore || isExpanded ? it : `${it.slice(0, MAX_ITEM_LENGTH)}...`;
+
+            return (
+              <div key={key}>
+                {renderItem(displayText)}
+                {needsShowMore && (
+                  <button
+                    onClick={() =>
+                      setExpandedItems((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
+                    style={{
+                      marginTop: 4,
+                      marginLeft: 40,
+                      fontSize: 12,
+                      color: themeColor1,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
     }
     return null;
   };
   
+  const sectionText: Record<Section, string> = {
+    Services: services,
+    Portfolio: portfolio,
+    Skills: skills,
+    Experience: experience,
+    Review: review,
+  };
+
   return (
     <div style={{
       width: "360px", borderRadius: "20px", overflow: "hidden",
@@ -307,30 +501,13 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {activePanel && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              width: isMobile ? '100%' : 'calc(100% - 24px)',
-              maxWidth: 520,
-              maxHeight: isMobile ? '100%' : '80%',
-              overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
-            }}
-          >
-            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
-              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
-            </div>
-            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
-              {renderPanelContent(activePanel)}
-            </div>
-          </div>
-        </div>
-      )}
+      <StarBulletModal
+        activePanel={activePanel}
+        isMobile={isMobile}
+        themeColor1={themeColor1}
+        panelText={sectionText}
+        onClose={() => setActivePanel(null)}
+      />
 
     </div>
   );

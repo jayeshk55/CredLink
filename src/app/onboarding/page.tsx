@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { set } from "zod";
+import ClassicDigitalCardPreview from "@/components/cards/DigitalCardPreview";
 
 /* -------------------------------------------------
    COLORS & STYLES
@@ -21,188 +22,9 @@ const colors = {
 };
 
 /* -------------------------------------------------
-   DIGITAL CARD PREVIEW COMPONENT
+   MAIN ONBOARDING PAGE
    ------------------------------------------------- */
-interface DigitalCardProps {
-  name: string;
-  phone: string;
-  email: string;
-  title: string;
-  company?: string;
-  location: string;
-  about: string;
-  skills: string;
-  portfolio: string;
-  experience: string;
-  photo?: string;
-}
 
-const DigitalCardPreview: React.FC<DigitalCardProps> = ({
-  name = "",
-  phone = "",
-  email = "",
-  title = "",
-  company = "",
-  location = "",
-  about = "",
-  skills = "",
-  portfolio = "",
-  experience = "",
-  photo = "",
-}) => {
-  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
-  const parsedCompany = (() => {
-    // Try to extract company from experience like: "Role @ Company (Year-Year)"
-    const atIndex = experience.indexOf('@');
-    if (atIndex !== -1) {
-      const afterAt = experience.slice(atIndex + 1).trim();
-      const end = afterAt.indexOf('(');
-      return (end !== -1 ? afterAt.slice(0, end) : afterAt).trim();
-    }
-    return '';
-  })();
-  const companyFinal = company && company.trim().length > 0 ? company : parsedCompany;
-  return (
-    <div
-      style={{
-        width: "360px",
-        borderRadius: "28px",
-        overflow: "hidden",
-        boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-        fontFamily: "system-ui, sans-serif",
-        position: "relative",
-        background: "#ffffff",
-      }}
-    >
-      {/* Header - Warm Orange/Red Gradient with cover */}
-      <div
-        style={{
-          background: "linear-gradient(180deg, rgba(45, 111, 255, 1) 0%, #517cd7ff 45%, #00c0fd 100%)",
-          padding: "22px",
-          color: colors.white,
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "92px",
-            borderRadius: "14px",
-            background: "rgba(255,255,255,0.15)",
-            border: "2px solid rgba(255,255,255,0.7)",
-            overflow: "hidden",
-          }}
-        >
-          {/* optional cover image could go here */}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "-44px" }}>
-          <div
-            style={{
-              width: "104px",
-              height: "104px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              border: "5px solid #ffffff",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
-              background: photo ? "transparent" : "#60A5FA",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {photo ? (
-              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              <span style={{ fontSize: "36px", fontWeight: 800, color: "white" }}>{firstLetter}</span>
-            )}
-          </div>
-
-          {name && (
-            <h3 style={{ margin: "14px 0 8px", fontSize: "26px", fontWeight: 800, color: "#FFFFFF" }}>{name}</h3>
-          )}
-          {(title || companyFinal) && (
-            <div style={{ display: "flex", gap: "12px", alignItems: "center", color: "#ffffff", opacity: 0.95 }}>
-              {title && <span style={{ fontSize: "14px", fontWeight: 700 }}>{title}</span>}
-              {title && companyFinal && <span style={{ width: 1, height: 16, background: "rgba(255,255,255,0.8)" }} />}
-              {companyFinal && <span style={{ fontSize: "14px", fontWeight: 700 }}>{companyFinal}</span>}
-            </div>
-          )}
-          {location && (
-            <p style={{ margin: "10px 0 0", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>
-          )}
-
-          {/* Social Row */}
-          {(email || phone) && (
-            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-              {/* Mail */}
-              {email && (
-                <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16v16H4z" opacity="0"/>
-                    <path d="M4 8l8 5 8-5"/>
-                    <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-                  </svg>
-                </div>
-              )}
-              {/* Phone */}
-              {phone && (
-                <div style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#25D366", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-                  </svg>
-                </div>
-              )}
-              {/* LinkedIn */}
-              {/* Globe */}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Body */}
-      <div style={{ padding: "8px 20px 16px", background: "linear-gradient(180deg, #00c0fd 0%, #00c0fd 100%)", color: "#FFFFFF", textAlign: "center" }}>
-        <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
-          {about}
-        </p>
-
-        {/* Pills */}
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "12px" }}>
-          {[
-            { text: "Services", value: "" },
-            { text: "Portfolio", value: portfolio },
-            { text: "Skills", value: skills },
-            { text: "Experience", value: experience },
-            { text: "Review", value: "" },
-          ]
-            .filter((b) => b.value && b.value.trim() !== "")
-            .map((b) => (
-              <button
-                key={b.text}
-                style={{
-                  padding: "8px 14px",
-                  background: "#ffffff",
-                  color: "#374151",
-                  border: "none",
-                  borderRadius: "12px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.12)",
-                }}
-              >
-                {b.text}
-              </button>
-            ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* -------------------------------------------------
-   PARTY POPUP COMPONENT
-   ------------------------------------------------- */
 interface PartyPopupProps {
   onClose: () => void;
 }
@@ -212,70 +34,65 @@ const PartyPopup: React.FC<PartyPopupProps> = ({ onClose }) => {
     <div
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'rgba(0, 0, 0, 0.5)',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 9999,
+        zIndex: 50,
       }}
-      onClick={onClose}
     >
       <div
         style={{
-          background: 'white',
-          borderRadius: '24px',
-          padding: '48px 40px',
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          padding: '24px',
           maxWidth: '400px',
+          width: '90%',
           textAlign: 'center',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
-          position: 'relative',
+          boxShadow: '0 20px 40px rgba(15,23,42,0.3)',
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Party Emoji */}
-        <div style={{ fontSize: '64px', marginBottom: '24px' }}></div>
-        
-        {/* Message */}
         <h2
           style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#1F2937',
-            marginBottom: '16px',
+            fontSize: '22px',
+            fontWeight: 700,
+            marginBottom: '8px',
+            color: '#111827',
           }}
         >
-          Your card has been created and ready to share!
+          Your card is ready!
         </h2>
-        
-        {/* Close Button */}
+        <p
+          style={{
+            fontSize: '14px',
+            color: '#6B7280',
+            marginBottom: '20px',
+          }}
+        >
+          {"We've created your digital card. Let's take you to your dashboard."}
+        </p>
         <button
           onClick={onClose}
           style={{
-            marginTop: '24px',
-            padding: '14px 48px',
-            background: `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
-            color: 'white',
+            width: '100%',
+            padding: '10px 0',
+            borderRadius: '9999px',
             border: 'none',
-            borderRadius: '12px',
-            fontSize: '16px',
-            fontWeight: '600',
+            background: `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: 600,
             cursor: 'pointer',
           }}
         >
-          Continue
+          Go to dashboard
         </button>
       </div>
     </div>
   );
 };
 
-/* -------------------------------------------------
-   MAIN ONBOARDING PAGE
-   ------------------------------------------------- */
 const OnboardingPage: React.FC = () => {
   const [step, setStep] = useState(0);
   const router = useRouter();
@@ -738,7 +555,7 @@ const OnboardingPage: React.FC = () => {
             padding: '40px',
             boxSizing: 'border-box',
           }}>
-            <DigitalCardPreview
+            <ClassicDigitalCardPreview
               name={formData.name}
               phone={formData.phone}
               email={formData.email}

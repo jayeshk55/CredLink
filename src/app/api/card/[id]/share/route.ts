@@ -10,10 +10,10 @@ export async function POST(
   try {
     const { id: cardId } = await params;
 
-    // Fetch card with owner for comparison
+    // Fetch card with owner for comparison (no need to select shares here)
     const card = await prisma.card.findUnique({
       where: { id: cardId },
-      select: { id: true, shares: true, userId: true },
+      select: { id: true, userId: true },
     });
 
     if (!card) {

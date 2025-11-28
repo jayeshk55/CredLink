@@ -1,6 +1,10 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import DigitalCardPreviewComponent from '@/components/cards/DigitalCardPreview';
+import FlatCardPreviewComponent from '@/components/cards/FlatCardPreview';
+import ModernCardPreviewComponent from '@/components/cards/ModernCardPreview';
+import SleekCardPreviewComponent from '@/components/cards/SleekCardPreview';
 
 // ====================================================================
 // START: DigitalCardPreview Component (Modified to accept theme)
@@ -456,8 +460,8 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
                 display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <rect x="4" y="6" width="16" height="12" rx="2" ry="2" />
-                  <path d="M4 8l8 5 8-5" />
+                  <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+                  <path d="M4 8l8 5 8-5"/>
                 </svg>
               </a>
             )}
@@ -469,7 +473,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
                 display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
                 </svg>
               </a>
             )}
@@ -481,7 +485,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
                 display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
-                  <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z" />
+                  <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
                 </svg>
               </a>
             )}
@@ -493,9 +497,9 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
                 display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z" />
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
                 </svg>
               </a>
             )}
@@ -544,7 +548,8 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
               maxWidth: 520,
               maxHeight: isMobile ? '100%' : '80%',
               overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              position: 'relative'
             }}
           >
             <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -672,7 +677,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
             width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden",
             background: photo ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
             display: "flex", alignItems: "center", justifyContent: "center",
-            border: `2px solid ${themeColor1}40`
+            border: "2px solid rgba(255,255,255,0.3)", position: "relative", zIndex: 2
           }}>
             {photo ? (
               <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -688,7 +693,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
         </div>
         
         {location && <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#FFFFFF", display: "flex", alignItems: "center", gap: "6px" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={themeColor1} strokeWidth="2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill={themeColor1} strokeWidth="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
@@ -699,28 +704,28 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
         
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
           <a href={`mailto:${email}`} style={{
-            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            flex: 1, padding: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
             display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" strokeWidth="2">
               <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
               <path d="M4 8l8 5 8-5"/>
             </svg>
             Email
           </a>
           <a href={`tel:${phone}`} style={{
-            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            flex: 1, padding: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
             display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ marginRight: 2 }}>
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
             Call
           </a>
           <a href={linkedin} style={{
-            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            flex: 1, padding: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
             display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
           }}>
@@ -730,11 +735,11 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
             LinkedIn
           </a>
           <a href={website} style={{
-            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            flex: 1, padding: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
             display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
@@ -875,7 +880,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
     <div style={{
       width: "360px", borderRadius: "4px", overflow: "hidden",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
-      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: "1px solid #e5e5e5", position: 'relative'
     }}>
       {/* Card Name Badge - Top Right */}
       {cardName && (
@@ -911,7 +916,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
         )}
         <div style={{
           width: "60px", height: "60px", borderRadius: "2px", overflow: "hidden",
-          background: photo ? "transparent" : "rgba(255,255,255,0.2)",
+          background: photo ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
           display: "flex", alignItems: "center", justifyContent: "center",
           border: "2px solid rgba(255,255,255,0.3)", position: "relative", zIndex: 2
         }}>
@@ -950,7 +955,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 6 }}>
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 013.08 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
               </svg>
             </a>
             <a href={linkedin} style={{
@@ -1469,8 +1474,8 @@ const EditPage = () => {
       experience,
       services,
       review: reviews,
-      photo: profileImage,
-      cover: bannerImage,
+      photo: profileImage || '',
+      cover: bannerImage || '',
       email,
       phone,
       linkedin,
@@ -1483,14 +1488,14 @@ const EditPage = () => {
 
     switch (selectedDesign) {
       case 'Flat':
-        return <FlatCardPreview {...commonProps} />;
+        return <FlatCardPreviewComponent {...commonProps} />;
       case 'Modern':
-        return <ModernCardPreview {...commonProps} />;
+        return <ModernCardPreviewComponent {...commonProps} />;
       case 'Sleek':
-        return <SleekCardPreview {...commonProps} />;
+        return <SleekCardPreviewComponent {...commonProps} />;
       case 'Classic':
       default:
-        return <DigitalCardPreview {...commonProps} />;
+        return <DigitalCardPreviewComponent {...commonProps} />;
     }
   };
 

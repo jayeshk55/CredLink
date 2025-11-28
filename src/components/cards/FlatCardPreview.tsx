@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
+import StarBulletModal from "./StarBulletModal";
 import styles from "./cardType.module.css";
 import { capitalizeFirstLetter } from '@/lib/utils';
 
@@ -136,23 +137,13 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
     );
   };
 
-  const renderPanelContent = (section: Section) => {
-    const mapSection = {
-      Skills: skillsList,
-      Services: servicesList,
-      Portfolio: portfolioList,
-      Experience: experienceList,
-      Review: reviewList,
-    };
-
-    return (
-      <div style={{ padding: isMobile ? 12 : 16 }}>
-        {mapSection[section].map((it, idx) => (
-          <div key={idx}>{renderItem(it)}</div>
-        ))}
-      </div>
-    );
-  };
+  const sectionText = {
+    Skills: skills,
+    Services: services,
+    Portfolio: portfolio,
+    Experience: experience,
+    Review: review,
+  } as const;
 
   return (
     <div
@@ -502,69 +493,13 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {/* MODAL */}
-      {activePanel && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 20,
-          }}
-          onClick={() => setActivePanel(null)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              width: isMobile ? "100%" : "calc(100% - 24px)",
-              maxWidth: 520,
-              maxHeight: isMobile ? "100%" : "80%",
-              overflow: "hidden",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-            }}
-          >
-            <div
-              style={{
-                padding: isMobile ? 12 : 16,
-                borderBottom: "1px solid #f0f0f0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <h3 style={{ margin: 0, color: "#111827", fontWeight: 700 }}>
-                {activePanel}
-              </h3>
-              <button
-                onClick={() => setActivePanel(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 18,
-                  cursor: "pointer",
-                  color: "#9CA3AF",
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            <div
-              style={{
-                maxHeight: isMobile ? "calc(80vh - 60px)" : 400,
-                overflow: "auto",
-              }}
-            >
-              {renderPanelContent(activePanel)}
-            </div>
-          </div>
-        </div>
-      )}
+      <StarBulletModal
+        activePanel={activePanel}
+        isMobile={isMobile}
+        themeColor1={themeColor1}
+        panelText={sectionText}
+        onClose={() => setActivePanel(null)}
+      />
     </div>
   );
 };
