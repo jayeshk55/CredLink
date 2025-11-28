@@ -970,10 +970,10 @@ export default function DashboardContactPage() {
                           </td>
 
                           <td className={styles.tableDataCell}>
-                            <span className={styles.tableCellText}>{contact.title}</span>
+                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</span>
                           </td>
                           <td className={styles.tableDataCell}>
-                            <span className={styles.tableCellText}>{contact.company}</span>
+                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.company || '').trim()}</span>
                           </td>
                           <td className={styles.tableDataDate}>
                             <span>{contact.dateAdded}</span>
@@ -1045,14 +1045,14 @@ export default function DashboardContactPage() {
                                     onClick={() => setPreviewContact(contact)}
                                     style={{ cursor: 'pointer' }}
                                   >
-                                    {contact.name}
+                                    {(contact.name || '').trim()}
                                   </h3>
                                   {contact.title && (
-                                    <p className={styles.mobileCardSubtitle}>{contact.title}</p>
+                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</p>
                                   )}
                                   {(contact.company || contact.location) && (
-                                    <p className={styles.mobileCardSubtitle}>
-                                      {[contact.company, contact.location]
+                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>
+                                      {[(contact.company || '').trim(), (contact.location || '').trim()]
                                         .filter(Boolean)
                                         .join(' • ')}
                                     </p>
@@ -1147,29 +1147,88 @@ export default function DashboardContactPage() {
                               
                               {/* Top-right action removed for a cleaner card front */}
                               
-                              <div className={styles.cardContentFlex}>
-                                {/* Name and Title with avatar */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
+                              <div
+                                className={styles.cardContentFlex}
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  alignItems: 'flex-start', /* top-align avatar and text block */
+                                  justifyContent: 'flex-start',
+                                  gap: '12px',
+                                  padding: '14px 12px 10px 12px', /* added extra top padding */
+                                  height: 'auto'
+                                }}
+                              >
+                                {/* Left: Avatar */}
+                                <div style={{ width: 45, height: 45, flexShrink: 0 }}>
                                   <div className={styles.avatarPlaceholder}>
                                     {contact.avatar ? (
-                                      <img src={contact.avatar} alt={contact.name} className={styles.avatarImage} />
+                                      <img
+                                        src={contact.avatar}
+                                        alt={contact.name}
+                                        className={styles.avatarImage}
+                                      />
                                     ) : (
-                                      <span className={styles.avatarText}>{getInitials(contact.name)}</span>
+                                      <span className={styles.avatarText}>
+                                        {getInitials(contact.name)}
+                                      </span>
                                     )}
                                   </div>
-                                  <h3 className={styles.cardName} style={{ margin: 0 }}>{contact.name}</h3>
                                 </div>
-                                <div style={{ marginLeft: 40 }}>
-                                  <p className={styles.cardTitle}>{contact.title}</p>
-                                  <p className={styles.cardCompany}>{contact.company}</p>
-
+                                {/* Right: Text */}
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'flex-start',
+                                    textAlign: 'left',
+                                    minWidth: 0,
+                                    padding: 0,
+                                  }}
+                                >
+                                  <h3
+                                    className={styles.cardName}
+                                    style={{
+                                      margin: 0,
+                                      lineHeight: 1.2,
+                                      fontWeight: 600,
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      padding: 0,
+                                    }}
+                                  >
+                                    {(contact.name || '').trim()}
+                                  </h3>
+                                  <p
+                                    className={styles.cardTitle}
+                                    style={{
+                                      margin: '2px 0 0',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      padding: 0,
+                                    }}
+                                  >
+                                    {(contact.title || '').trim()}
+                                  </p>
+                                  <p
+                                    className={styles.cardCompany}
+                                    style={{
+                                      margin: '2px 0 0',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      padding: 0,
+                                    }}
+                                  >
+                                    {(contact.company || '').trim()}
+                                  </p>
                                   {/* Tags */}
-                                  <div className={styles.cardTagsFlex}>
+                                  <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
                                     {contact.tags.slice(0, 2).map((tag, index) => (
-                                      <span
-                                        key={index}
-                                        className={`${styles.cardTag} ${getTagClass(tag)}`}
-                                      >
+                                      <span key={index} className={`${styles.cardTag} ${getTagClass(tag)}`}>
                                         {tag}
                                       </span>
                                     ))}
@@ -1187,8 +1246,7 @@ export default function DashboardContactPage() {
                             }`}>
                               <div className={styles.cardBackCenter}>
                                 <div className={styles.quickHeader}>
-                                  <h3 className={styles.quickTitle}>{contact.name}</h3>
-                                  <p className={styles.quickSubtitle}>Quick Actions</p>
+                                  <h3 className={styles.quickTitle} style={{ color: '#ffffff' }}>{contact.name}</h3>
                                   {showContactInfo[contact.id]?.type && (
                                     <div className={styles.quickInfoBox}>
                                       <p className={styles.quickInfoText}>

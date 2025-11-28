@@ -447,11 +447,24 @@ export default function MessagesPage() {
       });
 
       if (response.ok) {
-        setMessages(prev => prev.map(m => m.senderId === replyId ? { 
-          ...m, status: "Replied", read: true,
-          thread: [...(m.thread || []), { text: replyText, date: new Date().toISOString(), direction: 'out' }]
-        } : m));
-        setReplyText("");
+          setMessages(prev => prev.map(m => m.senderId === replyId ? { 
+            ...m, status: "Replied", read: true,
+            thread: [...(m.thread || []), { text: replyText, date: new Date().toISOString(), direction: 'out' }]
+          } : m));
+          setReplyText("");
+
+          // Ensure the newly sent message is visible above the composer
+          setTimeout(() => {
+            const container = conversationRef.current;
+            if (container) {
+              try {
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                setIsNearBottom(true);
+              } catch (e) {
+                container.scrollTop = container.scrollHeight;
+              }
+            }
+          }, 80);
       } else { alert('Failed to send reply.'); }
     } catch (err) { alert('Error sending reply.'); }
   };
@@ -510,10 +523,10 @@ export default function MessagesPage() {
       position: "relative" as const,
     },
     header: {
-      padding: "20px 24px",
+      padding: "10px 10px", // remove extra top space so search sits closer to header
       borderBottom: `1px solid ${colors.border}`,
-      backgroundColor: "rgba(255, 255, 255, 0.8)",
-      backdropFilter: "blur(12px)",
+      backgroundColor: "rgba(255, 255, 255, 0.85)",
+      backdropFilter: "blur(8px)",
       zIndex: 10,
     },
     searchContainer: {
@@ -534,36 +547,45 @@ export default function MessagesPage() {
     tabsContainer: {
       display: "flex",
       alignItems: "center",
-      justifyContent: "space-between",
-      marginTop: "24px",
+      gap: "8px",
+      flexWrap: "nowrap" as const,
+      marginTop: "12px",
+      width: "100%",
     },
     tabsList: {
       display: "flex",
-      gap: "8px",
-      overflowX: "auto" as const,
+      gap: "6px",
+      overflowX: "hidden" as const,
       paddingBottom: "4px",
+      flex: "1 1 0%",
+      minWidth: 0,
+      maxWidth: "calc(100% - 110px)", // reserve space for the select so it stays on one line
     },
     tabButton: (isActive: boolean) => ({
-      padding: "8px 16px",
+      padding: "6px 10px",
       borderRadius: "9999px",
-      fontSize: "13px",
+      fontSize: "12px",
       fontWeight: 600,
       border: isActive ? "none" : `1px solid ${colors.border}`,
       backgroundColor: isActive ? "#1E293B" : "transparent",
       color: isActive ? "#FFFFFF" : colors.textSec,
       cursor: "pointer",
       whiteSpace: "nowrap" as const,
-      transition: "all 0.2s",
+      transition: "all 0.15s",
     }),
     sortSelect: {
-      padding: "6px 12px",
-      fontSize: "12px",
+      padding: "4px 8px",
+      fontSize: "11px",
       fontWeight: 600,
       color: colors.textSec,
-      border: "none",
-      backgroundColor: "transparent",
+      border: `1px solid ${colors.border}`,
+      backgroundColor: "#FFFFFF",
       cursor: "pointer",
       outline: "none",
+      flexShrink: 0,
+      marginLeft: "8px",
+      borderRadius: "10px",
+      height: "32px",
     },
     sortSelectMobile: {
       padding: "2px 8px",
@@ -587,7 +609,7 @@ export default function MessagesPage() {
       backgroundColor: "#FAFAFA",
     },
     messageRow: (messageId: string, isRead: boolean) => ({
-      padding: isMobile ? "16px" : "16px 24px",
+      padding: isMobile ? "12px" : "12px 18px", // tighter row padding
       borderBottom: `1px solid ${colors.border}`,
       cursor: "pointer",
       backgroundColor: hoveredId === messageId ? "#F8FAFC" : (isRead ? "#FFFFFF" : "#F5F3FF"),
@@ -661,7 +683,7 @@ export default function MessagesPage() {
     chatBody: {
       flex: 1,
       overflowY: "auto" as const,
-      padding: "24px",
+      padding: "16px", // reduced inner chat padding
       backgroundColor: "#F8FAFC",
       display: "flex",
       flexDirection: "column" as const,
@@ -693,7 +715,7 @@ export default function MessagesPage() {
       overflowWrap: "break-word" as const,
     },
     composer: {
-      padding: "20px",
+      padding: "12px 16px", // reduced composer padding
       borderTop: `1px solid ${colors.border}`,
       backgroundColor: "#FFFFFF",
     },
@@ -768,7 +790,7 @@ export default function MessagesPage() {
                   {f}
                 </button>
               ))}
-            </div>
+            
             {!isMobile && (
               <select
                 value={sortOrder}
@@ -781,7 +803,7 @@ export default function MessagesPage() {
             )}
           </div>
           {isMobile && (
-            <div style={{ marginTop: "12px", display: "flex", justifyContent: "flex-start" }}>
+            <div style={styles.tabsList}>
               <select
                 value={sortOrder}
                 onChange={e => setSortOrder(e.target.value as any)}
@@ -793,7 +815,7 @@ export default function MessagesPage() {
             </div>
           )}
         </div>
-
+</div>
         {/* --- Message List --- */}
         <div style={styles.listContainer}>
           {filteredMessages.length === 0 ? (

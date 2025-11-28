@@ -94,8 +94,8 @@ export default function Header() {
           overflow: 'visible'
         }}
       >
-      <nav className="max-w-7xl mx-auto px-8 pt-6 pb-2" style={{ paddingLeft: '2rem', paddingRight: '2rem',paddingTop: '0.5rem' }}>
-        <div className="flex items-center justify-between h-14">
+      <nav className="max-w-7xl mx-auto px-6 pt-3 pb-1" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.25rem' }}>
+        <div className="flex items-center justify-between h-12">
           {/* Logo - Left Side */}
           <Link href="/" className="flex items-center group">
             <Image
@@ -120,33 +120,33 @@ export default function Header() {
           </Link>
 
           {/* Desktop Menu and Actions - Right Side */}
-          <div className="hidden lg:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-6">
             {/* Navigation Links */}
-            <div className="flex items-center gap-8">
-              <Link href="/" className="px-3 py-2 text-[15px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="px-2 py-1.5 text-[14px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 Home
               </Link>
               <button 
                 onClick={() => scrollToSection('find-digital-card')}
-                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+                className="px-2 py-1.5 text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
               >
                 Search
               </button>
               <button 
                 onClick={() => scrollToSection('what-is-digital-card')}
-                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+                className="px-2 py-1.5 text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
               >
                 About
               </button>
               <button 
                 onClick={() => scrollToSection('build-credibility')}
-                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+                className="px-2 py-1.5 text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
               >
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+                className="px-2 py-1.5 text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
               >
                 How It Works
               </button>
@@ -418,11 +418,11 @@ export default function Header() {
                 </div>
               ) : (
                 <>
-                  <a href="/auth/login" className="px-5 py-2.5 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50" style={{ textDecoration: 'none' }}>
+                  <a href="/auth/login" className="px-4 py-2 text-[14px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50/50" style={{ textDecoration: 'none' }}>
                     Login
                   </a>
-                  <a href="/auth/signup" className="relative px-12 py-2.5 text-[15px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group border-none cursor-pointer"
-                    style={{ minWidth: '120px', minHeight: '40px', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  <a href="/auth/signup" className="relative px-8 py-2 text-[14px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group border-none cursor-pointer"
+                    style={{ minWidth: '100px', minHeight: '36px', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <span className="relative z-10 flex items-center justify-center">
                       Create Card

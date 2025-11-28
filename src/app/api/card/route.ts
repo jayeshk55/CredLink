@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
 import { prisma } from "@/lib/prisma";
 
+
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key';
 
 // GET all cards for authenticated user
