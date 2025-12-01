@@ -495,7 +495,7 @@ return (
               </div>
 
               {accountPhoto && (
-                <button type="button" className="remove-photo-btn" onClick={() => setAccountPhoto(null)}>
+                <button type="button" className="remove-photo-btn" onClick={handleRemovePhoto}>
                   Remove
                 </button>
               )}

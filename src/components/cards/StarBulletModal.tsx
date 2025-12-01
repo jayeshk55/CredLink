@@ -112,7 +112,8 @@ const StarBulletModal: React.FC<StarBulletModalProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 20,
+        zIndex: 30,
+        padding: isMobile ? 0 : 8,
       }}
       onClick={onClose}
     >
@@ -121,11 +122,13 @@ const StarBulletModal: React.FC<StarBulletModalProps> = ({
         style={{
           background: "#fff",
           borderRadius: 16,
-          width: isMobile ? "100%" : "calc(100% - 24px)",
-          maxWidth: 520,
-          maxHeight: isMobile ? "100%" : "80%",
+          width: "86%",
+          maxWidth: "86%",
+          maxHeight: "72%",
           overflow: "hidden",
           boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div
@@ -155,8 +158,10 @@ const StarBulletModal: React.FC<StarBulletModalProps> = ({
         </div>
         <div
           style={{
-            maxHeight: isMobile ? "calc(80vh - 60px)" : 400,
-            overflow: "auto",
+            flex: 1,
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+            scrollBehavior: "smooth",
             padding: isMobile ? 12 : 16,
           }}
         >
