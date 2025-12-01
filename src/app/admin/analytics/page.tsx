@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
 
   const getPeriodLabel = (period: string) => {
     switch (period) {
-      case "thisWeek": return "New Users (This Week)";
+      // case "thisWeek": return "New Users (This Week)";
       case "lastMonth": return "New Users (Last Month)";
       case "last3Months": return "New Users (Last 3 Months)";
       case "thisYear": return "New Users (This Year)";
@@ -604,23 +604,29 @@ export default function AnalyticsPage() {
 
   // Update metrics based on filtered results (city/category/date)
   useEffect(() => {
-    const totalFilteredNewUsers = filteredActivityRows.reduce((sum: number, r: any) => sum + (r.newUsers || 0), 0);
-    
     // Compute unique cities from filtered users (for display)
     const uniqueCities = new Set<string>();
+    const allFilteredUsers = new Set<string>();
+    
     filteredActivityRows.forEach((row: any) => {
       (row.usersJoined || []).forEach((u: any) => {
         if (u.city) uniqueCities.add(u.city);
+        // Add user to filtered users set to count unique users
+        allFilteredUsers.add(u.name);
       });
     });
     
+    // Calculate filtered metrics
+    const filteredTotalUsers = allFilteredUsers.size;
+    const filteredNewUsers = filteredActivityRows.reduce((sum: number, r: any) => sum + (r.newUsers || 0), 0);
+    
     setOverview((prev: any) => ({ 
       ...prev, 
-      newUsersForPeriod: totalFilteredNewUsers,
-      activeCities: uniqueCities.size
-      // DO NOT overwrite totalUsers here; keep backend-provided total
+      totalUsers: filters.city === 'all' ? prev.totalUsers : filteredTotalUsers,
+      newUsersForPeriod: filters.city === 'all' ? prev.newUsersForPeriod : filteredNewUsers,
+      activeCities: filters.city === 'all' ? prev.activeCities : uniqueCities.size
     }));
-  }, [filteredActivityRows]);
+  }, [filteredActivityRows, filters.city]);
 
   if (loading) return <div className="flex justify-center items-center min-h-screen text-lg">Loading analytics...</div>;
 
