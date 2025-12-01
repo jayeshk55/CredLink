@@ -327,7 +327,7 @@ export default function AnalyticsPage() {
     category: "all",
     fromDate: "",
     toDate: "",
-    usersPeriod: "thisWeek", // New filter for users metric
+    usersPeriod: "lastMonth", // New filter for users metric
   });
 
   // Dynamic options fetched from backend
@@ -336,6 +336,97 @@ export default function AnalyticsPage() {
   const [loadingMeta, setLoadingMeta] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  // ---------- Chart Legend Helpers & Constants ----------
+  const COLORS = ["#2563eb", "#3b82f6", "#93c5fd", "#1d4ed8", "#60a5fa"];
+  const CATEGORY_DISPLAY_LIMIT = 5;
+  const [showAllCategories, setShowAllCategories] = useState(false);
+
+  const normalizeCategory = (name: string) => name.trim().toLowerCase();
+  const prettifyCategory = (name: string) =>
+    name
+      .trim()
+      .replace(/\s+/g, " ")
+      .split(" ")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+
+  // ----- City helpers -----
+  const normalizeCity = (city: string) => city.trim().toLowerCase();
+  const prettifyCity = (city: string) =>
+    city
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+  // ===== Filtered derived data (city/category/date) =====
+  const filteredActivityRows = useMemo(() => {
+    // Helper to parse row date (e.g. 'Nov 1') – fallback to today if parse fails
+    const parseRowDate = (label: string) => {
+      const currentYear = new Date().getFullYear();
+      const parsed = Date.parse(`${label} ${currentYear}`);
+      return isNaN(parsed) ? new Date() : new Date(parsed);
+    };
+
+    const from = filters.fromDate ? new Date(filters.fromDate) : null;
+    const to = filters.toDate ? new Date(filters.toDate) : null;
+
+    return activityData
+      .map((row: any) => {
+        const rowDateObj = parseRowDate(row.date);
+        if (from && rowDateObj < from) return null;
+        if (to && rowDateObj > to) return null;
+
+        const filteredUsers = (row.usersJoined || []).filter((u: any) => {
+          if (filters.city !== 'all' && normalizeCity(u.city) !== normalizeCity(filters.city)) return false;
+          if (filters.category !== 'all' && u.category !== filters.category) return false;
+          return true;
+        });
+
+        if (filteredUsers.length === 0) return null;
+
+        // Recompute top city/category for this filtered row
+        const cityCounts: Record<string, number> = {};
+        const catCounts: Record<string, number> = {};
+        filteredUsers.forEach((u: any) => {
+          cityCounts[u.city] = (cityCounts[u.city] || 0) + 1;
+          catCounts[u.category] = (catCounts[u.category] || 0) + 1;
+        });
+        const topCity = Object.entries(cityCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || row.topCity;
+        const topCategory = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || row.topCategory;
+
+        return {
+          ...row,
+          usersJoined: filteredUsers,
+          newUsers: filteredUsers.length,
+          topCity,
+          topCategory,
+        };
+      })
+      .filter(Boolean);
+  }, [activityData, filters.city, filters.category, filters.fromDate, filters.toDate]);
+
+// ---------- Export Helpers ----------
+  const exportCSV = () => {
+    const source = filteredActivityRows.length ? filteredActivityRows : activityData;
+    const csvContent = [
+      ["Date", "New Users", "Connections", "Top City", "Top Category"],
+      ...source.map((r: any) => [r.date, r.newUsers, r.connections, r.topCity, r.topCategory]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "analytics_report.csv";
+    a.click();
+  };
+
+  const exportPDF = () => window.print();
 
   // Update overview data when filters change (for non-realtime periods)
   useEffect(() => {
@@ -356,22 +447,42 @@ export default function AnalyticsPage() {
     const fetchMeta = async () => {
       setLoadingMeta(true);
       try {
-        // Cities
+        // -------- Cities --------
         const cityRes = await fetch('/api/admin/analytics/cities');
         const cityJson = await cityRes.json();
         if (cityRes.ok && cityJson.success) {
-          setCities(cityJson.cities || []);
-          setOverview((prev: any) => ({ ...prev, activeCities: (cityJson.cities || []).length }));
+          const unique: string[] = [];
+          const seen = new Set<string>();
+          (cityJson.cities || []).forEach((c: string) => {
+            const key = normalizeCity(c);
+            if (!seen.has(key)) {
+              seen.add(key);
+              unique.push(prettifyCity(c));
+            }
+          });
+          unique.sort((a, b) => a.localeCompare(b));
+          setCities(unique);
+          setOverview((prev: any) => ({ ...prev, activeCities: unique.length }));
         }
-        // Categories
+
+        // -------- Categories --------
         const catRes = await fetch('/api/admin/categories');
         const catJson = await catRes.json();
         if (catRes.ok && catJson.success) {
-          const list = (catJson.categories || [])
-            .filter((c: any) => c.isActive) // Only show active categories
-            .map((c: any) => c.name)
-            .sort((a: string, b: string) => a.localeCompare(b));
-          setCategories(list);
+          const uniqueCats: string[] = [];
+          const seenCat = new Set<string>();
+          (catJson.categories || [])
+            .filter((c: any) => c.isActive)
+            .forEach((c: any) => {
+              const name = prettifyCategory(c.name);
+              const key = normalizeCategory(name);
+              if (!seenCat.has(key)) {
+                seenCat.add(key);
+                uniqueCats.push(name);
+              }
+            });
+          uniqueCats.sort((a, b) => a.localeCompare(b));
+          setCategories(uniqueCats);
         }
       } catch (e) {
         console.error('Meta fetch failed', e);
@@ -393,7 +504,10 @@ export default function AnalyticsPage() {
         ...prev,
         totalUsers: stats?.totalUsers ?? prev.totalUsers,
         activeCities: stats?.activeCities ?? prev.activeCities,
-        newUsersForPeriod: stats?.newUsers ?? prev.newUsersForPeriod
+        newUsersForPeriod:
+          filters.usersPeriod === 'thisMonth'
+            ? stats?.newUsers ?? prev.newUsersForPeriod
+            : prev.newUsersForPeriod
       }));
     };
 
@@ -405,12 +519,8 @@ export default function AnalyticsPage() {
           const data = await res.json();
           applyStats(data?.stats);
           {
-            const mapped = data.engagementData
-              .filter((item: any) => item.name !== 'Users')
-              .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
-            const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
-           // console.debug('[Analytics] categoryData (poll)', mapped);
-            setCategoryDataRaw(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+            const mapped = aggregateCategoryArrayFromEngagementData(data.engagementData);
+            setCategoryDataRaw(mapped.length ? mapped : [{ category: 'Other', count: 1 }]);
           }
           setEngagementData(data.trafficData);
           setActivityData(data.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
@@ -427,12 +537,8 @@ export default function AnalyticsPage() {
           const payload = JSON.parse(evt.data);
           applyStats(payload?.stats);
           {
-            const mapped = payload.engagementData
-              .filter((item: any) => item.name !== 'Users')
-              .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
-            const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
-           // console.debug('[Analytics] categoryData (sse)', mapped);
-            setCategoryDataRaw(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+            const mapped = aggregateCategoryArrayFromEngagementData(payload.engagementData);
+            setCategoryDataRaw(mapped.length ? mapped : [{ category: 'Other', count: 1 }]);
           }
           setEngagementData(payload.trafficData);
           setActivityData(payload.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
@@ -458,110 +564,61 @@ export default function AnalyticsPage() {
     };
   }, [filters.usersPeriod]);
 
-  const toggleRowExpansion = (rowIndex: number) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (newExpandedRows.has(rowIndex)) {
-      newExpandedRows.delete(rowIndex);
-    } else {
-      newExpandedRows.add(rowIndex);
-    }
-    setExpandedRows(newExpandedRows);
+  // ... (rest of the code remains the same)
+
+  const aggregateCategoryArrayFromEngagementData = (list: any[]) => {
+    const counts: Record<string, number> = {};
+    list
+      .filter((item: any) => item.name !== 'Users')
+      .forEach((item: any) => {
+        const key = normalizeCategory(item.name);
+        counts[key] = (counts[key] || 0) + (Number(item.value) || 0);
+      });
+    return Object.entries(counts).map(([key, count]) => ({ category: prettifyCategory(key), count }));
   };
 
-  // ===== Export Handlers =====
-  const exportCSV = () => {
-    const source = filteredActivityRows.length ? filteredActivityRows : activityData;
-    const csvContent = [
-      ["Date", "New Users", "Connections", "Top City", "Top Category"],
-      ...source.map((r: any) => [r.date, r.newUsers, r.connections, r.topCity, r.topCategory]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
+  // ... (rest of the code remains the same)
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "analytics_report.csv";
-    a.click();
-  };
-
-  const exportPDF = () => window.print();
-
-  const COLORS = ["#2563eb", "#3b82f6", "#93c5fd", "#1d4ed8", "#60a5fa"];
-
-  // ===== Filtered derived data (city/category/date) =====
-  const filteredActivityRows = useMemo(() => {
-    // Helper to parse row date (assumes format like 'Nov 1') fallback to today
-    const parseRowDate = (label: string) => {
-      const currentYear = new Date().getFullYear();
-      const parsed = Date.parse(`${label} ${currentYear}`);
-      return isNaN(parsed) ? new Date() : new Date(parsed);
-    };
-    const from = filters.fromDate ? new Date(filters.fromDate) : null;
-    const to = filters.toDate ? new Date(filters.toDate) : null;
-    return activityData.map((row: any) => {
-      const rowDateObj = parseRowDate(row.date);
-      if (from && rowDateObj < from) return null;
-      if (to && rowDateObj > to) return null;
-      const filteredUsers = (row.usersJoined || []).filter((u: any) => {
-        if (filters.city !== 'all' && u.city !== filters.city) return false;
-        if (filters.category !== 'all' && u.category !== filters.category) return false;
-        return true;
-      });
-      if (filteredUsers.length === 0) return null;
-      // Recompute newUsers, topCity, topCategory for this filtered row
-      const cityCounts: Record<string, number> = {};
-      const catCounts: Record<string, number> = {};
-      filteredUsers.forEach((u: any) => {
-        cityCounts[u.city] = (cityCounts[u.city] || 0) + 1;
-        catCounts[u.category] = (catCounts[u.category] || 0) + 1;
-      });
-      const topCity = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || row.topCity;
-      const topCategory = Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || row.topCategory;
-      return {
-        ...row,
-        usersJoined: filteredUsers,
-        newUsers: filteredUsers.length,
-        topCity,
-        topCategory,
-      };
-    }).filter(Boolean);
-  }, [activityData, filters.city, filters.category, filters.fromDate, filters.toDate]);
-
-  // Category distribution based on filtered users (overrides raw for charts)
   const filteredCategoryData = useMemo(() => {
     const counts: Record<string, number> = {};
+    const display: Record<string, string> = {};
+
+    const add = (cat: string, inc: number = 1) => {
+      const key = normalizeCategory(cat);
+      counts[key] = (counts[key] || 0) + inc;
+      if (!display[key]) display[key] = prettifyCategory(cat);
+    };
+
     filteredActivityRows.forEach((row: any) => {
-      (row.usersJoined || []).forEach((u: any) => {
-        counts[u.category] = (counts[u.category] || 0) + 1;
-      });
+      (row.usersJoined || []).forEach((u: any) => add(u.category));
     });
-    const entries = Object.entries(counts).map(([category, count]) => ({ category, count }));
-    // Fallback to raw if no entries
-    if (entries.length === 0) return categoryDataRaw;
-    return entries.sort((a,b)=>b.count-a.count);
+
+    const entries = Object.entries(counts).map(([k, c]) => ({ category: display[k], count: c }));
+
+    if (entries.length === 0) {
+      return categoryDataRaw.map((d) => ({ category: prettifyCategory(d.category), count: d.count })).sort((a, b) => b.count - a.count);
+    }
+
+    return entries.sort((a, b) => b.count - a.count);
   }, [filteredActivityRows, categoryDataRaw]);
 
   // Update metrics based on filtered results (city/category/date)
   useEffect(() => {
     const totalFilteredNewUsers = filteredActivityRows.reduce((sum: number, r: any) => sum + (r.newUsers || 0), 0);
     
-    // Compute unique cities from filtered users
+    // Compute unique cities from filtered users (for display)
     const uniqueCities = new Set<string>();
-    const uniqueUsers = new Set<string>();
     filteredActivityRows.forEach((row: any) => {
       (row.usersJoined || []).forEach((u: any) => {
         if (u.city) uniqueCities.add(u.city);
-        if (u.name) uniqueUsers.add(u.name);
       });
     });
     
     setOverview((prev: any) => ({ 
       ...prev, 
       newUsersForPeriod: totalFilteredNewUsers,
-      activeCities: uniqueCities.size,
-      totalUsers: uniqueUsers.size
+      activeCities: uniqueCities.size
+      // DO NOT overwrite totalUsers here; keep backend-provided total
     }));
   }, [filteredActivityRows]);
 
@@ -589,17 +646,17 @@ export default function AnalyticsPage() {
           {cities.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
 
-        <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+        {/* <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
           <option value="all">All Categories</option>
           {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-        </select>
+        </select> */}
 
         <select
           value={filters.usersPeriod}
           onChange={(e) => setFilters({ ...filters, usersPeriod: e.target.value })}
           className={styles.periodFilter}
         >
-          <option value="thisWeek">This Week</option>
+          {/* <option value="thisWeek">This Week</option> */}
           <option value="lastMonth">Last Month</option>
           <option value="last3Months">Last 3 Months</option>
           <option value="thisYear">This Year</option>
@@ -657,8 +714,26 @@ export default function AnalyticsPage() {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
             </PieChart>
+          </div>
+          <div className="flex flex-wrap justify-center mt-4">
+            {(showAllCategories ? filteredCategoryData : filteredCategoryData.slice(0, CATEGORY_DISPLAY_LIMIT)).map((entry, index) => (
+              <div key={entry.category} className="flex items-center mx-3 my-1 text-sm">
+                <span
+                  className="inline-block w-3 h-3 mr-2 rounded-sm"
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></span>
+                <span>{entry.category}</span>
+              </div>
+            ))}
+            {filteredCategoryData.length > CATEGORY_DISPLAY_LIMIT && (
+              <button
+                className="text-blue-600 underline mx-3 my-1 text-sm"
+                onClick={() => setShowAllCategories(!showAllCategories)}
+              >
+                {showAllCategories ? "Show Less" : "See More"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -670,7 +745,6 @@ export default function AnalyticsPage() {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Legend />
               <Bar dataKey="newUsers" fill="#2563eb" name="New Users" />
               <Bar dataKey="connections" fill="#22c55e" name="New Connections" />
             </BarChart>
@@ -703,8 +777,9 @@ export default function AnalyticsPage() {
           <tbody>
             {(filteredActivityRows.length ? filteredActivityRows : activityData).map((row: any, i: number) => {
               const users = row.usersJoined || [];
-              const firstTwo = users.slice(0, 2);
-              const remaining = Math.max(users.length - 2, 0);
+              const isExpanded = expandedRows.has(i);
+              const visibleUsers = isExpanded ? users : users.slice(0, 2);
+              const remaining = Math.max(users.length - visibleUsers.length, 0);
               return (
                 <tr key={`${row.date}-${i}`} className="border-b hover:bg-gray-50">
                   <td className="py-2 font-medium">{row.date}</td>
@@ -714,7 +789,7 @@ export default function AnalyticsPage() {
                       <span className="text-xs text-gray-400">No users match filters</span>
                     ) : (
                       <div className="flex flex-wrap gap-1">
-                        {firstTwo.map((user: any, idx: number) => (
+                        {visibleUsers.map((user: any, idx: number) => (
                           <div key={idx} className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg">
                             <div className="font-medium">{user.name}</div>
                             <div className="text-xs text-blue-600 mt-1">
@@ -724,7 +799,30 @@ export default function AnalyticsPage() {
                           </div>
                         ))}
                         {remaining > 0 && (
-                          <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">+{remaining} Others</span>
+                          <button
+                            type="button"
+                            className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full hover:bg-orange-200"
+                            onClick={() => {
+                              const next = new Set(expandedRows);
+                              next.add(i);
+                              setExpandedRows(next);
+                            }}
+                          >
+                            +{remaining} Others
+                          </button>
+                        )}
+                        {isExpanded && users.length > 2 && (
+                          <button
+                            type="button"
+                            className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full hover:bg-gray-200"
+                            onClick={() => {
+                              const next = new Set(expandedRows);
+                              next.delete(i);
+                              setExpandedRows(next);
+                            }}
+                          >
+                            Show Less
+                          </button>
                         )}
                       </div>
                     )}
