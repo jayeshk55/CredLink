@@ -36,6 +36,7 @@ export async function GET(request: Request) {
           const payload = JSON.stringify({
             stats: {
               totalUsers: data.stats.totalUsers,
+              newUsers: data.stats.newUsers,
               newUsersThisMonth: (data as any)?.stats?.newUsersThisMonth ?? 0,
               newUsersThisWeek: data.stats.newUsers ?? 0,
               activeCities: (data as any)?.stats?.activeCities ?? 0,
