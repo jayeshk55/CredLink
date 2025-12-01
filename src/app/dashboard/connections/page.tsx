@@ -82,6 +82,11 @@ export default function DashboardContactPage() {
   const [hasUnreadRequests, setHasUnreadRequests] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     setHasUnreadRequests(connectionRequests.length > 0 && activeTab !== 'requests');
   }, [connectionRequests, activeTab]);

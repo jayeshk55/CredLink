@@ -82,7 +82,12 @@ export default function DashboardLayout({
         {/* Main Page Area */}
         <main 
           className="flex-1 overflow-y-auto"
-          style={mainStyle}
+          style={{
+            ...mainStyle,
+            background: pathname === "/dashboard/search" 
+              ? "linear-gradient(180deg,#f6fafb,#eef5f7)" 
+              : mainStyle.background
+          }}
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}

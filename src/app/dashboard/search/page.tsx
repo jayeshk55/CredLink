@@ -63,6 +63,10 @@ function SearchPageContent() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
@@ -171,7 +175,7 @@ function SearchPageContent() {
   }, [query, profiles]);
 
   return (
-    <div style={{ position: "relative", overflow: "visible", minHeight: "100vh", background: "linear-gradient(180deg,#f6fafb,#eef5f7)" }}>
+    <div style={{ position: "relative", overflow: "visible", minHeight: "100vh" }}>
       <div aria-hidden style={{
         position: "absolute",
         inset: 0,

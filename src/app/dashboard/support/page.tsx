@@ -32,6 +32,11 @@ export default function SupportPage() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [formData, setFormData] = useState({ name: "", email: "", topic: "", message: "" });
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Format steps like "1) Do this 2) Do that" into separate lines
   const formatAnswer = (text: string) => {
     return text.replace(/(\d\))/g, "\n$1").trim();

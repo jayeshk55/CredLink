@@ -37,6 +37,11 @@ export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Fetch contacts from API
   useEffect(() => {
     const fetchContacts = async () => {

@@ -35,6 +35,11 @@ function useWindowWidth(breakpoint = 760) {
 export default function AccountSettingsPage(): React.JSX.Element {
   const { checkAuth } = useAuth();
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // profile state
   const [accountPhoto, setAccountPhoto] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
