@@ -25,6 +25,12 @@ const EditPage = () => {
   const cardId = searchParams.get('id');
   
   const [activeTab, setActiveTab] = useState('Display');
+
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
   const [selectedColor2, setSelectedColor2] = useState('#145dfd');
   const [firstName, setFirstName] = useState('');

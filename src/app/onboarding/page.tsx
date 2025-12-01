@@ -642,7 +642,7 @@ const OnboardingPage: React.FC = () => {
             )}
             {step === 5 && (
               <input
-                placeholder="Company (e.g., BoostNow LLP)"
+                placeholder="Company (e.g., xyz company)"
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                 onFocus={() => setFocusedInput('company')}

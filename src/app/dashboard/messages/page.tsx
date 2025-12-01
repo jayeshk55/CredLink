@@ -49,6 +49,11 @@ export default function MessagesPage() {
   const [chatUpdateTrigger, setChatUpdateTrigger] = useState(0);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleConversationScroll = () => {
     const container = conversationRef.current;
     if (!container) return;

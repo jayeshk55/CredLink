@@ -6,6 +6,7 @@
   background-color: var(--color-background);
   min-height: 100vh;
   padding-top: 1.5rem; /* h-6 equivalent */
+  padding-bottom: 5rem; /* Add margin bottom to match dashboard page */
 }
 
 .contentWrapper {
