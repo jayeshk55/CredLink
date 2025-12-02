@@ -941,7 +941,7 @@ export default function MessagesPage() {
                           cursor: "pointer",
                           padding: "4px",
                           marginLeft: "auto",
-                          opacity: hoveredId === m.id ? 1 : 0,
+                          opacity: 1,
                           transition: "opacity 0.2s",
                         }}
                       >
