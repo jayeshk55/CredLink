@@ -50,8 +50,9 @@ export default function DashboardLayout({
   const isSearchPage = pathname === "/dashboard/search";
   const isNotificationsPage = pathname === "/dashboard/notifications";
   const isMessagesPage = pathname === "/dashboard/messages";
+  const isConnectionsPage = pathname === "/dashboard/connections";
 
-  const shouldSkipPadding = isMobile && (isCreateOrEditPage || isContactsPage || isSearchPage || isNotificationsPage || isMessagesPage);
+  const shouldSkipPadding = isMobile && (isCreateOrEditPage || isContactsPage || isSearchPage || isNotificationsPage || isMessagesPage || isConnectionsPage);
   const mainStyle: React.CSSProperties = shouldSkipPadding
     ? { background: "transparent" }
     : {
@@ -82,7 +83,12 @@ export default function DashboardLayout({
         {/* Main Page Area */}
         <main 
           className="flex-1 overflow-y-auto"
-          style={mainStyle}
+          style={{
+            ...mainStyle,
+            background: pathname === "/dashboard/search" 
+              ? "linear-gradient(180deg,#f6fafb,#eef5f7)" 
+              : mainStyle.background
+          }}
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}

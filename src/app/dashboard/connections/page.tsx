@@ -82,6 +82,11 @@ export default function DashboardContactPage() {
   const [hasUnreadRequests, setHasUnreadRequests] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     setHasUnreadRequests(connectionRequests.length > 0 && activeTab !== 'requests');
   }, [connectionRequests, activeTab]);
@@ -962,7 +967,7 @@ export default function DashboardContactPage() {
                                   style={{
                                     display: 'block',
                                     maxWidth: '320px',
-                                    whiteSpace: 'nowrap',
+                                   whiteSpace: 'normal',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     textAlign: 'left'
@@ -991,10 +996,10 @@ export default function DashboardContactPage() {
                           </td>
 
                           <td className={styles.tableDataCell}>
-                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</span>
+                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 180,whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</span>
                           </td>
                           <td className={styles.tableDataCell}>
-                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 220, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.company || '').trim()}</span>
+                            <span className={styles.tableCellText} style={{ display: 'block', maxWidth: 220,whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.company || '').trim()}</span>
                           </td>
                           <td className={styles.tableDataDate}>
                             <span>{contact.dateAdded}</span>
@@ -1076,20 +1081,20 @@ export default function DashboardContactPage() {
                                     {(contact.name || '').trim()}
                                   </h3>
                                   {contact.title && (
-                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</p>
+                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240,whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>{(contact.title || '').trim()}</p>
                                   )}
                                   {(contact.company || contact.location) && (
-                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>
+                                    <p className={styles.mobileCardSubtitle} style={{ display: 'block', maxWidth: 240,whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'left' }}>
                                       {[(contact.company || '').trim(), (contact.location || '').trim()]
                                         .filter(Boolean)
                                         .join(' • ')}
                                     </p>
                                   )}
-                                  {contact.phone && (
+                                 {/* {contact.phone && (
                                     <p className={styles.mobileCardSubtitle}>
                                       {contact.phone}
                                     </p>
-                                  )}
+                                  )} */}
                                 </div>
                               </div>
                               <div className={styles.mobileCardActions}>
@@ -1228,7 +1233,7 @@ export default function DashboardContactPage() {
                                       margin: 0,
                                       lineHeight: 1.2,
                                       fontWeight: 600,
-                                      whiteSpace: 'nowrap',
+                                     whiteSpace: 'normal',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       padding: 0,
@@ -1240,7 +1245,7 @@ export default function DashboardContactPage() {
                                     className={styles.cardTitle}
                                     style={{
                                       margin: '2px 0 0',
-                                      whiteSpace: 'nowrap',
+                                   whiteSpace: 'normal',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       padding: 0,
@@ -1252,7 +1257,7 @@ export default function DashboardContactPage() {
                                     className={styles.cardCompany}
                                     style={{
                                       margin: '2px 0 0',
-                                      whiteSpace: 'nowrap',
+                                     whiteSpace: 'normal',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       padding: 0,

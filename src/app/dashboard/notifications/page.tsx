@@ -16,6 +16,11 @@ export default function NotificationsPage() {
   const [clearedIds, setClearedIds] = useState<string[]>([]);
   const [sort, setSort] = useState<"latest" | "oldest">("latest");
 
+  // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const displayed = useMemo(() => {
     const clearedSet = new Set(clearedIds || []);
     const arr = items.filter((n) => !clearedSet.has(n.id));
