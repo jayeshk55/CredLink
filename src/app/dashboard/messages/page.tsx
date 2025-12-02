@@ -43,11 +43,14 @@ export default function MessagesPage() {
   const [replyText, setReplyText] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const conversationRef = useRef<HTMLDivElement | null>(null);
+  const composerInputRef = useRef<HTMLInputElement | null>(null);
+
   const [activeFilter, setActiveFilter] = useState<"All" | "Unread" | "Replied">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [chatUpdateTrigger, setChatUpdateTrigger] = useState(0);
   const [isNearBottom, setIsNearBottom] = useState(true);
+  const [showReplyLabel, setShowReplyLabel] = useState(true);
 
   const handleConversationScroll = () => {
     const container = conversationRef.current;
@@ -951,7 +954,17 @@ export default function MessagesPage() {
 
       {/* --- Detail View Overlay --- */}
       {activeMessage && (
-        <div style={styles.detailOverlay}>
+        <div
+          style={styles.detailOverlay}
+          onClick={(e) => {
+            // Desktop: click on dimmed background closes chat
+            if (isMobile) return;
+            if (e.target === e.currentTarget) {
+              setDetailId(null);
+              setReplyId(null);
+            }
+          }}
+        >
           <div style={styles.detailPanel}>
             
             {/* Chat Header */}
@@ -989,17 +1002,6 @@ export default function MessagesPage() {
                   )}
                 </div>
               </div>
-              <button 
-                onClick={() => setDetailId(null)} 
-                style={{ 
-                  background: "transparent", 
-                  border: "none", 
-                  cursor: "pointer", 
-                  color: colors.textLight 
-                }}
-              >
-                <X style={{ width: "20px", height: "20px" }} />
-              </button>
             </div>
 
             {/* Conversation */}
@@ -1059,16 +1061,42 @@ export default function MessagesPage() {
             {/* Composer */}
             <div style={styles.composer}>
               <div style={styles.composerInputContainer}>
-                <textarea
-                  value={replyText}
-                  onChange={e => setReplyText(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (replyText.trim()) sendReply(); }}}
-                  placeholder="Type your reply..."
-                  style={styles.textarea}
-                  rows={1}
-                />
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 8px 8px 12px" }}>
-                  <span style={{ fontSize: "11px", color: colors.textLight }}>Enter to send</span>
+                <div style={{ display: "flex", alignItems: "center", padding: "8px 12px", gap: "8px" }}>
+                  {showReplyLabel && (
+                    <span 
+                      style={{ fontSize: "14px", color: colors.textLight, flexShrink: 0, cursor: "pointer" }}
+                      onClick={() => {
+                        setShowReplyLabel(false);
+                        if (composerInputRef.current) {
+                          composerInputRef.current.focus();
+                        }
+                      }}
+                    >
+                      Type your reply
+                    </span>
+                  )}
+                  <input
+                    ref={composerInputRef}
+                    type="text"
+                    value={replyText}
+                    onChange={e => setReplyText(e.target.value)}
+                    onFocus={() => setShowReplyLabel(false)}
+                    onBlur={() => {
+                      if (!replyText.trim()) {
+                        setShowReplyLabel(true);
+                      }
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (replyText.trim()) sendReply(); }}}
+                    style={{
+                      flex: 1,
+                      backgroundColor: "transparent",
+                      border: "none",
+                      outline: "none",
+                      fontSize: "14px",
+                      color: colors.textMain,
+                      fontFamily: "inherit"
+                    }}
+                  />
                   <button
                     onClick={sendReply}
                     disabled={!replyText.trim()}
