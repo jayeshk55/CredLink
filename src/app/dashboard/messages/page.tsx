@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { Search, X, Trash2, Send, ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -35,7 +35,7 @@ interface MessageItem {
   incomingCount: number;
 }
 
-export default function MessagesPage() {
+function MessagesPageContent() {
   // --- Logic & State ---
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
@@ -1156,5 +1156,14 @@ export default function MessagesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Main wrapper component with Suspense boundary
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: "#64748B" }}>Loading messages...</div>}>
+      <MessagesPageContent />
+    </Suspense>
   );
 }
