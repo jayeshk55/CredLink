@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X, Trash2, Send, ChevronLeft } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // --- Types ---
 type MessageStatus = "New" | "Read" | "Replied" | "Pending" | "Archived" | "Deleted";
@@ -51,6 +52,31 @@ export default function MessagesPage() {
   const [chatUpdateTrigger, setChatUpdateTrigger] = useState(0);
   const [isNearBottom, setIsNearBottom] = useState(true);
   const [showReplyLabel, setShowReplyLabel] = useState(true);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const chatFromUrl = searchParams.get("chat");
+
+  const buildMessagesUrl = (chatId: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (chatId) {
+      params.set("chat", chatId);
+    } else {
+      params.delete("chat");
+    }
+    const query = params.toString();
+    return query ? `/dashboard/messages?${query}` : "/dashboard/messages";
+  };
+
+  useEffect(() => {
+    if (chatFromUrl) {
+      setDetailId(chatFromUrl);
+      setReplyId(chatFromUrl);
+    } else {
+      setDetailId(null);
+      setReplyId(null);
+    }
+  }, [chatFromUrl]);
 
   // Force scroll to top on mount to fix refresh scroll offset and ensure header stays fixed
   useEffect(() => {
@@ -387,8 +413,19 @@ export default function MessagesPage() {
       window.dispatchEvent(new Event('messages-updated'));
       window.dispatchEvent(new Event('message-read'));
     }
+    const url = buildMessagesUrl(senderId);
+    router.push(url, { scroll: false });
     setDetailId(senderId);
     setReplyId(senderId);
+  };
+
+  const closeDetail = () => {
+    setDetailId(null);
+    setReplyId(null);
+    if (typeof window !== 'undefined' && chatFromUrl) {
+      const url = buildMessagesUrl(null);
+      router.replace(url, { scroll: false });
+    }
   };
 
   const deleteMessage = (senderId: string) => {
@@ -401,8 +438,7 @@ export default function MessagesPage() {
     
     // Close detail view if this conversation was open
     if (detailId === senderId) {
-      setDetailId(null);
-      setReplyId(null);
+      closeDetail();
     }
 
     // Delete entire conversation from database
@@ -731,7 +767,7 @@ export default function MessagesPage() {
       backgroundColor: "#F8FAFC",
       border: `1px solid ${colors.border}`,
       borderRadius: "16px",
-      padding: "4px",
+      padding: "4px 10px 4px 12px",
       transition: "border 0.2s",
     },
     textarea: {
@@ -750,12 +786,17 @@ export default function MessagesPage() {
       backgroundColor: disabled ? "#E2E8F0" : colors.primary,
       color: disabled ? "#94A3B8" : "#FFFFFF",
       border: "none",
-      borderRadius: "12px",
-      padding: "8px 12px",
+      width: 40,
+      height: 40,
+      minWidth: 40,
+      minHeight: 40,
+      borderRadius: 9999,
+      padding: 0,
       cursor: disabled ? "not-allowed" : "pointer",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      flexShrink: 0,
       transition: "all 0.2s",
     }),
   };
@@ -965,8 +1006,7 @@ export default function MessagesPage() {
             // Desktop: click on dimmed background closes chat
             if (isMobile) return;
             if (e.target === e.currentTarget) {
-              setDetailId(null);
-              setReplyId(null);
+              closeDetail();
             }
           }}
         >
@@ -976,7 +1016,7 @@ export default function MessagesPage() {
             <div style={styles.chatHeader}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 {isMobile && (
-                  <button onClick={() => setDetailId(null)} style={{ background: "transparent", border: "none", padding: "4px", cursor: "pointer" }}>
+                  <button onClick={closeDetail} style={{ background: "transparent", border: "none", padding: "4px", cursor: "pointer" }}>
                     <ChevronLeft style={{ color: colors.textSec }} />
                   </button>
                 )}
