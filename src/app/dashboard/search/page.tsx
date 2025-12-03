@@ -186,9 +186,9 @@ function SearchPageContent() {
 
       <style>{`
         /* Core responsive & futuristic styles inline so you can paste this file directly */
-        .wrap { position: relative; z-index: 10; max-width: 1200px; margin: 18px auto; padding: 28px; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+        .wrap { position: relative; z-index: 10; max-width: 1200px;padding: 28px; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
         .header { display:flex; flex-direction: column; align-items:center; gap:8px; text-align:center; margin-bottom: 12px; }
-        .title { font-size:28px; font-weight:700; color:#111827; line-height:1.05; margin:0; text-align:center; }
+        .title { font-size:28px; font-weight:700; color:#111827; line-height:1.05; margin-top:6px; text-align:center; }
         .subtitle { color:#9ca3af; font-size:14px; line-height:1.4; max-width: 600px; margin: 0 auto; letter-spacing: 0.3px; }
         .search-panel { margin-top:18px; background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius:14px; padding:14px; border:1px solid rgba(0,0,0,0.04); box-shadow: 0 10px 30px rgba(2,6,23,0.08); overflow: visible; }
 

@@ -94,7 +94,7 @@ export default function NotificationsPage() {
   return (
     <div style={{ padding: '16px 16px 120px' }}>
       <h1 style={{ 
-        fontSize: '28px', 
+        fontSize: '24px', 
         fontWeight: 700, 
         color: '#111827', 
         marginBottom: 8,
@@ -105,7 +105,7 @@ export default function NotificationsPage() {
         Notifications
       </h1>
       <p style={{ 
-        fontSize: '14px', 
+        fontSize: '12px', 
         color: "#6b7280", 
         marginBottom: 12,
         textAlign: 'center',

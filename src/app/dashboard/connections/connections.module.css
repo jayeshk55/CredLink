@@ -126,10 +126,10 @@
 }
 
 .pageTitle {
-  font-size: 24px; /* text-2xl */
+  font-size: 24px; /* match Contacts heading */
   font-weight: bold;
   color: #111827; /* text-gray-900 */
-  margin-bottom: 4px; /* tighter */
+  margin: 0;
   letter-spacing: -0.025em; /* tracking-tight */
   text-align: center;
   width: 100%;
@@ -2076,7 +2076,7 @@
 
 .requestName {
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  margin: 0;
   font-size: 0.875rem;
   color: #111827;
 }
@@ -2195,7 +2195,7 @@
 
 /* PAGE TOP PADDING REMOVE + BOTTOM PADDING ADD */
 .heroSection {
-  padding-top: 0 !important;
+  padding-top: 4px !important;
 }
 
 .minHScreen {
@@ -2203,7 +2203,7 @@
 }
 @media (max-width: 639px) {
   .heroSection {
-    padding: 0 !important;  /* completely remove top padding on mobile */
+    padding: 8px 12px !important;  /* align with contacts page */
   }
 }
 
