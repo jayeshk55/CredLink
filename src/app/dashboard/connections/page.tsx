@@ -292,10 +292,11 @@ export default function DashboardContactPage() {
 
   // Handle showing contact info
   const handleContactInfo = (contactId: string, type: 'phone' | 'email') => {
-    setShowContactInfo(prev => ({
-      ...prev,
-      [contactId]: { type: prev[contactId]?.type === type ? null : type }
-    }));
+    setShowContactInfo(prev => {
+      const current = prev[contactId]?.type;
+      const next = current === type ? null : type;
+      return { ...prev, [contactId]: { type: next } };
+    });
   };
 
   // Handle delete connection
@@ -1290,7 +1291,9 @@ export default function DashboardContactPage() {
                                   {showContactInfo[contact.id]?.type && (
                                     <div className={styles.quickInfoBox}>
                                       <p className={styles.quickInfoText}>
-                                        {showContactInfo[contact.id]?.type === 'phone' ? contact.phone : contact.email}
+                                        {showContactInfo[contact.id]?.type === 'phone'
+                                          ? (contact.phone || 'Phone not available')
+                                          : (contact.email || 'Email not available')}
                                       </p>
                                     </div>
                                   )}
