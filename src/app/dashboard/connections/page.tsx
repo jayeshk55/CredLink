@@ -1140,8 +1140,10 @@ export default function DashboardContactPage() {
                             </div>
 
                             {/* Contact Info Display for Mobile */}
-                            {showContactInfo[contact.id]?.type && (
-                              <div className={styles.mobileContactInfoBox}>
+                        {!isSmallScreen && showContactInfo[contact.id]?.type && (
+  <div className={styles.mobileContactInfoBox}>
+
+
                                 <div className={styles.mobileContactInfoText}>
                                   <span className={styles.mobileContactInfoLabel}>
                                     {showContactInfo[contact.id]?.type === 'phone' ? 'Phone: ' : 'Email: '}
@@ -1164,13 +1166,22 @@ export default function DashboardContactPage() {
               /* Cards View */
               <div className={styles.cardsViewContainer}>
                 <div className={styles.cardsWrapper}>
-                  <div className={styles.cardsGrid}>
+                  <div className={styles.cardsGrid} onClick={() => setHoveredCard(null)}>
                     {sortedContacts.map((contact, index) => (
                       <div
                         key={contact.id}
                         className={styles.cardGroup}
-                        onMouseEnter={() => setHoveredCard(contact.id)}
-                        onMouseLeave={() => setHoveredCard(null)}
+                        onClick={(e) => {
+                          const target = e.target as HTMLElement;
+                          if (target.closest(`.${styles.quickActionBtn}`) || target.closest(`.${styles.quickInfoBox}`)) {
+                            e.stopPropagation();
+                            return;
+                            // Clicked inside quick-action area or info display; do not flip
+                            return;
+                          }
+                          e.stopPropagation();
+                          setHoveredCard(prev => prev === contact.id ? null : contact.id);
+                        }}
                       >
                         {/* Card Container with 3D Flip Effect */}
                         <div className={styles.flipCardContainer}>
