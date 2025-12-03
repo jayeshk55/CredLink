@@ -1132,7 +1132,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-   text-align: left !important;
+  text-align: left !important;
 }
 
 .mobileDateText {
@@ -1159,10 +1159,9 @@
 }
 
 .mobileContactInfoValue {
-    white-space: normal !important;
+  white-space: normal !important;
   color: #4b5563;
-    word-break: break-word;
-
+  word-break: break-word;
 }
 
 /* --- Cards View --- */
@@ -1378,7 +1377,7 @@
   text-align: left; /* left align */
   position: relative;
   z-index: 10;
-   overflow: visible !important;
+  overflow: visible !important;
   min-height: 0;
 }
 
@@ -1691,9 +1690,9 @@
 }
 
 .quickHeader {
-  text-align: left; /* left align header text */
+  text-align: center; /* center align header text */
   margin-bottom: 10px;
-  align-self: flex-start; /* keep other items centered while header aligns left */
+  align-self: center; /* keep header centered horizontally */
   width: 100%;
 }
 
@@ -1702,30 +1701,32 @@
   font-size: 18px; /* slightly smaller on base */
   line-height: 1.25;
   margin-bottom: 8px;
-  text-align: left;
+  text-align: center;
 }
 
 .quickSubtitle {
   color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
-  text-align: left;
+  text-align: center;
 }
 
 .quickInfoBox {
-  margin-top: 12px;
-  padding: 8px 12px;
+  margin-top: 8px;
+  padding: 6px 10px;
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   max-width: 100%;
+  text-align: center;
 }
 
 .quickInfoText {
   color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   overflow-wrap: anywhere; /* wrap long emails */
+  text-align: center;
 }
 
 .quickActionsOrbit {
@@ -1768,7 +1769,6 @@
 
 .quickActionBtn:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
   box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
@@ -1806,6 +1806,8 @@
   .quickActionBtn {
     width: 36px;
     height: 36px;
+    position: static; /* keep buttons in normal flow on mobile */
+    transform: none; /* prevent out-of-bounds transforms */
   }
   .quickActionIcon {
     width: 14px;
@@ -1813,6 +1815,12 @@
   }
   .quickActionsRow {
     gap: 10px;
+  }
+  .quickActionTop,
+  .quickActionLeft,
+  .quickActionRight {
+    position: static;
+    transform: none;
   }
 }
 
@@ -1824,6 +1832,8 @@
   .quickActionBtn {
     width: 40px;
     height: 40px;
+    position: static; /* keep buttons in normal flow on mobile */
+    transform: none; /* prevent out-of-bounds transforms */
   }
   .quickActionIcon {
     width: 16px;
@@ -1831,6 +1841,12 @@
   }
   .quickActionsRow {
     gap: 12px;
+  }
+  .quickActionTop,
+  .quickActionLeft,
+  .quickActionRight {
+    position: static;
+    transform: none;
   }
 }
 
