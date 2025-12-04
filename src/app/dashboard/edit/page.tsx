@@ -7,6 +7,7 @@ import DigitalCardPreviewComponent from '@/components/cards/DigitalCardPreview';
 import FlatCardPreviewComponent from '@/components/cards/FlatCardPreview';
 import ModernCardPreviewComponent from '@/components/cards/ModernCardPreview';
 import SleekCardPreviewComponent from '@/components/cards/SleekCardPreview';
+import LocationSelect from "@/components/LocationSelect";
 
 // ====================================================================
 // START: EditPage Component
@@ -1371,24 +1372,11 @@ const EditPage = () => {
             {/* Location Field */}
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Location</label>
-              <input
-                type="text"
+              <LocationSelect
                 value={cardLocation}
-                onChange={(e) => setCardLocation(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '14px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  boxSizing: 'border-box',
-                  backgroundColor: 'white',
-                  color: '#555',
-                  outline: 'none'
-                }}
+                onChange={(loc: string) => setCardLocation(loc)}
               />
             </div>
-            
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea

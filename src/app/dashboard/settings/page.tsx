@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import "./account-settings.css";
+import LocationSelect from "@/components/LocationSelect";
 
 /**
  * Account Settings Page
@@ -831,22 +832,21 @@ return (
               />
             </div>
           </div>
+          
+{/* Location row */}
+<div className={`form-row ${isMobile ? 'mobile' : ''}`}>
+  <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Location</label>
+  <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
+    <LocationSelect
+      value={userLocation}
+      onChange={(loc: string) => {
+        setUserLocation(loc);
+        updateLocationInDatabase(loc); // save instantly
+      }}
+    />
+  </div>
+</div>
 
-          {/* Location row */}
-          <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
-            <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Location</label>
-            <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
-              <input
-                value={userLocation}
-                onChange={(e) => setUserLocation(e.target.value)}
-                onFocus={() => setFocusedInput("location")}
-                onBlur={() => { setFocusedInput(null); updateLocationInDatabase(userLocation); }}
-                className={`form-input ${isMobile ? 'mobile' : ''}`}
-                aria-label="Location"
-                suppressHydrationWarning
-              />
-            </div>
-          </div>
 
           {/* Phone Number row */}
           <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
