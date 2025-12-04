@@ -7,6 +7,7 @@ import DigitalCardPreviewComponent from '@/components/cards/DigitalCardPreview';
 import FlatCardPreviewComponent from '@/components/cards/FlatCardPreview';
 import ModernCardPreviewComponent from '@/components/cards/ModernCardPreview';
 import SleekCardPreviewComponent from '@/components/cards/SleekCardPreview';
+import LocationSelect from "@/components/LocationSelect";
 
 // ====================================================================
 // START: EditPage Component
@@ -1105,7 +1106,7 @@ const EditPage = () => {
               { label: 'Full Name', value: firstName, setter: setFirstName },
               { label: 'Title', value: title, setter: setTitle },
               { label: 'Company', value: company, setter: setCompany },
-              { label: 'Location', value: cardLocation, setter: setCardLocation }
+            //  { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>{field.label}</label>
@@ -1127,6 +1128,25 @@ const EditPage = () => {
                 />
               </div>
             ))}
+{/* Location must be OUTSIDE map */}
+<div style={{ marginBottom: "15px" }}>
+  <label
+    style={{
+      display: "block",
+      fontSize: "13px",
+      color: "#555",
+      marginBottom: "5px",
+    }}
+  >
+    Location
+  </label>
+
+  <LocationSelect
+    value={cardLocation}
+    onChange={(loc: string) => setCardLocation(loc)}
+  />
+</div>
+
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea

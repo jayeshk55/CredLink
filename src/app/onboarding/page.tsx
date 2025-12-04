@@ -4,6 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { set } from "zod";
 import ClassicDigitalCardPreview from "@/components/cards/DigitalCardPreview";
+//import indianCities from "@/data/indianCities";
+import { City, State } from "country-state-city";
+import LocationSelect from "@/components/LocationSelect";
+
+
+
 
 /* -------------------------------------------------
    COLORS & STYLES
@@ -115,6 +121,8 @@ const OnboardingPage: React.FC = () => {
   });
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [isLargeScreen, setIsLargeScreen] = useState(true);
+  
+
 
   // Check authentication on mount
   useEffect(() => {
@@ -280,6 +288,7 @@ const OnboardingPage: React.FC = () => {
     router.push('/dashboard');
   };
 
+  
   /* -------------------------------------------------
      RESPONSIVE STYLES
      ------------------------------------------------- */
@@ -359,6 +368,8 @@ const OnboardingPage: React.FC = () => {
     color: '#1F2937',
     ...(focusedInput === id ? { borderBottom: `2px solid ${colors.primary}` } : {}),
   });
+
+  
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
@@ -650,16 +661,16 @@ const OnboardingPage: React.FC = () => {
                 style={inputStyle('company')}
               />
             )}
-            {step === 6 && (
-              <input
-                placeholder="Mumbai"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                onFocus={() => setFocusedInput('location')}
-                onBlur={() => setFocusedInput(null)}
-                style={inputStyle('location')}
-              />
-            )}
+
+
+        {step === 6 && (
+  <LocationSelect
+    value={formData.location}
+    onChange={(loc) => setFormData({ ...formData, location: loc })}
+  />
+)}
+
+
             {step === 7 && (
               <div style={{ textAlign: 'center' }}>
                 <input
