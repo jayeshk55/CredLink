@@ -126,10 +126,10 @@
 }
 
 .pageTitle {
-  font-size: 24px; /* match Contacts heading */
+  font-size: 24px; /* text-2xl */
   font-weight: bold;
   color: #111827; /* text-gray-900 */
-  margin: 0;
+  margin-bottom: 4px; /* tighter */
   letter-spacing: -0.025em; /* tracking-tight */
   text-align: center;
   width: 100%;
@@ -1226,19 +1226,19 @@
 .flipCardContainer {
   position: relative;
   width: 100%;
-  height: 175px; /* reduced height for mobile */
+  height: 165px; /* further reduced for mobile */
   perspective: 1000px;
 }
 
 @media (min-width: 640px) {
   .flipCardContainer {
-    height: 200px; /* adjusted for tablet */
+    height: 190px; /* reduced for tablet */
   }
 }
 
 @media (min-width: 1024px) {
   .flipCardContainer {
-    height: 256px; /* lg:h-64 */
+    height: 220px; /* reduced for desktop */
   }
 }
 
@@ -2076,7 +2076,7 @@
 
 .requestName {
   font-weight: 500;
-  margin: 0;
+  margin-bottom: 0.25rem;
   font-size: 0.875rem;
   color: #111827;
 }
@@ -2195,7 +2195,7 @@
 
 /* PAGE TOP PADDING REMOVE + BOTTOM PADDING ADD */
 .heroSection {
-  padding-top: 4px !important;
+  padding-top: 0 !important;
 }
 
 .minHScreen {
@@ -2203,7 +2203,16 @@
 }
 @media (max-width: 639px) {
   .heroSection {
-    padding: 8px 12px !important;  /* align with contacts page */
+    padding: 0 !important;  /* completely remove top padding on mobile */
+  }
+
+  /* Reduce mobile card height */
+  .mobileCard {
+    padding: 12px;
+  }
+
+  .mobileCardsList {
+    gap: 8px; /* tighter vertical space between cards */
   }
 }
 

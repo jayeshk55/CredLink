@@ -279,6 +279,12 @@ export default function UsersPage() {
       {/* ===== Header ===== */}
       <div className={styles.header}>
         <h1>User Management</h1>
+        <div className={styles.statsContainer}>
+          <div className={styles.statCard}>
+            <div className={styles.statNumber}>{users.length}</div>
+            <div className={styles.statLabel}>Total Users</div>
+          </div>
+        </div>
       </div>
 
       {/* ===== Filters ===== */}
