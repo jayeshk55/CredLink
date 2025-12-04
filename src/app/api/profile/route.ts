@@ -92,6 +92,8 @@ export async function PUT(request: NextRequest) {
         fullName: true,
         phone: true,
         location: true,
+        company: true,
+        title: true,
         profileImage: true,
         createdAt: true,
         updatedAt: true

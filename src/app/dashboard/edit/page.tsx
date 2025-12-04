@@ -91,6 +91,10 @@ const EditPage = () => {
   const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
   const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(true);
+
   const hexToRgb = (hex: string) => {
     if (!hex || hex.length < 4) hex = '#145DFD';
     const bigint = parseInt(hex.slice(1), 16);
@@ -135,6 +139,23 @@ const EditPage = () => {
       setHexValue2(selectedColor2);
     }
   }, [selectedColor2]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     const fetchCardData = async () => {
@@ -326,6 +347,69 @@ const EditPage = () => {
     setBValue2(newRgb.b);
     setSelectedColor2(hex);
   };
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleTitleSelect = (selectedTitle: string) => {
+    if (selectedTitle === 'CUSTOM') {
+      setIsCustomTitle(true);
+      setTitle('');
+    } else {
+      setIsCustomTitle(false);
+      setTitle(selectedTitle);
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const professionalTitles = [
+    "Software Engineer",
+    "Product Manager", 
+    "UX Designer",
+    "UI Designer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Mobile Developer",
+    "Data Scientist",
+    "Data Analyst",
+    "Marketing Manager",
+    "Digital Marketer",
+    "Content Creator",
+    "Social Media Manager",
+    "Business Analyst",
+    "Project Manager",
+    "Consultant",
+    "Entrepreneur",
+    "Founder",
+    "CEO",
+    "CTO",
+    "CFO",
+    "COO",
+    "Sales Manager",
+    "Account Manager",
+    "HR Manager",
+    "Recruiter",
+    "Teacher",
+    "Professor",
+    "Doctor",
+    "Lawyer",
+    "Architect",
+    "Graphic Designer",
+    "Photographer",
+    "Videographer",
+    "Writer",
+    "Editor",
+    "Journalist",
+    "Researcher",
+    "Engineer",
+    "Manager",
+    "Director",
+    "Coordinator",
+    "Specialist",
+    "CUSTOM"
+  ];
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -1102,51 +1186,197 @@ const EditPage = () => {
         return (
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
-            {[
-              { label: 'Full Name', value: firstName, setter: setFirstName },
-              { label: 'Title', value: title, setter: setTitle },
-              { label: 'Company', value: company, setter: setCompany },
-            //  { label: 'Location', value: cardLocation, setter: setCardLocation }
-            ].map(field => (
-              <div key={field.label} style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>{field.label}</label>
-                <input
-                  type="text"
-                  value={field.value}
-                  onChange={(e) => field.setter(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    fontSize: '14px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    boxSizing: 'border-box',
-                    backgroundColor: field.label === 'Full Name' ? '#f8f8f8' : 'white',
-                    color: '#555',
-                    outline: 'none'
-                  }}
-                />
+            
+            {/* Full Name Field */}
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Full Name</label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  boxSizing: 'border-box',
+                  backgroundColor: '#f8f8f8',
+                  color: '#555',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            {/* Title Field with Custom Dropdown */}
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Title</label>
+              <div className="dropdown-container" style={{ position: 'relative' }}>
+                {!isCustomTitle ? (
+                  <>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        onFocus={handleDropdownToggle}
+                        placeholder="Select or enter title..."
+                        readOnly={title !== '' && !isDropdownOpen}
+                        style={{
+                          width: '100%',
+                          padding: '10px 30px 10px 10px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '8px',
+                          boxSizing: 'border-box',
+                          backgroundColor: title !== '' && !isDropdownOpen ? '#f8f8f8' : 'white',
+                          color: '#555',
+                          outline: 'none',
+                          cursor: title !== '' && !isDropdownOpen ? 'default' : 'pointer'
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          color: '#6B7280'
+                        }}
+                      >
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+                    {isDropdownOpen && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '0',
+                          right: '0',
+                          backgroundColor: '#ffffff',
+                          border: '2px solid #D1D5DB',
+                          borderTop: 'none',
+                          borderRadius: '0 0 8px 8px',
+                          maxHeight: isLargeScreen ? '200px' : '150px',
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                        }}
+                      >
+                        {professionalTitles.map((titleOption, index) => (
+                          <div
+                            key={index}
+                            onClick={() => handleTitleSelect(titleOption)}
+                            style={{
+                              padding: isLargeScreen ? '12px 16px' : '14px 16px',
+                              cursor: 'pointer',
+                              fontSize: isLargeScreen ? '16px' : '14px',
+                              color: '#1F2937',
+                              borderBottom: index < professionalTitles.length - 1 ? '1px solid #E5E7EB' : 'none',
+                              backgroundColor: titleOption === 'CUSTOM' ? '#F9FAFB' : '#ffffff',
+                              fontWeight: titleOption === 'CUSTOM' ? '600' : 'normal',
+                              // Mobile touch optimization
+                              ...(isLargeScreen ? {} : {
+                                minHeight: '44px',
+                                display: 'flex',
+                                alignItems: 'center',
+                              }),
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.backgroundColor = titleOption === 'CUSTOM' ? '#F3F4F6' : '#F9FAFB';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.backgroundColor = titleOption === 'CUSTOM' ? '#F9FAFB' : '#ffffff';
+                            }}
+                          >
+                            {titleOption}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Enter custom title..."
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        backgroundColor: 'white',
+                        color: '#555',
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        setIsCustomTitle(false);
+                        setIsDropdownOpen(true);
+                      }}
+                      style={{
+                        marginTop: '5px',
+                        padding: '5px 10px',
+                        fontSize: '12px',
+                        backgroundColor: '#6B7280',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ← Back to list
+                    </button>
+                  </div>
+                )}
               </div>
-            ))}
-{/* Location must be OUTSIDE map */}
-<div style={{ marginBottom: "15px" }}>
-  <label
-    style={{
-      display: "block",
-      fontSize: "13px",
-      color: "#555",
-      marginBottom: "5px",
-    }}
-  >
-    Location
-  </label>
+            </div>
 
-  <LocationSelect
-    value={cardLocation}
-    onChange={(loc: string) => setCardLocation(loc)}
-  />
-</div>
+            {/* Company Field */}
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Company</label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  boxSizing: 'border-box',
+                  backgroundColor: 'white',
+                  color: '#555',
+                  outline: 'none'
+                }}
+              />
+            </div>
 
+            {/* Location Field */}
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Location</label>
+              <LocationSelect
+                value={cardLocation}
+                onChange={(loc: string) => setCardLocation(loc)}
+              />
+            </div>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea

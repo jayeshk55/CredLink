@@ -46,6 +46,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [userLocation, setUserLocation] = useState<string>("");
   const [company, setCompany] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [isCustomTitle, setIsCustomTitle] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isLargeScreen, setIsLargeScreen] = useState<boolean>(true);
 
   // Fetch basic user data on mount (name/email)
   useEffect(() => {
@@ -166,7 +169,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  // responsive
   const { width, isMobile } = useWindowWidth(760);
 
   // focus UI states for inputs
@@ -195,11 +197,39 @@ export default function AccountSettingsPage(): React.JSX.Element {
     fetchUserProfile();
   }, []);
 
-  // Send OTP function
- {/* const handleSendOTP = () => {
-    toast.success("OTP sent to " + phoneNumber);
-    setShowOtpModal(true);
-  };
+  // Refresh data when page becomes visible (when user navigates back to this page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const fetchUserProfile = async () => {
+          try {
+            const res = await fetch("/api/profile", { credentials: "include" });
+            if (!res.ok) return;
+            const data = await res.json();
+            const user = data.user ?? {};
+            setName(user.fullName ?? "");
+            setEmail(user.email ?? "");
+            setPhoneNumber(user.phone ?? "");
+            setUserLocation(user.location ?? "");
+            setCompany(user.company ?? "");
+            setTitle(user.title ?? "");
+            setAccountPhoto(user.profileImage ?? null);
+            setHasPassword(user.hasPassword ?? true);
+          } catch (err) {
+            console.error("Failed to refresh user profile:", err);
+          }
+        };
+        fetchUserProfile();
+      }
+    };
+
+    // Listen for page visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   // OTP verification function
   const handleVerifyOTP = (otpValue: string) => {
@@ -212,7 +242,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
       toast.error("Wrong OTP entered. Please try again.");
     }, 1000);
   };
-*/}
+
   // Handle phone number editing
   const handleEditPhone = () => {
     setTempPhoneNumber(phoneNumber);
@@ -243,7 +273,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
       if (res.ok) {
         setPhoneNumber(tempPhoneNumber);
         setIsEditingPhone(false);
-        // setIsPhoneVerified(false);
         toast.success("Phone number updated successfully");
       } else {
         toast.error("Failed to update phone number");
@@ -393,6 +422,89 @@ export default function AccountSettingsPage(): React.JSX.Element {
       return false;
     }
   };
+
+  // Dropdown handlers for title field
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleTitleSelect = (selectedTitle: string) => {
+    if (selectedTitle === 'CUSTOM') {
+      setIsCustomTitle(true);
+      setTitle('');
+    } else {
+      setIsCustomTitle(false);
+      setTitle(selectedTitle);
+      updateTitleInDatabase(selectedTitle);
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const professionalTitles = [
+    "Software Engineer",
+    "Product Manager", 
+    "UX Designer",
+    "UI Designer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Mobile Developer",
+    "Data Scientist",
+    "Data Analyst",
+    "Marketing Manager",
+    "Digital Marketer",
+    "Content Creator",
+    "Social Media Manager",
+    "Business Analyst",
+    "Project Manager",
+    "Consultant",
+    "Entrepreneur",
+    "Founder",
+    "CEO",
+    "CTO",
+    "CFO",
+    "COO",
+    "Sales Manager",
+    "Account Manager",
+    "HR Manager",
+    "Recruiter",
+    "Teacher",
+    "Professor",
+    "Doctor",
+    "Lawyer",
+    "Architect",
+    "Graphic Designer",
+    "Photographer",
+    "Videographer",
+    "Writer",
+    "Editor",
+    "Journalist",
+    "Researcher",
+    "Engineer",
+    "Manager",
+    "Director",
+    "Coordinator",
+    "Specialist",
+    "CUSTOM"
+  ];
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const changePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -553,15 +665,155 @@ return (
           <div className={`form-row ${isMobile ? 'mobile' : ''}`}>
             <label className={`form-label ${isMobile ? 'mobile' : ''}`}>Title</label>
             <div className={`form-control ${isMobile ? 'mobile' : ''}`}>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onFocus={() => setFocusedInput("title")}
-                onBlur={() => { setFocusedInput(null); updateTitleInDatabase(title); }}
-                className={`form-input ${isMobile ? 'mobile' : ''}`}
-                aria-label="Title"
-                suppressHydrationWarning
-              />
+              <div className="dropdown-container" style={{ position: 'relative' }}>
+                {!isCustomTitle ? (
+                  <>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        value={title}
+                        onChange={(e) => {
+                          // Allow typing only when field is empty or in custom mode
+                          // Prevent manual editing of predefined titles
+                          if (!title || isCustomTitle) {
+                            setTitle(e.target.value);
+                          }
+                        }}
+                        onFocus={() => {
+                          // Always allow dropdown to open, even when title is selected
+                          handleDropdownToggle();
+                        }}
+                        placeholder="Select or enter title..."
+                        readOnly={title !== '' && !isCustomTitle}
+                        className={`form-input ${isMobile ? 'mobile' : ''}`}
+                        aria-label="Title"
+                        suppressHydrationWarning
+                        style={{
+                          width: '100%',
+                          padding: '8px 30px 8px 8px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          boxSizing: 'border-box',
+                          backgroundColor: title !== '' && !isDropdownOpen ? '#f8f8f8' : 'white',
+                          color: '#555',
+                          outline: 'none',
+                          cursor: title !== '' && !isDropdownOpen ? 'default' : 'pointer'
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          color: '#6B7280'
+                        }}
+                      >
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+                    {isDropdownOpen && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '0',
+                          right: '0',
+                          backgroundColor: '#ffffff',
+                          border: '2px solid #D1D5DB',
+                          borderTop: 'none',
+                          borderRadius: '0 0 8px 8px',
+                          maxHeight: isLargeScreen ? '200px' : '150px',
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                        }}
+                      >
+                        {professionalTitles.map((titleOption, index) => (
+                          <div
+                            key={index}
+                            onClick={() => handleTitleSelect(titleOption)}
+                            style={{
+                              padding: isLargeScreen ? '12px 16px' : '14px 16px',
+                              cursor: 'pointer',
+                              fontSize: isLargeScreen ? '16px' : '14px',
+                              color: '#1F2937',
+                              borderBottom: index < professionalTitles.length - 1 ? '1px solid #E5E7EB' : 'none',
+                              backgroundColor: titleOption === 'CUSTOM' ? '#F9FAFB' : '#ffffff',
+                              fontWeight: titleOption === 'CUSTOM' ? '600' : 'normal',
+                              // Mobile touch optimization
+                              ...(isLargeScreen ? {} : {
+                                minHeight: '44px',
+                                display: 'flex',
+                                alignItems: 'center',
+                              }),
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.backgroundColor = titleOption === 'CUSTOM' ? '#F3F4F6' : '#F9FAFB';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.backgroundColor = titleOption === 'CUSTOM' ? '#F9FAFB' : '#ffffff';
+                            }}
+                          >
+                            {titleOption}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div>
+                    <input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      onBlur={() => updateTitleInDatabase(title)}
+                      placeholder="Enter custom title..."
+                      className={`form-input ${isMobile ? 'mobile' : ''}`}
+                      aria-label="Title"
+                      suppressHydrationWarning
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        boxSizing: 'border-box',
+                        backgroundColor: 'white',
+                        color: '#555',
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        setIsCustomTitle(false);
+                        setIsDropdownOpen(true);
+                      }}
+                      style={{
+                        marginTop: '5px',
+                        padding: '5px 10px',
+                        fontSize: '12px',
+                        backgroundColor: '#6B7280',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ← Back to list
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

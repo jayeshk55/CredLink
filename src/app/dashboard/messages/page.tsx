@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, Suspense } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X, Trash2, Send, ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -35,7 +35,7 @@ interface MessageItem {
   incomingCount: number;
 }
 
-function MessagesPageContent() {
+export default function MessagesPage() {
   // --- Logic & State ---
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
@@ -759,15 +759,20 @@ function MessagesPageContent() {
       overflowWrap: "break-word" as const,
     },
     composer: {
-      padding: "12px 16px", // reduced composer padding
+      padding: isMobile ? "8px 8px" : "12px 16px", // reduced composer padding
       borderTop: `1px solid ${colors.border}`,
       backgroundColor: "#FFFFFF",
+      width: "100%",
+      boxSizing: "border-box" as const,
     },
     composerInputContainer: {
       backgroundColor: "#F8FAFC",
       border: `1px solid ${colors.border}`,
       borderRadius: "16px",
-      padding: "4px 10px 4px 12px",
+      padding: isMobile ? "4px 8px 4px 10px" : "4px 10px 4px 12px",
+      width: "100%",
+      maxWidth: "100%",
+      boxSizing: "border-box" as const,
       transition: "border 0.2s",
     },
     textarea: {
@@ -1106,7 +1111,7 @@ function MessagesPageContent() {
             {/* Composer */}
             <div style={styles.composer}>
               <div style={styles.composerInputContainer}>
-                <div style={{ display: "flex", alignItems: "center", padding: "8px 12px", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", padding: "8px 12px", gap: "8px", width: "100%", boxSizing: "border-box" }}>
                   {showReplyLabel && (
                     <span 
                       style={{ fontSize: "14px", color: colors.textLight, flexShrink: 0, cursor: "pointer" }}
@@ -1156,14 +1161,5 @@ function MessagesPageContent() {
         </div>
       )}
     </div>
-  );
-}
-
-// Main wrapper component with Suspense boundary
-export default function MessagesPage() {
-  return (
-    <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: "#64748B" }}>Loading messages...</div>}>
-      <MessagesPageContent />
-    </Suspense>
   );
 }

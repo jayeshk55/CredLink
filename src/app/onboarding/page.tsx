@@ -121,8 +121,8 @@ const OnboardingPage: React.FC = () => {
   });
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [isLargeScreen, setIsLargeScreen] = useState(true);
-  
-
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Check authentication on mount
   useEffect(() => {
@@ -154,6 +154,20 @@ const OnboardingPage: React.FC = () => {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.dropdown-container')) {
+          setIsDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -288,7 +302,81 @@ const OnboardingPage: React.FC = () => {
     router.push('/dashboard');
   };
 
-  
+  const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === 'CUSTOM') {
+      setIsCustomTitle(true);
+      setFormData({ ...formData, title: '' });
+    } else {
+      setIsCustomTitle(false);
+      setFormData({ ...formData, title: value });
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleTitleSelect = (title: string) => {
+    if (title === 'CUSTOM') {
+      setIsCustomTitle(true);
+      setFormData({ ...formData, title: '' });
+    } else {
+      setIsCustomTitle(false);
+      setFormData({ ...formData, title: title });
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const professionalTitles = [
+    "Software Engineer",
+    "Product Manager", 
+    "UX Designer",
+    "UI Designer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Mobile Developer",
+    "Data Scientist",
+    "Data Analyst",
+    "Marketing Manager",
+    "Digital Marketer",
+    "Content Creator",
+    "Social Media Manager",
+    "Business Analyst",
+    "Project Manager",
+    "Consultant",
+    "Entrepreneur",
+    "Founder",
+    "CEO",
+    "CTO",
+    "CFO",
+    "COO",
+    "Sales Manager",
+    "Account Manager",
+    "HR Manager",
+    "Recruiter",
+    "Teacher",
+    "Professor",
+    "Doctor",
+    "Lawyer",
+    "Architect",
+    "Graphic Designer",
+    "Photographer",
+    "Videographer",
+    "Writer",
+    "Editor",
+    "Journalist",
+    "Researcher",
+    "Engineer",
+    "Manager",
+    "Director",
+    "Coordinator",
+    "Specialist",
+    "CUSTOM"
+  ];
+
   /* -------------------------------------------------
      RESPONSIVE STYLES
      ------------------------------------------------- */
@@ -642,14 +730,117 @@ const OnboardingPage: React.FC = () => {
               />
             )}
             {step === 4 && (
-              <input
-                placeholder="Digital Marketer & Creator"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                onFocus={() => setFocusedInput('title')}
-                onBlur={() => setFocusedInput(null)}
-                style={inputStyle('title')}
-              />
+              <>
+                {!isCustomTitle ? (
+                  <div className="dropdown-container" style={{ position: 'relative', marginBottom: '24px' }}>
+                    <div
+                      onClick={handleDropdownToggle}
+                      style={{
+                        ...inputStyle('title'),
+                        padding: '8px 32px 8px 0',
+                        marginBottom: '0',
+                        cursor: 'pointer',
+                        backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236B7280\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 8px center',
+                        backgroundSize: '20px',
+                        position: 'relative',
+                        userSelect: 'none',
+                      }}
+                    >
+                      {formData.title || 'Select your professional title'}
+                    </div>
+                    
+                    {isDropdownOpen && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '0',
+                          right: '0',
+                          backgroundColor: '#ffffff',
+                          border: '2px solid #D1D5DB',
+                          borderTop: 'none',
+                          borderRadius: '0 0 8px 8px',
+                          maxHeight: isLargeScreen ? '200px' : '150px',
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                        }}
+                      >
+                        {professionalTitles.map((title, index) => (
+                          <div
+                            key={index}
+                            onClick={() => handleTitleSelect(title)}
+                            style={{
+                              padding: isLargeScreen ? '12px 16px' : '14px 16px',
+                              cursor: 'pointer',
+                              fontSize: isLargeScreen ? '16px' : '14px',
+                              color: '#1F2937',
+                              borderBottom: index < professionalTitles.length - 1 ? '1px solid #E5E7EB' : 'none',
+                              backgroundColor: title === 'CUSTOM' ? '#F9FAFB' : '#ffffff',
+                              fontWeight: title === 'CUSTOM' ? '600' : 'normal',
+                              // Mobile touch optimization
+                              ...(isLargeScreen ? {} : {
+                                minHeight: '44px',
+                                display: 'flex',
+                                alignItems: 'center',
+                              }),
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.backgroundColor = title === 'CUSTOM' ? '#F3F4F6' : '#F9FAFB';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.backgroundColor = title === 'CUSTOM' ? '#F9FAFB' : '#ffffff';
+                            }}
+                          >
+                            {title === 'CUSTOM' ? 'Enter custom title...' : title}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      placeholder="Enter your professional title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      onFocus={() => setFocusedInput('title')}
+                      onBlur={() => setFocusedInput(null)}
+                      style={inputStyle('title')}
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => {
+                        setIsCustomTitle(false);
+                        setFormData({ ...formData, title: '' });
+                      }}
+                      style={{
+                        position: 'absolute',
+                        right: '0',
+                        top: '8px',
+                        background: 'none',
+                        border: 'none',
+                        color: '#6B7280',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        transition: 'background-color 200ms',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F3F4F6';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'none';
+                      }}
+                    >
+                      ← Back to list
+                    </button>
+                  </div>
+                )}
+              </>
             )}
             {step === 5 && (
               <input
