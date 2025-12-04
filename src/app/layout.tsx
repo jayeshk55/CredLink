@@ -5,7 +5,7 @@ import { ToastProvider } from "@/components/providers/toast-provider";
 import FirebaseConfigProvider from "@/components/FirebaseConfigProvider";
 import "./globals.css";
 
-const poppins = Poppins({
+const poppins= Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default  function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
