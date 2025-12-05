@@ -15,9 +15,29 @@ const poppins= Poppins({
 
 export const metadata: Metadata = {
   title: "MyKard",
-  description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
+  description:
+    "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
   icons: {
-    icon: '/icon.png',
+    icon: [
+      {
+        url: "/assets/mykard.png",
+        type: "image/png",
+        sizes: "any",
+      },
+      {
+        url: "/assets/mykard.png",
+        rel: "shortcut icon",
+        type: "image/png",
+        sizes: "any",
+      },
+    ],
+    apple: [
+      {
+        url: "/assets/mykard.png",
+        sizes: "any",
+        type: "image/png",
+      },
+    ],
   },
 };
 
