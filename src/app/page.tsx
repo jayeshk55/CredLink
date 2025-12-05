@@ -17,6 +17,13 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (isLoading) return
+    if (isAuthenticated) {
+      router.replace("/dashboard")
+    }
+  }, [isAuthenticated, isLoading, router])
+
   // If redirected from another page with a target section, scroll to it smoothly
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -45,8 +52,9 @@ export default function Home() {
     }
   }, [])
 
-  // Don't auto-redirect - let users navigate manually
-  // The header will show "Dashboard" button if authenticated
+  if (isAuthenticated) {
+    return null
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

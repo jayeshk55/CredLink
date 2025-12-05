@@ -12,36 +12,19 @@ const poppins= Poppins({
   display: "swap",
 });
 
-
 export const metadata: Metadata = {
   title: "MyKard",
-  description:
-    "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
+  description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
   icons: {
     icon: [
-      {
-        url: "/assets/mykard.png",
-        type: "image/png",
-        sizes: "any",
-      },
-      {
-        url: "/assets/mykard.png",
-        rel: "shortcut icon",
-        type: "image/png",
-        sizes: "any",
-      },
+      { url: "/assets/my1.png", rel: "icon", type: "image/png" },
+      { url: "/assets/my1.png", rel: "shortcut icon", type: "image/png" },
     ],
-    apple: [
-      {
-        url: "/assets/mykard.png",
-        sizes: "any",
-        type: "image/png",
-      },
-    ],
+    apple: [{ url: "/assets/my1.png", rel: "apple-touch-icon", type: "image/png" }],
   },
 };
 
-export default  function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
