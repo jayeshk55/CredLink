@@ -349,6 +349,10 @@ const EditPage = () => {
   };
 
   const handleDropdownToggle = () => {
+    // When opening dropdown, show all titles by clearing search term
+    if (!isDropdownOpen) {
+      setTitleSearchTerm('');
+    }
     setIsDropdownOpen(!isDropdownOpen);
   };
 
@@ -363,62 +367,58 @@ const EditPage = () => {
     setIsDropdownOpen(false);
   };
 
-  const professionalTitles = [
-    "Software Engineer",
-    "Product Manager", 
-    "UX Designer",
-    "UI Designer",
-    "Full Stack Developer",
-    "Frontend Developer",
-    "Backend Developer",
-    "Mobile Developer",
-    "Data Scientist",
-    "Data Analyst",
-    "Marketing Manager",
-    "Digital Marketer",
-    "Content Creator",
-    "Social Media Manager",
-    "Business Analyst",
-    "Project Manager",
-    "Consultant",
-    "Entrepreneur",
-    "Founder",
-    "CEO",
-    "CTO",
-    "CFO",
-    "COO",
-    "Sales Manager",
-    "Account Manager",
-    "HR Manager",
-    "Recruiter",
-    "Teacher",
-    "Professor",
-    "Doctor",
-    "Lawyer",
-    "Architect",
-    "Graphic Designer",
-    "Photographer",
-    "Videographer",
-    "Writer",
-    "Editor",
-    "Journalist",
-    "Researcher",
-    "Engineer",
-    "Manager",
-    "Director",
-    "Coordinator",
-    "Specialist",
-    "CUSTOM"
-  ];
+  const [professionalTitles, setProfessionalTitles] = useState<string[]>([]);
+  const [filteredTitles, setFilteredTitles] = useState<string[]>([]);
+  const [titleSearchTerm, setTitleSearchTerm] = useState('');
 
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
-  };
+  // Load professions from CSV on component mount
+  useEffect(() => {
+    const loadProfessions = async () => {
+      try {
+        const response = await fetch('/assets/all_professions.csv');
+        const csvText = await response.text();
+        const professions = csvText
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .sort();
+        console.log('Loaded professions:', professions.length, 'items');
+        setProfessionalTitles([...professions, 'CUSTOM']);
+        setFilteredTitles([...professions, 'CUSTOM']);
+      } catch (error) {
+        console.error('Error loading professions:', error);
+        // Fallback to basic titles if CSV fails to load
+        const fallbackTitles = [
+          "Software Engineer", "Product Manager", "UX Designer", "UI Designer",
+          "Full Stack Developer", "Frontend Developer", "Backend Developer",
+          "Mobile Developer", "Data Scientist", "Data Analyst", "Marketing Manager",
+          "Digital Marketer", "Content Creator", "Social Media Manager",
+          "Business Analyst", "Project Manager", "Consultant", "Entrepreneur",
+          "Founder", "CEO", "CTO", "CFO", "COO", "Sales Manager",
+          "Account Manager", "HR Manager", "Recruiter", "Teacher", "Professor",
+          "Doctor", "Lawyer", "Architect", "Graphic Designer", "Photographer",
+          "Videographer", "Writer", "Editor", "Journalist", "Researcher",
+          "Engineer", "Manager", "Director", "Coordinator", "Specialist", "CUSTOM"
+        ];
+        setProfessionalTitles(fallbackTitles);
+        setFilteredTitles(fallbackTitles);
+      }
+    };
+    loadProfessions();
+  }, []);
+
+  // Filter titles based on search term
+  useEffect(() => {
+    if (titleSearchTerm.trim() === '') {
+      // Show all titles when search is empty
+      setFilteredTitles(professionalTitles);
+    } else {
+      const filtered = professionalTitles.filter(title =>
+        title.toLowerCase().includes(titleSearchTerm.toLowerCase())
+      );
+      setFilteredTitles(filtered);
+    }
+  }, [titleSearchTerm, professionalTitles]);
 
   const handleAddField = () => {
     if (newFieldName.trim()) {
@@ -1218,10 +1218,12 @@ const EditPage = () => {
                       <input
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e) => {
+                          setTitle(e.target.value);
+                          setTitleSearchTerm(e.target.value);
+                        }}
                         onFocus={handleDropdownToggle}
-                        placeholder="Select or enter title..."
-                        readOnly={title !== '' && !isDropdownOpen}
+                        placeholder="Search or select title..."
                         style={{
                           width: '100%',
                           padding: '10px 30px 10px 10px',
@@ -1229,10 +1231,10 @@ const EditPage = () => {
                           border: '1px solid #ddd',
                           borderRadius: '8px',
                           boxSizing: 'border-box',
-                          backgroundColor: title !== '' && !isDropdownOpen ? '#f8f8f8' : 'white',
+                          backgroundColor: 'white',
                           color: '#555',
                           outline: 'none',
-                          cursor: title !== '' && !isDropdownOpen ? 'default' : 'pointer'
+                          cursor: 'pointer'
                         }}
                       />
                       <svg
@@ -1274,7 +1276,7 @@ const EditPage = () => {
                           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                         }}
                       >
-                        {professionalTitles.map((titleOption, index) => (
+                        {filteredTitles.map((titleOption, index) => (
                           <div
                             key={index}
                             onClick={() => handleTitleSelect(titleOption)}
@@ -1283,7 +1285,7 @@ const EditPage = () => {
                               cursor: 'pointer',
                               fontSize: isLargeScreen ? '16px' : '14px',
                               color: '#1F2937',
-                              borderBottom: index < professionalTitles.length - 1 ? '1px solid #E5E7EB' : 'none',
+                              borderBottom: index < filteredTitles.length - 1 ? '1px solid #E5E7EB' : 'none',
                               backgroundColor: titleOption === 'CUSTOM' ? '#F9FAFB' : '#ffffff',
                               fontWeight: titleOption === 'CUSTOM' ? '600' : 'normal',
                               // Mobile touch optimization
