@@ -5,19 +5,22 @@ import { ToastProvider } from "@/components/providers/toast-provider";
 import FirebaseConfigProvider from "@/components/FirebaseConfigProvider";
 import "./globals.css";
 
-const poppins = Poppins({
+const poppins= Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
-
 export const metadata: Metadata = {
   title: "MyKard",
   description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
   icons: {
-    icon: '/icon.png',
+    icon: [
+      { url: "/assets/my1.png", rel: "icon", type: "image/png" },
+      { url: "/assets/my1.png", rel: "shortcut icon", type: "image/png" },
+    ],
+    apple: [{ url: "/assets/my1.png", rel: "apple-touch-icon", type: "image/png" }],
   },
 };
 

@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
     '/faq',
     '/terms',
     '/privacy',
-    '/admin/login',
+    '/admin/access/secure-4095',
     '/cards/public/*',
     '/api/message/receive',
     '/api/message/send'
@@ -108,7 +108,7 @@ export function middleware(request: NextRequest) {
   // Redirect logic
   if (!isApiRequest) {
     // Always allow auth pages and explicit public pages
-    if (isAuthPath || isPublicPath) {
+    if (isPublicPath || isAuthPath) {
       return NextResponse.next({
         request: {
           headers: requestHeaders,
@@ -116,10 +116,11 @@ export function middleware(request: NextRequest) {
       })
     }
 
-    // Admin routes require admin token
-    if (isAdminPath) {
+    // Admin routes require admin token (but exclude the secure login path)
+    if (isAdminPath && path !== '/admin/access/secure-4095') {
       if (!hasAdminToken) {
-        return NextResponse.redirect(new URL('/admin/login', request.url))
+        // Block access to admin routes entirely - return 403 Forbidden
+        return new NextResponse('Access Denied', { status: 403 })
       }
       return NextResponse.next({
         request: {

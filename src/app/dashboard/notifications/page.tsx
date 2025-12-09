@@ -92,7 +92,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div style={{ padding: '16px 16px 120px' }}>
+    <div style={{ padding: '6px 16px 120px' }}>
       <h1 style={{ 
         fontSize: '24px', 
         fontWeight: 700, 
