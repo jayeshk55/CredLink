@@ -119,8 +119,8 @@ export function middleware(request: NextRequest) {
     // Admin routes require admin token (but exclude the secure login path)
     if (isAdminPath && path !== '/admin/access/secure-4095') {
       if (!hasAdminToken) {
-        // Block access to admin routes entirely - return 403 Forbidden
-        return new NextResponse('Access Denied', { status: 403 })
+        // Mask admin routes without auth by surfacing a 404 experience
+        return NextResponse.rewrite(new URL('/404', request.url), { status: 404 })
       }
       return NextResponse.next({
         request: {
